@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@tailwind utilities;
+
+:root {
+  --color-primary: #212121; /* xanh dương */
+  --color-yellow: #FFEB3B; /* cam */
+  --color-blue: #0D47A1; /* xanh ngọc */
+  --color-gray: #9E9E9E; /* xám */
+}
+
+.logo{
+   font-family: "Playfair", serif;
+  font-weight: 500;
+    color: #E27E6A
+}
+
+/* ✅ BƯỚC 5: CSS cho các mũi tên điều hướng tùy chỉnh */
+
+/* Định vị và style cơ bản cho cả hai nút */
+.swiper-button-prev-custom,
+.swiper-button-next-custom {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%); /* Căn giữa theo chiều dọc */
+    z-index: 10;
+    width: 32px;  /* Kích thước nhỏ gọn */
+    height: 32px; /* Kích thước nhỏ gọn */
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4A4A4A; /* Màu icon mũi tên */
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.swiper-button-prev-custom:hover,
+.swiper-button-next-custom:hover {
+    background-color: #f3f4f6; /* Màu nền xám nhẹ khi hover */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Định vị cụ thể cho từng nút */
+.swiper-button-prev-custom {
+    left: -20px;
+}
+
+.swiper-button-next-custom {
+    right: -20px;
+}
+
+/* Style cho icon mũi tên bên trong (sử dụng pseudo-element của Swiper) */
+.swiper-button-prev-custom::after,
+.swiper-button-next-custom::after {
+    font-family: 'swiper-icons';
+    font-size: 12px;  /* Kích thước icon nhỏ */
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Chỉnh sửa nội dung mặc định của icon */
+.swiper-button-prev-custom::after {
+    content: 'prev';
+}
+
+.swiper-button-next-custom::after {
+    content: 'next';
+}
+
+/* Style khi nút bị vô hiệu hóa (khi slider ở đầu hoặc cuối) */
+.swiper-button-prev-custom.swiper-button-disabled,
+.swiper-button-next-custom.swiper-button-disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
