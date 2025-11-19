@@ -1,36 +1,23 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, CircularProgress, TextField } from '@mui/material'
 import { useFormik } from 'formik'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { sendLoginSignupOtp } from '../../../State/AuthSlice'
 import { useAppDispatch } from '../../../State/Store'
-import { sellerLogin } from '../../../State/seller/sellerAuthSlice'
 
-const SellerLoginForm = () => {
+const RegisterForm = () => {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
-
   const [isOtpSent, setIsOtpSent] = useState(false)
   const [isSendingOtp, setIsSendingOtp] = useState(false)
 
   const formik = useFormik({
     initialValues: {
       email: '',
-      otp: ''
+      otp: '',
+      fullName: ''
     },
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
-      setSubmitting(true)
-      try {
-        await dispatch(sellerLogin(values)).unwrap()
-        alert('Login Success')
-        navigate('/seller')
-      } catch (error: any) {
-        setFieldError('otp', 'Wrong OTP or Email') // Hiển thị error đúng lúc
-      } finally {
-        setSubmitting(false)
-      }
+    onSubmit: values => {
+      console.log('form data', values)
     }
   })
 
@@ -55,8 +42,7 @@ const SellerLoginForm = () => {
 
   return (
     <div>
-      <h1 className="text-center font-bold text-3xl pb-5">Login as Seller</h1>
-
+      <h1 className="text-center font-bold text-xl text-[#E27E6A] pb-8">Sign Up</h1>
       <form onSubmit={formik.handleSubmit} className="space-y-6" noValidate>
         {!isOtpSent ? (
           <div className="space-y-6 flex flex-col gap-6">
@@ -127,6 +113,17 @@ const SellerLoginForm = () => {
                 }
               }}
             />
+            <TextField
+              fullWidth
+              name="fullName"
+              label="Full Name"
+              value={formik.values.fullName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+              helperText={formik.touched.fullName && formik.errors.fullName}
+              disabled={isSendingOtp}
+            />
 
             <Button
               type="submit"
@@ -138,7 +135,7 @@ const SellerLoginForm = () => {
               {formik.isSubmitting ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
-                'Verify & Login'
+                'Sign Up'
               )}
             </Button>
           </div>
@@ -148,4 +145,4 @@ const SellerLoginForm = () => {
   )
 }
 
-export default SellerLoginForm
+export default RegisterForm

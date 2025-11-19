@@ -1,52 +1,52 @@
 .card {
-    position: relative;
-    width: 100%; /* <-- THAY ĐỔI 1: Co giãn theo chiều rộng của ô grid */
-    aspect-ratio: 3 / 4; /* <-- THAY ĐỔI 2: Giữ tỷ lệ khung hình 3:4 */
-    overflow: hidden;
+  position: relative;
+  width: 100%; /* <-- THAY ĐỔI 1: Co giãn theo chiều rộng của ô grid */
+  aspect-ratio: 3 / 4; /* <-- THAY ĐỔI 2: Giữ tỷ lệ khung hình 3:4 */
+  overflow: hidden;
 }
 
 .card-media {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transition: transform .5s ease-in-out;
-    cursor: pointer;
-    object-fit: cover; /* Giữ nguyên */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+  cursor: pointer;
+  object-fit: cover; /* Giữ nguyên */
 }
 
-.indicator{
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
+.indicator {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-.indicator-button{
-    width: 10px;
-    height: 10px;
-    background-color: aliceblue;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
+.indicator-button {
+  width: 10px;
+  height: 10px;
+  background-color: aliceblue;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
-.indicator-button.active{
-    background-color: gray;
+.indicator-button.active {
+  background-color: gray;
 }
 
 .thin-line-through {
-    text-decoration: line-through;
-    text-decoration-thickness: 1px;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
 }
 
-.group-hover-effect{
-    padding: 1rem;
-    transition: transform 0.3s;
+.group-hover-effect {
+  padding: 1rem;
+  transition: transform 0.3s;
 }
 
-.group:hover .group-hover-effect{
-    transform: translateY(0.25rem);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.group:hover .group-hover-effect {
+  transform: translateY(0.25rem);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

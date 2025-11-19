@@ -1,36 +1,39 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, CircularProgress, TextField } from '@mui/material'
 import { useFormik } from 'formik'
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { sendLoginSignupOtp } from '../../../State/AuthSlice'
-import { useAppDispatch } from '../../../State/Store'
-import { sellerLogin } from '../../../State/seller/sellerAuthSlice'
+// Nhớ import resetAuth từ slice
+import { resetAuth, sendLoginSignupOtp, signing } from '../../../State/AuthSlice'
+import { useAppDispatch, useAppSelector } from '../../../State/Store'
 
-const SellerLoginForm = () => {
+const LoginForm = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const { auth } = useAppSelector(store => store)
 
-  const [isOtpSent, setIsOtpSent] = useState(false)
-  const [isSendingOtp, setIsSendingOtp] = useState(false)
+  // 1. Tự động chuyển hướng khi isLoggedIn = true
+  useEffect(() => {
+    if (auth.isLoggedIn) {
+      navigate('/')
+    }
+  }, [auth.isLoggedIn, navigate])
+
+  // 2. Reset state (loading, error, otpSent) khi rời khỏi trang Login
+  useEffect(() => {
+    return () => {
+      dispatch(resetAuth())
+    }
+  }, [dispatch])
 
   const formik = useFormik({
     initialValues: {
       email: '',
       otp: ''
     },
-    onSubmit: async (values, { setSubmitting, setFieldError }) => {
-      setSubmitting(true)
-      try {
-        await dispatch(sellerLogin(values)).unwrap()
-        alert('Login Success')
-        navigate('/seller')
-      } catch (error: any) {
-        setFieldError('otp', 'Wrong OTP or Email') // Hiển thị error đúng lúc
-      } finally {
-        setSubmitting(false)
-      }
+    onSubmit: values => {
+      // Formik submit chỉ dùng để gọi hàm Login (Signing)
+      dispatch(signing(values))
     }
   })
 
@@ -41,24 +44,27 @@ const SellerLoginForm = () => {
       return
     }
 
-    setIsSendingOtp(true)
+    // Không cần setIsSendingOtp, Redux sẽ tự set auth.loading = true khi action này chạy
     try {
       await dispatch(sendLoginSignupOtp({ email: formik.values.email })).unwrap()
-      setIsOtpSent(true)
     } catch (error: any) {
       console.error('Failed to send OTP:', error)
-      formik.setFieldError('email', 'Wrong OTP or Email')
-    } finally {
-      setIsSendingOtp(false)
+      formik.setFieldError('email', 'Failed to send OTP')
     }
+  }
+
+  // Hàm xử lý khi bấm "Change email"
+  const handleChangeEmail = () => {
+    dispatch(resetAuth()) // Reset otpSent về false thông qua Redux Action
+    formik.setFieldValue('otp', '') // Xóa giá trị OTP trong form
   }
 
   return (
     <div>
-      <h1 className="text-center font-bold text-3xl pb-5">Login as Seller</h1>
-
+      <h1 className="text-center font-bold text-xl text-[#E27E6A] pb-8">Login</h1>
       <form onSubmit={formik.handleSubmit} className="space-y-6" noValidate>
-        {!isOtpSent ? (
+        {/* LOGIC HIỂN THỊ: Dựa hoàn toàn vào auth.otpSent */}
+        {!auth.otpSent ? (
           <div className="space-y-6 flex flex-col gap-6">
             <TextField
               fullWidth
@@ -70,20 +76,18 @@ const SellerLoginForm = () => {
               onBlur={formik.handleBlur}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
-              disabled={isSendingOtp}
+              // Disabled khi đang loading (gửi OTP hoặc Login)
+              disabled={auth.loading}
             />
 
             <Button
               variant="contained"
-              onClick={handleSendOtp}
-              disabled={isSendingOtp}
+              onClick={handleSendOtp} // Nút này gọi hàm gửi OTP riêng
+              disabled={auth.loading} // Disable khi đang loading
               className="w-full flex justify-center rounded-lg text-white py-4"
-              sx={{
-                py: '11px', // Tăng chiều cao
-                color: 'white' // Màu chữ trắng
-              }}
+              sx={{ py: '11px', color: 'white' }}
             >
-              {isSendingOtp ? <CircularProgress size={28} color="inherit" /> : 'Send OTP'}
+              {auth.loading ? <CircularProgress size={28} color="inherit" /> : 'Send OTP'}
             </Button>
           </div>
         ) : (
@@ -91,21 +95,21 @@ const SellerLoginForm = () => {
             <div className="text-center">
               <p className="text-sm text-gray-600">An OTP has been sent to</p>
               <p className="font-semibold text-gray-800">{formik.values.email}</p>
+
               <Button
                 variant="text"
-                className="text-sm text-white hover:text-indigo-500 mt-1 normal-case"
-                onClick={() => {
-                  setIsOtpSent(false)
-                  formik.setFieldValue('otp', '')
-                }}
-                disabled={formik.isSubmitting}
+                className="text-sm text-primary hover:underline mt-1 normal-case"
+                onClick={handleChangeEmail} // Gọi hàm reset thông qua Redux
+                disabled={auth.loading}
               >
                 (Change email)
               </Button>
             </div>
+
             <p className="font-medium text-sm opacity-60">
               Enter OTP sent to your email !
             </p>
+
             <TextField
               fullWidth
               id="otp"
@@ -116,7 +120,7 @@ const SellerLoginForm = () => {
               onBlur={formik.handleBlur}
               error={formik.touched.otp && Boolean(formik.errors.otp)}
               helperText={formik.touched.otp && formik.errors.otp}
-              disabled={formik.isSubmitting}
+              disabled={auth.loading}
               inputProps={{
                 maxLength: 6,
                 style: {
@@ -129,13 +133,13 @@ const SellerLoginForm = () => {
             />
 
             <Button
-              type="submit"
+              type="submit" // Nút này kích hoạt formik.onSubmit (Login)
               variant="contained"
-              disabled={formik.isSubmitting}
+              disabled={auth.loading}
               className="w-full flex justify-center py-3 rounded-lg"
-              sx={{ py: '11px' }} // Tăng chiều cao
+              sx={{ py: '11px' }}
             >
-              {formik.isSubmitting ? (
+              {auth.loading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
                 'Verify & Login'
@@ -148,4 +152,4 @@ const SellerLoginForm = () => {
   )
 }
 
-export default SellerLoginForm
+export default LoginForm
