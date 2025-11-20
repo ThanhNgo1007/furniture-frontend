@@ -1,6 +1,8 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux'
 import authSlice from './AuthSlice'
+import cartSlice from './customer/cartSlice'
+import orderSlice from './customer/orderSlice'
 import productSlice from './customer/ProductSlice'
 import sellerProductSlice from './seller/sellerProductSlice'
 import sellerSlice from './seller/sellerSlice'
@@ -11,7 +13,9 @@ const rootReducer = combineReducers({
   //Store seller products
   sellerProduct: sellerProductSlice,
   product: productSlice,
-  auth: authSlice
+  auth: authSlice,
+  cart: cartSlice,
+  order: orderSlice
 })
 
 const store = configureStore({

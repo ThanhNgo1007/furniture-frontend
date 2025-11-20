@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Box, Button, FormControl, FormControlLabel, FormLabel, Modal, Radio, RadioGroup, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import AddressCard from './AddressCard'
-import AddressForm from './AddressForm';
-import PricingCard from '../Cart/PricingCard';
 import { Add } from '@mui/icons-material';
-import { object } from 'yup';
+import { Box, Button, FormControlLabel, Modal, Radio, RadioGroup } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useAppDispatch } from '../../../State/Store';
+import { fetchUserCart } from '../../../State/customer/cartSlice';
+import PricingCard from '../Cart/PricingCard';
+import AddressCard from './AddressCard';
+import AddressForm from './AddressForm';
 
 const style = {
   position: 'absolute',
@@ -26,6 +27,11 @@ const paymentGatewayList=[
         image: "https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760982183/cod_tgv7da.jpg",
         label: ""
     },
+    {
+        value: "VNPAY",
+        image: "https://res.cloudinary.com/dtlxpw3eh/image/upload/v1763598428/channels4_profile_gzwdm5.webp",
+        label: ""
+    }
 ]
 
 const Checkout = () => {
@@ -36,6 +42,11 @@ const [paymentGateway, setPaymentGateway] = useState("COD");
 const handlePaymentChange = (event:any) => {
     setPaymentGateway(event.target.value);
 }
+
+const dispatch = useAppDispatch();
+    useEffect(() => {
+        dispatch(fetchUserCart(localStorage.getItem("jwt") || ""));
+    }, [dispatch]);
   return (
     <>
     <div className='pt-10 px-5 sm:px-10 md:px-44
@@ -117,7 +128,7 @@ const handlePaymentChange = (event:any) => {
         aria-describedby="modal-modal-description"
     >
         <Box sx={style}>
-            <AddressForm/>
+            <AddressForm paymentGateway={paymentGateway}/>
         </Box>
     </Modal>
     </>

@@ -2,11 +2,11 @@ export interface Address {
   id?: number
   name: string
   mobile: string
-  pincode: string
+  pinCode: string
   address: string
   locality: string
   city: string
-  state: string
+  ward: string
 }
 
 export enum UserRole {

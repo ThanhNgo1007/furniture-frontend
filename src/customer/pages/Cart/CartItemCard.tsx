@@ -1,28 +1,37 @@
-import { Add, Close, Remove } from '@mui/icons-material'
-import { Button, Divider, IconButton } from '@mui/material'
-import React from 'react'
+import { Add, Close, Remove } from '@mui/icons-material';
+import { Button, Divider, IconButton } from '@mui/material';
+import { useAppDispatch } from '../../../State/Store';
+import { updateCartItem } from '../../../State/customer/cartSlice';
+import { type CartItem } from '../../../types/cartTypes';
 
-const CartItem = () => {
+const CartItemCard = ({item}: {item: CartItem}) => {
 
-    const handleUpdateQuantity=()=>{
+  const dispatch=useAppDispatch();
+
+    const handleUpdateQuantity=(value:number) => () =>{
         //update cart quantity
+        dispatch(updateCartItem({jwt: localStorage.getItem("jwt"), cartItemId: item.id, cartItem: {quantity: item.quantity+value}}));
     }
+
+    const formatUSD = (price: number) => {
+    return `$` + new Intl.NumberFormat('en-US').format(price)
+  }
   return (
-    <div className='border rounded-md relative'>
+    <div className='border border-gray-200 rounded-md relative'>
 
         <div className='p-5 flex gap-3'>
 
-            <div className="">
-                <img className="w-[90px] rounded-md" src="https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811578/storklinta-6-drawer-dresser-white-anchor-1_fkmzra.avif" 
+            <div>
+                <img className="w-[150px] rounded-md" src={item.product.images[0]} 
                 alt="" />
             </div>
             <div className="space-y-2">
 
-                <h1 className='font-semibold text-lg'>Storklinta</h1>
-                <p className='text-gray-600 font-medium text-sm'>6-drawer dresser, white/anchor/unlock function, 55 1/8x18 7/8x29 1/2 "</p>
-                <p className='text-gray-400 text-xs'><strong>Sold by: </strong>IKEA</p>
+                <h1 className='font-semibold text-lg'>{item.product.title}</h1>
+                <p className='text-gray-600 font-medium text-sm line-clamp-1'>{item.product.description}</p>
+                <p className='text-gray-400 text-xs'><strong>Sold by: </strong>{item.product.seller?.bussinessDetails.bussinessName}</p>
                 <p className='text-sm'>7 days replacement available</p>
-                <p className='text-sm text-gray-500'><strong>quantity: </strong>5</p>
+                <p className='text-sm text-gray-500'><strong>quantity: </strong>{item.quantity}</p>
 
             </div>
 
@@ -36,9 +45,9 @@ const CartItem = () => {
                 <div className="flex items-center gap-2 w-[140px] justify-between">
                      <Button 
                                       variant="text"
-                                      disabled={true}
+                                      disabled={item.quantity<=1}
                                       sx={{ color: 'text.primary', borderRadius: '30px', minWidth: '10px' }}
-                                      onClick={handleUpdateQuantity}
+                                      onClick={handleUpdateQuantity(-1)}
                                       
                                     >
                                       <Remove fontSize="small" />
@@ -54,22 +63,25 @@ const CartItem = () => {
                                         minWidth: '30px'
                                       }}
                                     >
-                                      {5}
+                                      {item.quantity}
                                     </Button>
                                     
                                     {/* Nút Cộng */}
                                     <Button 
                                       variant="text"
                                       sx={{ color: 'text.primary', borderRadius: '30px', minWidth: '40px' }}
-                                      onClick={handleUpdateQuantity}
+                                      onClick={handleUpdateQuantity(1)}
                                     >
                                       <Add fontSize="small" />
                                     </Button>
                 </div>
 
             </div>
-            <div className='pr-5'>
-                <p className='text-gray-700 font-medium'>$299.99    </p>
+            
+            <div className='flex items-center gap-2 pr-5'>
+              <p className='text-gray-700 font-medium line-through'>{formatUSD(item.msrpPrice)}</p>
+              <p className='text-gray-700 font-medium'>{formatUSD(item.sellingPrice)}</p>
+              
             </div>
         </div>
         <div className='absolute top-1 right-1'>
@@ -82,4 +94,4 @@ const CartItem = () => {
   )
 }
 
-export default CartItem
+export default CartItemCard

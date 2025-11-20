@@ -1,36 +1,43 @@
 import { Box, Button, Grid, TextField } from '@mui/material'
 import { useFormik } from 'formik'
-import React from 'react'
-import * as Yup from 'yup' 
+import * as Yup from 'yup'
+import { createOrder } from '../../../State/customer/orderSlice'
+import { useAppDispatch } from '../../../State/Store'
 
 const AddressFormSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     mobile: Yup.string().required("Mobile number is required").matches(/^[0]\d{9}$/,
         "Invalid mobile number"
     ),
-    pinCode: Yup.string().required("Pin code is required").matches(/^[1-9][0-9]{5}$/,
+    pinCode: Yup.string().required("Pin code is required").matches(/^[1-9][0-9]{4}$/,
         "Invalid pin code"
     ),
     address: Yup.string().required("Address is required"),
-    city: Yup.string().required("City is required"),
-    state: Yup.string().required("State is required"),
-    locality: Yup.string().required("Locallity is required"),
+    city: Yup.string().required("City (Thanh pho) is required"),
+    ward: Yup.string().required("Ward (Xa/Phuong) is required"),
+    locality: Yup.string().required("Locality (Tinh) is required"),
 })
 
-const AddressForm = () => {
+const AddressForm = ({paymentGateway}:any) => {
+    const dispatch = useAppDispatch();
     const formik = useFormik({
         initialValues: {
             name: '',
             mobile: "",
             pinCode: "",
             address: "",
+            locality: "",
             city: "",
-            state: "",
-            locality: ""
+            ward: "",
+            
         },
         validationSchema: AddressFormSchema,
         onSubmit: (values) => {
             console.log(values)
+            dispatch(createOrder({address:values,
+                jwt:localStorage.getItem("jwt") || "",
+                paymentGateway
+            }))
         },
     });
   return (
@@ -118,12 +125,12 @@ const AddressForm = () => {
                 <Grid size={{xs:6}}>
                     <TextField
                     fullWidth
-                    name="state"
-                    label="state"
-                    value={formik.values.state}
+                    name="ward"
+                    label="ward"
+                    value={formik.values.ward}
                     onChange={formik.handleChange}
-                    error={formik.touched.state && Boolean(formik.errors.state)}
-                    helperText={formik.touched.state && formik.errors.state}>
+                    error={formik.touched.ward && Boolean(formik.errors.ward)}
+                    helperText={formik.touched.ward && formik.errors.ward}>
 
                     </TextField>
                 </Grid>
