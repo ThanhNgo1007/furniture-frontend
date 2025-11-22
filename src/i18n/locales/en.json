@@ -1,0 +1,24 @@
+{
+  "navbar": {
+    "login": "Log in or Sign up",
+    "search": "Search...",
+    "becomeSeller": "Become Seller",
+    "furniture": "Furniture",
+    "rugs": "Rugs",
+    "lighting": "Lighting",
+    "outdoor": "Outdoor & Garden",
+    "guides": "Seller's Guide",
+    "works": "How It Works",
+    "support": "Support"
+  },
+  "footer": {
+    "about": "About Aptdeco",
+    "works": "How Aptdeco Works",
+    "reviews": "Reviews",
+    "blog": "Blog",
+    "sell": "Sell on AptDeco",
+    "rights": "APTDECO, INC. ALL RIGHTS RESERVED",
+    "privacy": "PRIVACY",
+    "terms": "TERMS AND CONDITIONS"
+  }
+}

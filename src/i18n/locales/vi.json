@@ -1,0 +1,24 @@
+{
+  "navbar": {
+    "login": "Đăng nhập / Đăng ký",
+    "search": "Tìm kiếm...",
+    "becomeSeller": "Kênh Người Bán",
+    "furniture": "Nội thất",
+    "rugs": "Thảm",
+    "lighting": "Chiếu sáng",
+    "outdoor": "Ngoài trời & Sân vườn",
+    "guides": "Hướng dẫn bán hàng",
+    "works": "Cách Aptdeco hoạt động",
+    "support": "Hỗ trợ"
+  },
+  "footer": {
+    "about": "Về Aptdeco",
+    "works": "Cách Aptdeco hoạt động",
+    "reviews": "Đánh giá",
+    "blog": "Tin tức",
+    "sell": "Bán hàng trên AptDeco",
+    "rights": "APTDECO, INC. BẢO LƯU MỌI QUYỀN",
+    "privacy": "CHÍNH SÁCH BẢO MẬT",
+    "terms": "ĐIỀU KHOẢN SỬ DỤNG"
+  }
+}
