@@ -197,7 +197,20 @@ const AddProduct = () => {
               required
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
+            <TextField
+              fullWidth
+              id="quantity"
+              name="quantity"
+              label="Quantity"
+              value={formik.values.quantity}
+              onChange={formik.handleChange}
+              error={formik.touched.quantity && Boolean(formik.errors.quantity)}
+              helperText={formik.touched.quantity && formik.errors.quantity}
+              required
+            />
+          </Grid>
+          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
             <TextField
               fullWidth
               id="msrp_price"
@@ -210,7 +223,7 @@ const AddProduct = () => {
               required
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
             <TextField
               fullWidth
               id="sellingPrice"
@@ -223,7 +236,7 @@ const AddProduct = () => {
               required
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 4, lg: 4 }}>
+          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
             <FormControl
               fullWidth
               error={formik.touched.color && Boolean(formik.errors.color)}

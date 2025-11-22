@@ -1,19 +1,16 @@
-import React from 'react'
-import HolidayCategory from './HolidayCategory'
-import CategoryGrid from './CategoryGrid/CategoryGrid'
-import Deal from './Deal/Deal'
-import Introduction from './Introduction'
-import RoomCategory from './ShopByCategory/ShopByCategory'
 import banner from '@/assets/seller.jpg'
 import Button from '@mui/material/Button'
+import CategoryGrid from './CategoryGrid/CategoryGrid'
 import CommunityImpact from './CommunityImpact'
+import Deal from './Deal/Deal'
+import HolidayCategory from './HolidayCategory'
+import RoomCategory from './ShopByCategory/ShopByCategory'
 
 const Home = () => {
   return (
     <>
         <div className='space-y-5 lg:space-y-10 relative'>
             <HolidayCategory/>
-            <Introduction/>
             <CategoryGrid/>
             <Deal/>
             <CommunityImpact/>

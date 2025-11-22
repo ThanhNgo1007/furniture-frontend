@@ -1,12 +1,10 @@
 import { Divider } from '@mui/material'
 import { useAppSelector } from '../../../State/Store'
+import { formatVND } from '../../../Util/formatCurrency'
 
 const PricingCard = () => {
   const { cart } = useAppSelector(store => store.cart)
 
-  const formatUSD = (price: number) => {
-    return `$` + new Intl.NumberFormat('en-US').format(price)
-  }
 
   if (!cart) return null;
 
@@ -20,13 +18,13 @@ const PricingCard = () => {
     <div className='space-y-3 p-5 text-lg'>
         <div className='flex justify-between items-center'>
             <span>Subtotal</span>
-            <span className="font-medium">{formatUSD(subtotal)}</span>
+            <span className="font-medium">{formatVND(subtotal)}</span>
         </div>
 
         <div className='flex justify-between items-center'>
             <span>Discount</span>
             <span className="text-green-600 font-medium">
-                - {formatUSD(totalDiscount)}
+                - {formatVND(totalDiscount)}
             </span>
         </div>
 
@@ -51,7 +49,7 @@ const PricingCard = () => {
 
         <div className='flex justify-between items-center text-teal-600 py-2 font-bold text-xl'>
             <span>Total</span>
-            <span>{formatUSD(total)}</span>
+            <span>{formatVND(total)}</span>
         </div>
     </div>
   )

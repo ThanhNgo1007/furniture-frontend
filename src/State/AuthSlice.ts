@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { api } from '../config/Api'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { api } from '../config/Api'; // Lưu ý kiểm tra đường dẫn import api cho đúng với cấu trúc thư mục của bạn
+import type { User } from '../types/userTypes';
+
+// --- CÁC ACTION CŨ GIỮ NGUYÊN ---
 
 export const sendLoginSignupOtp = createAsyncThunk(
   '/sellers/sendLoginSignupOtp',
@@ -25,6 +28,7 @@ export const signing = createAsyncThunk<any, any>(
       return response.data.jwt
     } catch (error) {
       console.log('error', error)
+      return rejectWithValue(error) // Thêm return lỗi để bắt ở rejected
     }
   }
 )
@@ -39,6 +43,7 @@ export const signup = createAsyncThunk<any, any>(
       return response.data.jwt
     } catch (error) {
       console.log('error', error)
+      return rejectWithValue(error)
     }
   }
 )
@@ -56,6 +61,7 @@ export const fetchUserProfile = createAsyncThunk<any, any>(
       return response.data
     } catch (error) {
       console.log('error', error)
+      return rejectWithValue(error)
     }
   }
 )
@@ -67,7 +73,7 @@ export const logout = createAsyncThunk<any, any>(
       localStorage.clear()
       console.log('logout success')
       navigate('/')
-      return 'Logout success' // Trả về một giá trị để action được fulfilled
+      return 'Logout success'
     } catch (error) {
       console.log('error - - - ', error)
       return rejectWithValue(error)
@@ -75,23 +81,61 @@ export const logout = createAsyncThunk<any, any>(
   }
 )
 
+// --- CÁC ACTION MỚI CHO ADMIN (QUẢN LÝ USER) ---
+
+// 1. Lấy danh sách tất cả user
+export const getAllUsers = createAsyncThunk<User[], string>(
+  "auth/getAllUsers",
+  async (jwt, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/api/admin/users", {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      console.log("all users", response.data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to fetch users");
+    }
+  }
+);
+
+// 2. Cập nhật quyền (Role) của user
+export const updateUserRole = createAsyncThunk<User, { userId: number, role: string }>(
+  "auth/updateUserRole",
+  async ({ userId, role }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/api/admin/users/${userId}/role`, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("jwt")}` },
+        params: { role } // Gửi role qua query param
+      });
+      console.log("updated role", response.data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to update role");
+    }
+  }
+);
+
+// --- CẬP NHẬT STATE ---
+
 interface AuthState {
   jwt: string | null
   otpSent: boolean
   isLoggedIn: boolean
-  user: any | null
+  user: User | null
   loading: boolean
-  error: any // Thêm state error để hiển thị lỗi
+  error: any
+  users: User[] // <-- Thêm danh sách users vào state
 }
 
 const initialState: AuthState = {
-  // 3. Khởi tạo từ localStorage để không mất login khi F5
   jwt: localStorage.getItem('jwt'),
   otpSent: false,
-  isLoggedIn: !!localStorage.getItem('jwt'), // Nếu có jwt thì là đã login
+  isLoggedIn: !!localStorage.getItem('jwt'),
   user: null,
   loading: false,
-  error: null
+  error: null,
+  users: [] // <-- Khởi tạo mảng rỗng
 }
 
 const authSlice = createSlice({
@@ -105,6 +149,7 @@ const authSlice = createSlice({
     }
   },
   extraReducers: builder => {
+    // ... Các case cũ (Login, Signup, Profile, Logout)
     builder.addCase(sendLoginSignupOtp.pending, state => {
       state.loading = true
     })
@@ -128,7 +173,7 @@ const authSlice = createSlice({
     builder.addCase(signing.rejected, (state, action) => {
       state.loading = false
       state.isLoggedIn = false
-      state.error = action.payload // Lưu lỗi để hiển thị
+      state.error = action.payload
     })
     builder.addCase(signup.fulfilled, (state, action) => {
       state.jwt = action.payload
@@ -142,7 +187,39 @@ const authSlice = createSlice({
       state.jwt = null
       state.isLoggedIn = false
       state.user = null
+      state.users = [] // Xóa danh sách user khi logout
     })
+
+    // --- XỬ LÝ CÁC CASE MỚI (ADMIN) ---
+
+    // getAllUsers
+    builder.addCase(getAllUsers.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(getAllUsers.fulfilled, (state, action) => {
+      state.loading = false;
+      state.users = action.payload; // Lưu danh sách user vào state
+    });
+    builder.addCase(getAllUsers.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+
+    // updateUserRole
+    builder.addCase(updateUserRole.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(updateUserRole.fulfilled, (state, action) => {
+      state.loading = false;
+      // Tìm và cập nhật user vừa đổi quyền trong danh sách
+      state.users = state.users.map((user) =>
+        user.id === action.payload.id ? action.payload : user
+      );
+    });
+    builder.addCase(updateUserRole.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
   }
 })
 

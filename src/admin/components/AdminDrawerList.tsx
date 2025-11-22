@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react'
-import DrawerList from '../../component/DrawerList'
-import { AccountBox, Add, Category, Chair, Dashboard, Home, IntegrationInstructions, LocalOffer, Logout } from '@mui/icons-material'
+import { AccountBox, Add, Category, Chair, Dashboard, Group, Home, IntegrationInstructions, LocalOffer, Logout } from '@mui/icons-material';
+import DrawerList from '../../component/DrawerList';
 
 const menu = [
     {
@@ -45,6 +44,12 @@ const menu = [
         path: "/admin/deals",
         icon: <LocalOffer className='text-teal-600'/>,
         activeIcon: <LocalOffer className='text-white'/>
+    },
+    {
+        name: "Customers", // Mục quản lý user
+        path: "/admin/customers",
+        icon: <Group className="text-teal-600" />,
+        activeIcon: <Group className="text-white" />
     },
 ];
 

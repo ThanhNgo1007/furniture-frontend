@@ -1,31 +1,27 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Radio } from '@mui/material'
-import React from 'react'
+// Đảm bảo bạn import đúng type Address
+// Nếu chưa có file types, bạn có thể dùng any tạm thời, nhưng tốt nhất nên define type
+import type { Address } from '../../../types/userTypes'
 
-const AddressCard = () => {
-    const handleChange = (event:any) => {
-        console.log(event.target.checked)
-    }
+interface AddressCardProps {
+  address: Address
+}
+
+const AddressCard = ({ address }: AddressCardProps) => {
   return (
-    <div className='p-5 border border-gray-200 rounded-md flex'>
-        <div>
-            <Radio
-                checked={true}
-                onChange={handleChange}
-                value=""
-                name="radio-button"
-                color='success'
-            />
-        </div>
-        <div className='space-y-3 pt-2'>
-            <h1>Ngo Huu Thanh</h1>
-            <p className='w-[320px]'>
-                Dong Van Cong, Binh Thuy, Can Tho
-            </p>
-            <p>
-                <strong>Mobile phone: </strong> +848888888888
-            </p>
-        </div>
+    // Bỏ thẻ div bao ngoài có border và Radio, vì Checkout.tsx đã lo phần đó
+    <div className='w-full space-y-3 pt-2'>
+        {/* Hiển thị Tên */}
+        <h1 className='font-semibold text-lg'>{address?.name}</h1>
+        
+        {/* Hiển thị Địa chỉ chi tiết */}
+        <p className='text-gray-600'>
+            {address?.address}, {address?.ward}, {address?.locality} {address?.pinCode}, {address?.city}
+        </p>
+        
+        {/* Hiển thị Số điện thoại */}
+        <p>
+            <strong>Mobile phone: </strong> {address?.mobile}
+        </p>
     </div>
   )
 }

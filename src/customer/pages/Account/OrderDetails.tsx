@@ -1,81 +1,137 @@
 /* eslint-disable no-constant-condition */
-import { Box, Button, Divider } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
-import OrderStepper from './OrderStepper';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import PaymentsIcon from '@mui/icons-material/Payments';
+import { Box, Button, Divider } from '@mui/material';
+import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+// Import thêm action cancelOrder
+import { cancelOrder, fetchOrderById, fetchOrderItemById } from '../../../State/customer/orderSlice';
+import { useAppDispatch, useAppSelector } from '../../../State/Store';
+import OrderStepper from './OrderStepper';
 
 const OrderDetails = () => {
-    const navigate=useNavigate();
-  return (
-    <Box className="space-y-5">
-        <section className='flex flex-col gap-5 justify-center items-center'>
-            <img className="w-[100px]" src={"https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811578/storklinta-6-drawer-dresser-white-anchor-1_fkmzra.avif"} alt="" />
-            <div className='text-sm space-y-1 text-center'>
-                <h1 className='font-bold'>Storklinta
-                </h1>
-                <p>6-drawer dresser, white/anchor/unlock function, 55 1/8x18 7/8x29 1/2"</p>
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { orderId, orderItemId } = useParams();
+    const { order } = useAppSelector(store => store)
 
-            </div>
-            <div>
-                <Button onClick={()=> navigate(`/review/${5}/create`)}>Write Review</Button>
-            </div>
+    useEffect(() => {
+        dispatch(fetchOrderById({ orderId: Number(orderId), jwt: localStorage.getItem('jwt') || '' }))
+        dispatch(fetchOrderItemById({ orderItemId: Number(orderItemId), jwt: localStorage.getItem('jwt') || '' }))
 
-        </section>
+    }, [dispatch, orderId, orderItemId])
 
-        <section className='border-p5'>
-            <OrderStepper orderStatus="SHIPPED"/>
-        </section>
-        <div className='border p-5'>
-            <h1 className="font-bold pb-3">Delivery Address</h1>
-            <div className="text-sm space-y-2">
-                <div className="flex gap-5 font-medium">
-                    <p>{"Ngo Huu Thanh"}</p>
-                    <Divider flexItem orientation='vertical'/>
-                    <p>09563643543</p>
+    const formatVND = (price: any) => {
+        return new Intl.NumberFormat('vi-VN').format(price) + "đ"
+    }
+
+    // --- THÊM HÀM XỬ LÝ HỦY ĐƠN ---
+    const handleCancelOrder = () => {
+        dispatch(cancelOrder(Number(orderId)));
+    }
+
+    const currentOrder = order.currentOrder;
+    const currentItem = order.orderItem;
+    const shippingAddress = currentOrder?.shippingAddress;
+
+    const msrpPrice = currentItem?.msrpPrice || 0;
+    const sellingPrice = currentItem?.sellingPrice || 0;
+    const savedAmount = msrpPrice - sellingPrice;
+
+    return (
+        <Box className="space-y-5">
+            {/* ... (Phần hiển thị thông tin sản phẩm giữ nguyên) ... */}
+            <section className='flex flex-col gap-5 justify-center items-center'>
+                <img className="w-[100px]" src={currentItem?.product.images[0]} alt="" />
+                <div className='text-sm space-y-1 text-center'>
+                    <h1 className='font-bold'>{currentItem?.product.title}</h1>
+                    <p className='line-clamp-1 text-gray-500'>{currentItem?.product.description}</p>
                 </div>
-                <p>Nguyen Van Cu, Ninh Kieu, Can Tho</p>
-
-            </div>
-
-        </div>
-        <div className='border space-y-4'>
-            <div className="flex justify-between text-sm pt-5 px-5">
-                <div className="space-y-1">
-                    <p className='font-bold'>Total Item Price</p>
-                    <p>You saved <span className='text-green-500 font-medium text-xs'>${699}.00 </span>
-                    on this item</p>
+                <div>
+                    <Button onClick={() => navigate(`/review/${currentItem?.product.id}/create`)}>Write Review</Button>
                 </div>
-                <p className='font-medium'>$ {99}.00</p>
-            </div>
-            <div className="px-5">
-                <div className='bg-teal-50 px-5 py-2 text-xs font-medium flex items-center gap-3'>
-                    <PaymentsIcon/>
-                    <p>Cash On Delivery</p>
+            </section>
+
+            <section className='border-p5'>
+                <OrderStepper 
+                    orderStatus={currentOrder?.orderStatus} 
+                    orderDate={currentOrder?.orderDate}
+                    deliveryDate={currentOrder?.deliveryDate}
+                />
+            </section>
+
+            {/* ... (Phần địa chỉ giữ nguyên) ... */}
+            <div className='border p-5'>
+                <h1 className="font-bold pb-3">Delivery Address</h1>
+                <div className="text-sm space-y-2">
+                    <div className="flex gap-5 font-medium">
+                        <p>{shippingAddress?.name}</p>
+                        <Divider flexItem orientation='vertical' />
+                        <p>{shippingAddress?.mobile}</p>
+                    </div>
+                    <p>
+                        {shippingAddress?.address}, {shippingAddress?.ward}, {shippingAddress?.locality}, {shippingAddress?.city}
+                        {shippingAddress?.pinCode ? ` - ${shippingAddress.pinCode}` : ""}
+                    </p>
                 </div>
             </div>
-            <Divider/>
-            <div className='px-5 p-5'>
-                <p className="text-xs"><strong>Sold By: </strong>{`Storklinta`}</p>
-            </div>
-            <div className='p-10'>
-                <Button
-                disabled={true}
-                //  onClick={handleCancelOrder}
-                color='error'
-                sx={{py: "0.7rem"}}
-                className=''
-                variant='outlined'
-                fullWidth
-                >
-                    {true?"Order Cancelled":"Cancel Order"}
 
-                </Button>
-            </div>
+            <div className='border space-y-4'>
+                {/* ... (Phần giá tiền giữ nguyên) ... */}
+                <div className="flex justify-between text-sm pt-5 px-5">
+                    <div className="space-y-1">
+                        <p className='font-bold'>Total Item Price</p>
+                        <p>You saved <span className='text-green-500 font-medium text-xs'>{formatVND(savedAmount)}</span> on this item</p>
+                    </div>
+                    <p className='font-medium text-lg'>{formatVND(sellingPrice * (currentItem?.quantity || 1))}</p>
+                </div>
+                <div className="px-5">
+                    <div className='bg-teal-50 px-5 py-2 text-xs font-medium flex items-center gap-3 rounded-md'>
+                        <PaymentsIcon />
+                        <p>{currentOrder?.paymentDetails?.status === 'COMPLETED' ? "Paid Online (VNPay)" : "Cash On Delivery"}</p>
+                    </div>
+                </div>
+                <Divider />
+                <div className='px-5 p-5'>
+                    <p className="text-xs"><strong>Sold By: </strong>{currentItem?.product.seller?.bussinessDetails.bussinessName}</p>
+                </div>
+                
+                {/* --- SỬA LOGIC HIỂN THỊ NÚT CANCEL TẠI ĐÂY --- */}
+                
+                {/* Chỉ cho phép hủy khi trạng thái là: PENDING, PLACED hoặc CONFIRMED */}
+                { (currentOrder?.orderStatus === 'PENDING' || 
+                   currentOrder?.orderStatus === 'PLACED' || 
+                   currentOrder?.orderStatus === 'CONFIRMED') && (
+                    <div className='p-10'>
+                        <Button
+                            onClick={handleCancelOrder} // Gọi hàm handleCancelOrder
+                            color='error'
+                            sx={{ py: "0.7rem" }}
+                            variant='outlined'
+                            fullWidth
+                        >
+                            Cancel Order
+                        </Button>
+                    </div>
+                )}
 
-        </div>
-        
-    </Box>
-  )
+                {/* Nếu trạng thái là SHIPPED hoặc ARRIVING nhưng chưa DELIVERED */}
+                { (currentOrder?.orderStatus === 'SHIPPED' || currentOrder?.orderStatus === 'ARRIVING') && (
+                    <div className='p-10 text-center text-gray-500 font-medium'>
+                         Order cannot be cancelled as it has been shipped.
+                    </div>
+                )}
+
+                {/* Hiển thị thông báo đã hủy */}
+                {currentOrder?.orderStatus === 'CANCELLED' && (
+                    <div className='p-10 text-center text-red-500 font-bold'>
+                        Order Cancelled
+                    </div>
+                )}
+
+            </div>
+        </Box>
+    )
 }
 
 export default OrderDetails

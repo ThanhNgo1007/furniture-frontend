@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
-  Add,
-  LocalShipping,
-  Remove,
-  Shield,
-  ShoppingBag,
-  Wallet,
-  WorkspacePremium
+    Add,
+    LocalShipping,
+    Remove,
+    Shield,
+    ShoppingBag,
+    Wallet,
+    WorkspacePremium
 } from '@mui/icons-material'
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import StarIcon from '@mui/icons-material/Star'
@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { fetchProductById } from '../../../State/customer/ProductSlice'
 import { useAppDispatch, useAppSelector } from '../../../State/Store'
+import { formatVND } from '../../../Util/formatCurrency'
 import ReviewCard from '../Product/Review/ReviewCard'
 import SimilarProduct from './SimilarProduct'
 
@@ -27,9 +28,6 @@ const ProductDetails = () => {
   const { product } = useAppSelector(store => store)
   const [activeImage, setActiveImage] = useState(0)
 
-  const formatUSD = (price: any) => {
-    return `$` + new Intl.NumberFormat('en-US').format(price)
-  }
 
   useEffect(() => {
     if (!productId) return
@@ -72,7 +70,6 @@ const ProductDetails = () => {
                 {product.product?.seller?.bussinessDetails.bussinessName}
               </span>
             </h1>
-            <FavoriteBorderIcon sx={{ bgcolor: 'white' }} />
           </div>
 
           <p className="text-gray-500 font-semibold">{product.product?.title}</p>
@@ -91,14 +88,15 @@ const ProductDetails = () => {
           </div>
           <div>
             <div className="price font-bold text-3xl mt-5 space-x-6">
-              <span>{formatUSD(product.product?.sellingPrice)}</span>
+              <span>{formatVND(product.product?.sellingPrice || 0)}</span>
               <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded ">
                 {product.product?.discountPercent}% OFF
               </span>
               <div className="original-price text-base text-gray-500 line-through">
-                {formatUSD(product.product?.msrpPrice)}
+                {formatVND(product.product?.msrpPrice || 0)}
               </div>
             </div>
+            <p className="text-md font-semibold text-gray-500">Quantity Available: {product.product?.quantity}</p>
             <p className="text-xs">Designed to meet the US Federal Stability Standard</p>
           </div>
           <div className="mt-7 space-y-3">

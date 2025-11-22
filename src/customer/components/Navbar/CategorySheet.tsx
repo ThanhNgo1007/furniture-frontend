@@ -2,6 +2,9 @@
 import { Box } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { furnituresLevelThree } from '../../../data/category/levelthree/furnituresLevelThree'
+import { lightingLevelThree } from '../../../data/category/levelthree/lightingLevelThree'
+import { outdoorLevelThree } from '../../../data/category/levelthree/outdoorLevelThree'
+import { rugsLevelThree } from '../../../data/category/levelthree/rugsLevelThree'
 import { furnituresLevelTwo } from '../../../data/category/leveltwo/furnituresLevelTwo'
 import { lightingLevelTwo } from '../../../data/category/leveltwo/lightingLevelTwo'
 import { outdoorLevelTwo } from '../../../data/category/leveltwo/outdoorLevelTwo'
@@ -12,14 +15,17 @@ const categoryTwo: { [key: string]: any[] } = {
   furnitures: furnituresLevelTwo,
   rugs: rugsLevelTwo,
   lighting: lightingLevelTwo,
-  'outdoor-garden': outdoorLevelTwo
+  "outdoor-garden": outdoorLevelTwo
 }
 
 const categoryThree: { [key: string]: any[] } = {
-  furnitures: furnituresLevelThree
+  furnitures: furnituresLevelThree,
+  lighting: lightingLevelThree,
+  "outdoor-garden": outdoorLevelThree,
+  rugs: rugsLevelThree
 }
 
-const CategorySheet = ({ selectedCategory }: any) => {
+const CategorySheet = ({ selectedCategory, handleClose }: any) => {
   const navigate = useNavigate()
 
   // Helper function
@@ -40,29 +46,26 @@ const CategorySheet = ({ selectedCategory }: any) => {
       className="bg-white shadow-lg lg:h-[500px] overflow-y-auto border-t border-gray-200"
     >
       {/* Căn chỉnh lề cho khớp với Navbar */}
-      <div className="flex text-sm flex-wrap px-20 py-10 max-w-7xl mx-auto">
-        {currentData.map(
-          (
-            item // 'item' là category cấp 2
-          ) => (
+      <div className="flex text-sm flex-wrap px-10 py-10 max-w-8xl mx-auto">
+        {currentData.map((item, index) => (
             <div
               key={item.categoryId}
               className={`p-8 lg:w-[20%] ${
-                item.name.length % 2 !== 0 ? '' : 'bg-slate-50'
+                index % 2 === 1 ? 'bg-slate-50' : 'bg-white'
               }`}
             >
               <p className="mb-5 font-bold text-lg">{item.name}</p>
               <ul className="space-y-3">
                 {childCategory(categoryThree[selectedCategory], item.categoryId).map(
-                  (
-                    childItem: any // 'childItem' là category cấp 3
-                  ) => (
+                  (childItem: any) => (
                     <div key={childItem.categoryId}>
-                      {/* ✅ SỬA LỖI Ở ĐÂY:
-                                          Thay item.categoryId bằng childItem.categoryId
-                                        */}
                       <li
-                        onClick={() => navigate(`/products/${childItem.categoryId}`)}
+                        onClick={() => {
+                            // 1. Điều hướng đến trang sản phẩm
+                            navigate(`/products/${childItem.categoryId}`)
+                            // 2. Đóng CategorySheet
+                            if (handleClose) handleClose();
+                        }}
                         className="hover:text-[#E27E6A] cursor-pointer text-gray-600 transition-colors"
                       >
                         {childItem.name}

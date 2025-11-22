@@ -25,14 +25,20 @@ export interface Order {
   discount?: number,
   orderStatus: OrderStatus,
   totalItem: number,
-  deliverDate: string,
+  deliveryDate: string,
 }
 
 export enum OrderStatus {
   PENDING = "PENDING",
+  PLACED = "PLACED",         // <--- Thêm cái này
+  CONFIRMED = "CONFIRMED",   // <--- Thêm cái này
   SHIPPED = "SHIPPED",
   DELIVERED = "DELIVERED",
-  CANCELED = "CANCELED",
+  CANCELLED = "CANCELLED",   // <--- Sửa thành 2 chữ L (khớp Backend)
+
+  // Lưu ý: Backend không có ARRIVING, nhưng nếu bạn muốn giữ logic FE không lỗi đỏ thì cứ thêm vào.
+  // Tuy nhiên, logic check (orderStatus === 'ARRIVING') sẽ không bao giờ true nếu BE không trả về.
+  ARRIVING = "ARRIVING"
 }
 
 export interface OrderItem {

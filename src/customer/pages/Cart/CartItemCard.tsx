@@ -1,8 +1,9 @@
 import { Add, Close, Remove } from '@mui/icons-material';
 import { Button, Divider, IconButton } from '@mui/material';
-import { useAppDispatch } from '../../../State/Store';
 import { updateCartItem } from '../../../State/customer/cartSlice';
+import { useAppDispatch } from '../../../State/Store';
 import { type CartItem } from '../../../types/cartTypes';
+import { formatVND } from '../../../Util/formatCurrency';
 
 const CartItemCard = ({item}: {item: CartItem}) => {
 
@@ -13,9 +14,6 @@ const CartItemCard = ({item}: {item: CartItem}) => {
         dispatch(updateCartItem({jwt: localStorage.getItem("jwt"), cartItemId: item.id, cartItem: {quantity: item.quantity+value}}));
     }
 
-    const formatUSD = (price: number) => {
-    return `$` + new Intl.NumberFormat('en-US').format(price)
-  }
   return (
     <div className='border border-gray-200 rounded-md relative'>
 
@@ -79,8 +77,8 @@ const CartItemCard = ({item}: {item: CartItem}) => {
             </div>
             
             <div className='flex items-center gap-2 pr-5'>
-              <p className='text-gray-700 font-medium line-through'>{formatUSD(item.msrpPrice)}</p>
-              <p className='text-gray-700 font-medium'>{formatUSD(item.sellingPrice)}</p>
+              <p className='text-gray-700 font-medium line-through'>{formatVND(item.msrpPrice)}</p>
+              <p className='text-gray-700 font-medium'>{formatVND(item.sellingPrice)}</p>
               
             </div>
         </div>
