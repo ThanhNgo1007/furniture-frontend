@@ -12,8 +12,9 @@ export const sendLoginSignupOtp = createAsyncThunk(
     try {
       const response = await api.post('/auth/sent/login-signup-otp', { email })
       console.log('login otp', response)
-    } catch (error) {
+    } catch (error: any) {
       console.log('error', error)
+      return rejectWithValue(error.response?.data || "Failed to send OTP") // Thêm return lỗi để bắt ở rejected
     }
   }
 )
