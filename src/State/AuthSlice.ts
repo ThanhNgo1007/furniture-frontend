@@ -24,7 +24,7 @@ export const signing = createAsyncThunk<any, any>(
     try {
       const response = await api.post('/auth/signing', loginRequest)
       console.log('login otp', response.data)
-      localStorage.setItem('jwt', response.data.jwt)
+      localStorage.setItem('jwt', response.data.jwt);
       return response.data.jwt
     } catch (error: any) {
       console.log('error', error)
@@ -112,6 +112,21 @@ export const updateUserRole = createAsyncThunk<User, { userId: number, role: str
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Failed to update role");
+    }
+  }
+);
+
+export const addUserAddress = createAsyncThunk<User, { jwt: string, address: any }>(
+  "auth/addUserAddress",
+  async ({ jwt, address }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/api/users/address/add", address, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      console.log("Address added:", response.data);
+      return response.data; // Trả về User object mới (đã có địa chỉ)
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to add address");
     }
   }
 );
@@ -224,6 +239,19 @@ const authSlice = createSlice({
       );
     });
     builder.addCase(updateUserRole.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+
+    // addUserAddress
+    builder.addCase(addUserAddress.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(addUserAddress.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload; // Cập nhật user mới có địa chỉ
+    });
+    builder.addCase(addUserAddress.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
     });
