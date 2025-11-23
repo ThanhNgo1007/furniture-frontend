@@ -26,9 +26,9 @@ export const signing = createAsyncThunk<any, any>(
       console.log('login otp', response.data)
       localStorage.setItem('jwt', response.data.jwt)
       return response.data.jwt
-    } catch (error) {
+    } catch (error: any) {
       console.log('error', error)
-      return rejectWithValue(error) // Thêm return lỗi để bắt ở rejected
+      return rejectWithValue(error.response?.data || "Failed to login") // Thêm return lỗi để bắt ở rejected
     }
   }
 )
@@ -41,9 +41,9 @@ export const signup = createAsyncThunk<any, any>(
       console.log('sign up otp', response.data)
       localStorage.setItem('jwt', response.data.jwt)
       return response.data.jwt
-    } catch (error) {
+    } catch (error: any) {
       console.log('error', error)
-      return rejectWithValue(error)
+      return rejectWithValue(error.response?.data || "Failed to sign up")
     }
   }
 )
@@ -124,7 +124,7 @@ interface AuthState {
   isLoggedIn: boolean
   user: User | null
   loading: boolean
-  error: any
+  error: string | null
   users: User[] // <-- Thêm danh sách users vào state
 }
 
@@ -146,6 +146,13 @@ const authSlice = createSlice({
       state.error = null
       state.loading = false
       state.otpSent = false
+    },
+    logout: (state) => { // Nên có reducer logout đồng bộ để clear state ngay
+      state.jwt = null
+      state.isLoggedIn = false
+      state.user = null
+      state.users = []
+      localStorage.clear()
     }
   },
   extraReducers: builder => {
@@ -173,7 +180,7 @@ const authSlice = createSlice({
     builder.addCase(signing.rejected, (state, action) => {
       state.loading = false
       state.isLoggedIn = false
-      state.error = action.payload
+      state.error = action.payload as string
     })
     builder.addCase(signup.fulfilled, (state, action) => {
       state.jwt = action.payload
@@ -202,7 +209,7 @@ const authSlice = createSlice({
     });
     builder.addCase(getAllUsers.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = action.payload as string;
     });
 
     // updateUserRole
@@ -218,7 +225,7 @@ const authSlice = createSlice({
     });
     builder.addCase(updateUserRole.rejected, (state, action) => {
       state.loading = false;
-      state.error = action.payload;
+      state.error = action.payload as string;
     });
   }
 })

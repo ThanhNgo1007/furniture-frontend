@@ -104,11 +104,12 @@ export const fetchOrderItemById = createAsyncThunk<OrderItem,
 
 //Payment success
 export const paymentSuccess = createAsyncThunk<any,
-  { paymentId: string, jwt: string, paymentLinkId: string },
+  // Thêm vnp_ResponseCode và vnp_TransactionStatus vào payload
+  { paymentId: string, jwt: string, paymentLinkId: string, vnp_ResponseCode?: string, vnp_TransactionStatus?: string },
   { rejectValue: string }
 >(
   "orders/paymentSuccess",
-  async ({ paymentId, jwt, paymentLinkId }, { rejectWithValue }) => {
+  async ({ paymentId, jwt, paymentLinkId, vnp_ResponseCode, vnp_TransactionStatus }, { rejectWithValue }) => {
     try {
       const response = await api.get(`/api/payment/${paymentId}`,
         {
@@ -117,9 +118,12 @@ export const paymentSuccess = createAsyncThunk<any,
           },
           params: {
             paymentLinkId,
+            // QUAN TRỌNG: Gửi mã phản hồi xuống server
+            vnp_ResponseCode: vnp_ResponseCode,
+            vnp_TransactionStatus: vnp_TransactionStatus
           }
         });
-      console.log("payment success", response.data);
+      console.log("payment processed", response.data);
       return response.data;
     } catch (error: any) {
       console.log("error", error.response);

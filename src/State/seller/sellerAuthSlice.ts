@@ -32,11 +32,7 @@ export const sellerLogin = createAsyncThunk<any, any>(
       localStorage.setItem('jwt', jwt)
       return response.data
     } catch (error: any) {
-      // Bắt lỗi từ server và reject để Formik biết
-      if (error.response?.data?.message) {
-        return rejectWithValue(error.response.data.message)
-      }
-      return rejectWithValue('Login failed')
+      return rejectWithValue(error.response?.data || "Failed to login")
     }
   }
 )

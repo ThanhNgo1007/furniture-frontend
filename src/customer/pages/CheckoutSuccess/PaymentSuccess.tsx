@@ -3,6 +3,7 @@ import { Button, CircularProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { resetCartState } from '../../../State/customer/cartSlice'; // --- IMPORT ---
 import { paymentSuccess } from '../../../State/customer/orderSlice';
 
 const PaymentSuccess = () => {
@@ -14,7 +15,6 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     
-    // Lấy tham số từ URL do Backend redirect về
     const paymentId = searchParams.get('paymentId');
     const paymentLinkId = searchParams.get('paymentLinkId');
     const responseCode = searchParams.get('vnp_ResponseCode');
@@ -23,19 +23,20 @@ const PaymentSuccess = () => {
     if (paymentId && responseCode === '00' && !error) {
       const data = {
         paymentId: paymentId,
-        paymentLinkId: paymentLinkId || paymentId, // Nếu thiếu thì dùng chính paymentId
+        paymentLinkId: paymentLinkId || paymentId,
         jwt: localStorage.getItem('jwt') || ""
       };
 
-      // Gọi API xác nhận xuống Backend
       dispatch(paymentSuccess(data))
         .then((res: any) => {
-          // Kiểm tra kết quả trả về từ Action
           if (res.payload && res.payload.message === "Payment successful") {
             setStatus('success');
+            
+            // --- XÓA GIỎ HÀNG TRÊN FRONTEND ---
+            // Reset Redux state để làm mới giỏ hàng
+            dispatch(resetCartState());
           } else {
-             // Trường hợp API báo lỗi logic dù VNPay thành công
-            setStatus('success'); // Vẫn hiện success nếu tiền đã trừ, nhưng log lỗi
+            setStatus('success');
             console.error("Payment verified but backend reported issue:", res);
           }
         })

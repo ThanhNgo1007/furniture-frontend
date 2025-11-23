@@ -38,7 +38,8 @@ export enum OrderStatus {
 
   // Lưu ý: Backend không có ARRIVING, nhưng nếu bạn muốn giữ logic FE không lỗi đỏ thì cứ thêm vào.
   // Tuy nhiên, logic check (orderStatus === 'ARRIVING') sẽ không bao giờ true nếu BE không trả về.
-  ARRIVING = "ARRIVING"
+  ARRIVING = "ARRIVING",
+  FAILED = "FAILED"
 }
 
 export interface OrderItem {

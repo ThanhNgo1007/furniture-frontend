@@ -38,6 +38,20 @@ const OrderDetails = () => {
     const sellingPrice = currentItem?.sellingPrice || 0;
     const savedAmount = msrpPrice - sellingPrice;
 
+    const getPaymentMethodText = () => {
+        const pStatus = currentOrder?.paymentDetails?.status;
+        const oStatus = currentOrder?.orderStatus;
+
+        // Nếu thanh toán thành công
+        if (pStatus === 'COMPLETED') return "Paid Online (VNPay)";
+        
+        // Nếu thanh toán thất bại hoặc đơn đã hủy
+        if (pStatus === 'FAILED' || oStatus === 'CANCELLED') return "Payment Failed / Cancelled";
+        
+        // Mặc định là COD (chỉ khi PENDING và chưa thanh toán)
+        return "Cash On Delivery";
+    }
+
     return (
         <Box className="space-y-5">
             {/* ... (Phần hiển thị thông tin sản phẩm giữ nguyên) ... */}
@@ -83,12 +97,15 @@ const OrderDetails = () => {
                         <p className='font-bold'>Total Item Price</p>
                         <p>You saved <span className='text-green-500 font-medium text-xs'>{formatVND(savedAmount)}</span> on this item</p>
                     </div>
-                    <p className='font-medium text-lg'>{formatVND(sellingPrice * (currentItem?.quantity || 1))}</p>
+                    <p className='font-medium text-lg'>{formatVND(currentOrder?.totalSellingPrice || 0)}</p>
                 </div>
                 <div className="px-5">
-                    <div className='bg-teal-50 px-5 py-2 text-xs font-medium flex items-center gap-3 rounded-md'>
+                    <div className={`px-5 py-2 text-xs font-medium flex items-center gap-3 rounded-md
+                        ${currentOrder?.orderStatus === 'CANCELLED' ? 'bg-red-50 text-red-600' : 'bg-teal-50 text-gray-700'}
+                    `}>
                         <PaymentsIcon />
-                        <p>{currentOrder?.paymentDetails?.status === 'COMPLETED' ? "Paid Online (VNPay)" : "Cash On Delivery"}</p>
+                        {/* SỬA Ở ĐÂY: Gọi hàm renderPaymentMethod */}
+                        <p>{getPaymentMethodText()}</p>
                     </div>
                 </div>
                 <Divider />

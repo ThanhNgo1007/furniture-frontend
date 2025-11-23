@@ -11,6 +11,7 @@ import BecomeSeller from './customer/pages/Become Seller/BecomeSeller'
 import Cart from './customer/pages/Cart/Cart'
 import Checkout from './customer/pages/Checkout/Checkout'
 import OrderSuccess from './customer/pages/CheckoutSuccess/OrderSuccess'
+import PaymentFailed from './customer/pages/CheckoutSuccess/PaymentFailed'
 import PaymentSuccess from './customer/pages/CheckoutSuccess/PaymentSuccess'
 import Home from './customer/pages/Home/Home'
 import ProductDetails from './customer/pages/Page Details/ProductDetails'
@@ -59,6 +60,7 @@ function App() {
              <Route path="/login" element={<Auth />} />
              <Route path="/checkout" element={<Checkout />} />
              <Route path="/payment/success" element={<PaymentSuccess />} />
+             <Route path="/payment/failed" element={<PaymentFailed />} />
              <Route path="/products/:category" element={<Product />} />
              <Route path="/product-details/:categoryId/:name/:productId" element={<ProductDetails />} />
              <Route path="/cart" element={<Cart />} />
