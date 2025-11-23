@@ -1,6 +1,7 @@
 import { Add, Close, Remove } from '@mui/icons-material';
-import { Button, Divider, IconButton } from '@mui/material';
+import { Button, Divider, IconButton, Typography } from '@mui/material';
 // 1. Import thêm deleteCartItem
+import { useState } from 'react';
 import { deleteCartItem, updateCartItem } from '../../../State/customer/cartSlice';
 import { useAppDispatch } from '../../../State/Store';
 import { type CartItem } from '../../../types/cartTypes';
@@ -10,7 +11,22 @@ const CartItemCard = ({item}: {item: CartItem}) => {
 
   const dispatch = useAppDispatch();
 
+  // --- STATE THÔNG BÁO LỖI ---
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const stockQuantity = item.product.quantity;
+
   const handleUpdateQuantity = (value: number) => () => {
+      // Trường hợp TĂNG số lượng
+      if (value > 0) {
+          if (item.quantity + value > (stockQuantity || 0)) {
+              setErrorMessage(`Kho chỉ còn ${stockQuantity} sp`);
+              return; // Chặn không cho dispatch
+          }
+      }
+      
+      // Trường hợp GIẢM hoặc TĂNG hợp lệ
+      setErrorMessage(""); // Xóa lỗi cũ
       dispatch(updateCartItem({
           jwt: localStorage.getItem("jwt"), 
           cartItemId: item.id, 
@@ -18,9 +34,7 @@ const CartItemCard = ({item}: {item: CartItem}) => {
       }));
   }
 
-  // 2. Hàm xử lý xóa sản phẩm
   const handleRemoveCartItem = () => {
-      // Confirm trước khi xóa (Tùy chọn, nhưng nên có)
       if (window.confirm("Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?")) {
           dispatch(deleteCartItem({
               jwt: localStorage.getItem("jwt") || "",
@@ -48,7 +62,7 @@ const CartItemCard = ({item}: {item: CartItem}) => {
         <Divider/>
 
         <div className='justify-between flex items-center '>
-            <div className='px-5 py-2 flex justify-between items-center'>
+            <div className='px-5 py-2 flex flex-col'> {/* Sửa flex để chứa thông báo lỗi */}
                 <div className="flex items-center gap-2 w-[140px] justify-between">
                      <Button 
                           variant="text"
@@ -73,12 +87,20 @@ const CartItemCard = ({item}: {item: CartItem}) => {
                       
                       <Button 
                         variant="text"
+                        // BỎ DISABLED CHECK STOCK Ở ĐÂY để cho phép click và hiện lỗi
                         sx={{ color: 'text.primary', borderRadius: '30px', minWidth: '40px' }}
                         onClick={handleUpdateQuantity(1)}
                       >
                         <Add fontSize="small" />
                       </Button>
                 </div>
+
+                {/* --- THÔNG BÁO LỖI --- */}
+                {errorMessage && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, fontSize: '0.7rem', width: 'max-content' }}>
+                        {errorMessage}
+                    </Typography>
+                )}
             </div>
             
             <div className='flex items-center gap-2 pr-5'>
@@ -87,10 +109,9 @@ const CartItemCard = ({item}: {item: CartItem}) => {
             </div>
         </div>
 
-        {/* 3. Gắn sự kiện xóa vào nút Close */}
         <div className='absolute top-1 right-1'>
             <IconButton 
-                color='error' // Đổi sang màu error (đỏ) cho đúng ý nghĩa nút xóa
+                color='error' 
                 onClick={handleRemoveCartItem}
             >
                 <Close/>
