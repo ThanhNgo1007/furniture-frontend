@@ -116,7 +116,7 @@ const Navbar = () => {
 
     // --- 3. CẬP NHẬT GIAO DIỆN MOBILE MENU (3 CẤP) ---
     const MobileMenuContent = () => (
-        <Box sx={{ width: 280 }} role="presentation" className="pt-5 h-full bg-white overflow-y-auto">
+        <Box sx={{ width: 280 }} role="presentation" className="pt-5 h-full bg-gray-50 overflow-y-auto">
             <div className="flex justify-center mb-5 border-b pb-4">
                 <h1 className="logo text-2xl text-[#E27E6A] font-bold">AptDeco</h1>
             </div>
@@ -210,8 +210,33 @@ const Navbar = () => {
                     );
                 })}
             </List>
+            <div className="p-5 border-t mt-auto bg-gray-50">
+            <Button 
+                onClick={() => {
+                    navigate('/become-seller');
+                    setOpenMobileMenu(false);
+                }}
+                fullWidth
+                startIcon={<Storefront />} 
+                variant="outlined" // Hoặc "contained" nếu muốn nổi bật
+                sx={{ 
+                    borderRadius: '20px', 
+                    textTransform: 'none', 
+                    borderColor: 'black', 
+                    color: 'black', 
+                    bgcolor: 'white',
+                    py: 1.5,
+                    fontWeight: 'bold',
+                    '&:hover': { borderColor: '#E27E6A', color: '#E27E6A', bgcolor: 'white' }
+                }}
+            >
+                {t('navbar.becomeSeller')}
+            </Button>
+        </div>
+            
         </Box>
     );
+    
 
     // --- Logic Seller/Admin & Render Desktop (Giữ nguyên) ---
     const isSeller = location.pathname.startsWith("/seller");

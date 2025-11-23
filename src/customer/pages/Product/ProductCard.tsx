@@ -1,13 +1,13 @@
-import { Favorite, FavoriteBorder, ModeComment } from '@mui/icons-material'; // Thêm FavoriteBorder
-import { Button } from '@mui/material'
-import { teal } from '@mui/material/colors'
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { addProductToWishlist } from '../../../State/customer/wishlistSlice'
-import { useAppDispatch } from '../../../State/Store'
-import type { Product } from '../../../types/ProductTypes'
-import { formatVND } from '../../../Util/formatCurrency'
-import './ProductCard.css'
+import { Favorite, FavoriteBorder, ModeComment } from '@mui/icons-material';
+import { Button } from '@mui/material';
+import { teal } from '@mui/material/colors';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { addProductToWishlist } from '../../../State/customer/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '../../../State/Store';
+import type { Product } from '../../../types/ProductTypes';
+import { formatVND } from '../../../Util/formatCurrency';
+import './ProductCard.css';
 
 const ProductCard = ({ item }: { item: Product }) => {
   const [currentImage, setCurrentImage] = useState(0)
@@ -15,82 +15,112 @@ const ProductCard = ({ item }: { item: Product }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch();
   
-  // State quản lý trạng thái yêu thích (trong thực tế nên check từ store xem ID này có chưa)
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  // 1. LẤY DANH SÁCH WISHLIST TỪ STORE (Thay vì dùng useState)
+  const { wishlist } = useAppSelector(store => store.wishlist);
 
+  // 2. KIỂM TRA XEM SẢN PHẨM NÀY CÓ TRONG WISHLIST KHÔNG
+  // (Dùng optional chaining ?. để tránh lỗi nếu wishlist null)
+  const isWishlisted = wishlist?.products?.some((p) => p.id === item.id);
+
+  // Hiệu ứng chuyển ảnh khi hover
   useEffect(() => {
-    if (isHovered) {
-      const interval = setInterval(() => {
+    let interval: any;
+    if (isHovered && item.images && item.images.length > 1) {
+      interval = setInterval(() => {
         setCurrentImage(prevImage => (prevImage + 1) % item.images.length)
       }, 1000)
-      return () => clearInterval(interval)
-    }
-  }, [isHovered])
-
-  const handleAddToWishlist = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
-    
-    // KIỂM TRA: Chỉ thực hiện nếu item.id tồn tại (không phải undefined)
-    if (item.id) {
-        dispatch(addProductToWishlist({ productId: item.id }));
-        setIsWishlisted(!isWishlisted);
-        console.log("Added to wishlist:", item.id);
     } else {
-        console.error("Cannot add to wishlist: Product ID is missing");
+        setCurrentImage(0); // Reset về ảnh đầu
+    }
+    return () => clearInterval(interval)
+  }, [isHovered, item.images])
+
+  // 3. HÀM XỬ LÝ THÊM/XÓA WISHLIST
+  const handleAddToWishlist = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Ngăn sự kiện click lan ra thẻ cha (không navigate)
+    
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+        if (item.id) {
+            // Logic Backend: Có rồi thì xóa, chưa có thì thêm
+            dispatch(addProductToWishlist({ productId: item.id, jwt }));
+        }
+    } else {
+        // Chưa đăng nhập thì chuyển hướng
+        navigate("/login");
     }
   };
+
+  const handleNavigate = () => {
+     if(item.id) {
+         navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)
+     }
+  }
 
   return (
     <>
       <div
-        onClick={() =>
-          navigate(
-            `/product-details/${item.category?.categoryId}/${item.title}/${item.id}`
-          )
-        }
+        onClick={handleNavigate}
         className="group p-4 relative cursor-pointer"
       >
         <div
           className="card"
           onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => {
-            setIsHovered(false)
-            setCurrentImage(0); // Reset về ảnh đầu khi bỏ chuột ra
-          }}
+          onMouseLeave={() => setIsHovered(false)}
         >
-          {item.images.map((img, index) => (
+          {item.images && item.images.map((img, index) => (
             <img
               key={index}
               className="card-media"
               src={img}
-              style={{ transform: `translateX(${(index - currentImage) * 100}%)` }}
+              // Hiệu ứng trượt ảnh hoặc hiện/ẩn tùy CSS của bạn
+              style={{ 
+                  transform: `translateX(${(index - currentImage) * 100}%)`,
+                  opacity: index === currentImage ? 1 : 0 // Fallback nếu CSS transform không hoạt động như ý
+              }}
               alt={item.title}
             />
           ))}
           
-          {/* Lớp phủ khi Hover */}
+          {/* Lớp phủ khi Hover - CHỈ HIỆN KHI HOVER */}
           {isHovered && (
             <div className="indicator flex flex-col items-center space-y-2">
               <div className="flex gap-3">
-                {/* --- NÚT WISHLIST ĐÃ SỬA --- */}
+                {/* --- NÚT WISHLIST --- */}
                 <Button 
                     variant="contained" 
                     color="secondary" 
-                    onClick={handleAddToWishlist} // Gắn hàm xử lý
-                    sx={{ minWidth: '40px', width: '40px', height: '40px', borderRadius: '50%', p: 0 }} // Style tròn
+                    onClick={handleAddToWishlist}
+                    sx={{ 
+                        minWidth: '40px', 
+                        width: '40px', 
+                        height: '40px', 
+                        borderRadius: '50%', 
+                        p: 0,
+                        bgcolor: 'white',
+                        '&:hover': { bgcolor: '#f5f5f5' }
+                    }} 
                 >
                   {isWishlisted ? (
-                    <Favorite sx={{ color: 'red' }} />
+                    <Favorite sx={{ color: 'red' }} /> // Đỏ nếu đã thích
                   ) : (
-                    <FavoriteBorder sx={{ color: teal[300] }} />
+                    <FavoriteBorder sx={{ color: teal[300] }} /> // Viền xanh nếu chưa thích
                   )}
                 </Button>
 
-                {/* Nút Comment/Review */}
+                {/* Nút Comment/Review (Chưa có chức năng) */}
                 <Button 
                     variant="contained" 
                     color="secondary"
-                    sx={{ minWidth: '40px', width: '40px', height: '40px', borderRadius: '50%', p: 0 }}
+                    sx={{ 
+                        minWidth: '40px', 
+                        width: '40px', 
+                        height: '40px', 
+                        borderRadius: '50%', 
+                        p: 0,
+                        bgcolor: 'white',
+                        '&:hover': { bgcolor: '#f5f5f5' }
+                    }}
                 >
                   <ModeComment sx={{ color: teal[300] }} />
                 </Button>
@@ -117,20 +147,19 @@ const ProductCard = ({ item }: { item: Product }) => {
               {/* Giá bán */}
               <div className="price font-bold text-xl">
                 {formatVND(item.sellingPrice)}
-              </div>
-
-              {/* Giá gốc (nếu có giảm giá) */}
+              </div>    
+            </div>
+            {/* Giá gốc (nếu có giảm giá) */}
               {item.msrpPrice > item.sellingPrice && (
-                  <>
+                  <div className="flex items-center gap-2">
                     <div className="original-price text-sm text-gray-400 line-through">
                         {formatVND(item.msrpPrice)}
                     </div>
                     <span className="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded">
                         -{item.discountPercent}%
                     </span>
-                  </>
+                  </div>
               )}
-            </div>
           </div>
         </div>
       </div>

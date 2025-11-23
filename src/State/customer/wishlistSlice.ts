@@ -28,11 +28,11 @@ export const getWishlistByUserId = createAsyncThunk(
 
 export const addProductToWishlist = createAsyncThunk(
   "wishlist/addProductToWishlist",
-  async ({ productId }: { productId: number }, { rejectWithValue }) => {
+  async (req: { jwt: string; productId: number }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/api/wishlist/add-product/${productId}`, {}, {
+      const response = await api.post(`/api/wishlist/add-product/${req.productId}`, {}, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`
+          Authorization: `Bearer ${req.jwt}`
         },
       });
       console.log("product added to wishlist", response.data);
@@ -40,6 +40,25 @@ export const addProductToWishlist = createAsyncThunk(
     } catch (error: any) {
       console.log("error", error);
       return rejectWithValue(error.response?.data.message || "Failed to add product to wishlist");
+    }
+  }
+);
+
+export const removeProductFromWishlist = createAsyncThunk(
+  "wishlist/removeProductFromWishlist",
+  async ({ productId }: { productId: number }, { rejectWithValue }) => {
+    try {
+      // Gọi endpoint remove-product mới tạo
+      const response = await api.put(`/api/wishlist/remove-product/${productId}`, {}, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`
+        },
+      });
+      console.log("product removed from wishlist", response.data);
+      return response.data;
+    } catch (error: any) {
+      console.log("error", error);
+      return rejectWithValue(error.response?.data.message || "Failed to remove product");
     }
   }
 );
@@ -77,6 +96,18 @@ const wishlistSlice = createSlice({
         state.loading = false;
       })
       .addCase(addProductToWishlist.rejected, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(removeProductFromWishlist.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeProductFromWishlist.fulfilled, (state, action: PayloadAction<Wishlist>) => {
+        state.wishlist = action.payload;
+        state.loading = false;
+      })
+      .addCase(removeProductFromWishlist.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       })

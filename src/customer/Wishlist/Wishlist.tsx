@@ -21,11 +21,11 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../State/Store';
 import { addItemToCart } from '../../State/customer/cartSlice';
-import { getWishlistByUserId } from '../../State/customer/wishlistSlice';
+import { getWishlistByUserId, removeProductFromWishlist } from '../../State/customer/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '../../State/Store';
 import type { Product } from '../../types/ProductTypes';
-
+import { formatVND } from '../../Util/formatCurrency'; // Import hàm format tiền nếu có
 
 const Wishlist = () => {
   const navigate = useNavigate();
@@ -40,61 +40,70 @@ const Wishlist = () => {
 
   useEffect(() => {
     if (localStorage.getItem("jwt")) {
-      dispatch(getWishlistByUserId());
+      dispatch(getWishlistByUserId())
     } else {
       navigate('/login');
     }
+
   }, [dispatch, navigate]);
 
-  // --- SỬA HÀM NÀY ---
+  // --- 1. HÀM XỬ LÝ THÊM VÀO GIỎ HÀNG ---
   const handleAddToCart = (product: Product) => {
-    // 1. Kiểm tra ID tồn tại
-    if (!product.id) {
-        console.error("Product ID is missing");
-        return;
-    }
+    if (!product.id) return;
 
-    // 2. Kiểm tra trùng lặp (Thêm optional chaining ?. để tránh lỗi null)
+    // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa (dựa trên cart state hiện tại)
     const isProductInCart = cart?.cartItemsInBag?.some(
         (cartItem) => cartItem.product?.id === product.id
     );
 
     if (isProductInCart) {
-        setSnackbarMessage("Sản phẩm này đã tồn tại trong giỏ hàng!");
+        setSnackbarMessage("Sản phẩm này đã có trong giỏ hàng!");
         setSnackbarSeverity("warning");
         setOpenSnackbar(true);
         return;
     }
 
-    dispatch(addItemToCart({
-        jwt: localStorage.getItem("jwt") || "",
-        request: {  // <--- THÊM DÒNG NÀY
-            productId: product.id,
-            quantity: 1
-        }
-    })).then((action) => {
-        if (addItemToCart.fulfilled.match(action)) {
-            setSnackbarMessage("Đã thêm sản phẩm vào giỏ hàng!");
-            setSnackbarSeverity("success");
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+        dispatch(addItemToCart({
+            jwt: jwt,
+            request: {
+                productId: product.id,
+                quantity: 1
+            }
+        })).then((action) => {
+            if (addItemToCart.fulfilled.match(action)) {
+                setSnackbarMessage("Đã thêm vào giỏ hàng thành công!");
+                setSnackbarSeverity("success");
+            } else {
+                setSnackbarMessage("Không thể thêm vào giỏ hàng.");
+                setSnackbarSeverity("error");
+            }
             setOpenSnackbar(true);
-        } else {
-            setSnackbarMessage("Thêm vào giỏ thất bại.");
-            setSnackbarSeverity("error");
-            setOpenSnackbar(true);
-        }
-    });
+        });
+    } else {
+        navigate("/login");
+    }
   };
 
-  // --- SỬA HÀM NÀY ---
-  const handleRemove = (itemId?: number) => {
-    if (!itemId) return; // Nếu không có ID thì thoát luôn
-    console.log("Remove item:", itemId);
-    // dispatch(removeProductFromWishlist({ productId: itemId })); 
+  // --- 2. HÀM XỬ LÝ XÓA KHỎI WISHLIST ---
+  const handleRemove = (productId: number) => {
+    const jwt = localStorage.getItem("jwt");
+    if(jwt && productId) {
+        dispatch(removeProductFromWishlist({
+            productId: productId
+        })).then((action) => {
+             if (removeProductFromWishlist.fulfilled.match(action)) {
+                 // Có thể hiện thông báo xóa thành công nếu muốn
+                 console.log("Removed item", productId);
+             }
+        });
+    }
   };
 
   const handleCloseSnackbar = () => setOpenSnackbar(false);
 
-  if (loading) {
+  if (loading && !wishlist) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
         <CircularProgress />
@@ -102,6 +111,7 @@ const Wishlist = () => {
     );
   }
 
+  // Lấy danh sách sản phẩm, nếu null thì trả về mảng rỗng
   const wishlistItems = wishlist?.products || [];
 
   return (
@@ -115,13 +125,12 @@ const Wishlist = () => {
       </Box>
 
       {wishlistItems.length > 0 ? (
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0' }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e0e0e0', borderRadius: '8px' }}>
           <Table sx={{ minWidth: 650 }} aria-label="wishlist table">
             <TableHead sx={{ bgcolor: '#f9fafb' }}>
               <TableRow>
-                {/* Header columns... */}
-                <TableCell align="center" sx={{ fontWeight: 'bold', width: '50px' }}></TableCell>
-                <TableCell align="left" sx={{ fontWeight: 'bold', width: '120px' }}>Image</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', width: '60px' }}>Remove</TableCell>
+                <TableCell align="left" sx={{ fontWeight: 'bold', width: '100px' }}>Image</TableCell>
                 <TableCell align="left" sx={{ fontWeight: 'bold' }}>Product Name</TableCell>
                 <TableCell align="left" sx={{ fontWeight: 'bold' }}>Unit Price</TableCell>
                 <TableCell align="center" sx={{ fontWeight: 'bold' }}>Stock Status</TableCell>
@@ -132,26 +141,33 @@ const Wishlist = () => {
             <TableBody>
               {wishlistItems.map((product) => (
                 <TableRow
-                  key={product.id || Math.random()} // Fallback key nếu id null
+                  key={product.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: '#fafafa' } }}
                 >
+                  {/* Cột Xóa */}
                   <TableCell align="center">
-                    {/* Gọi hàm remove với product.id */}
-                    <IconButton onClick={() => handleRemove(product.id)} color="error" size="small">
-                      <CloseIcon />
+                    <IconButton 
+                        onClick={() => product.id && handleRemove(product.id)} 
+                        color="error" 
+                        size="small"
+                        sx={{ bgcolor: '#fff5f5', '&:hover': { bgcolor: '#fed7d7' } }}
+                    >
+                      <CloseIcon fontSize="small" />
                     </IconButton>
                   </TableCell>
 
+                  {/* Cột Ảnh */}
                   <TableCell align="left">
                     <Avatar
                       variant="rounded"
-                      src={product.images && product.images.length > 0 ? product.images[0] : ""}
+                      src={product.images?.[0] || ""}
                       alt={product.title}
-                      sx={{ width: 80, height: 80, cursor: 'pointer', border: '1px solid #eee' }}
+                      sx={{ width: 70, height: 70, cursor: 'pointer', border: '1px solid #eee' }}
                       onClick={() => product.id && navigate(`/product-details/${product.category?.categoryId}/${product.title}/${product.id}`)}
                     />
                   </TableCell>
 
+                  {/* Cột Tên */}
                   <TableCell align="left">
                     <Typography 
                       variant="subtitle1" 
@@ -160,14 +176,25 @@ const Wishlist = () => {
                     >
                       {product.title}
                     </Typography>
-                  </TableCell>
-
-                  <TableCell align="left">
-                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
-                      ${product.sellingPrice}
+                    <Typography variant="caption" color="text.secondary">
+                        {product.category?.name}
                     </Typography>
                   </TableCell>
 
+                  {/* Cột Giá */}
+                  <TableCell align="left">
+                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
+                      {/* Dùng hàm formatVND nếu có, không thì hiển thị số thường */}
+                      {typeof formatVND === 'function' ? formatVND(product.sellingPrice) : `${product.sellingPrice} đ`}
+                    </Typography>
+                    {product.msrpPrice > product.sellingPrice && (
+                        <Typography variant="caption" sx={{ textDecoration: 'line-through', color: 'gray' }}>
+                            {typeof formatVND === 'function' ? formatVND(product.msrpPrice) : `${product.msrpPrice} đ`}
+                        </Typography>
+                    )}
+                  </TableCell>
+
+                  {/* Cột Trạng thái kho */}
                   <TableCell align="center">
                     <span 
                       style={{ 
@@ -184,11 +211,11 @@ const Wishlist = () => {
                     </span>
                   </TableCell>
 
+                  {/* Cột Nút Mua */}
                   <TableCell align="center">
                     <Button
                       variant="contained"
-                      // Disable nếu hết hàng hoặc không có ID
-                      disabled={!product.quantity || product.quantity <= 0 || !product.id}
+                      disabled={product.quantity && product.quantity <= 0 || !product.id}
                       startIcon={<ShoppingCartIcon />}
                       onClick={() => handleAddToCart(product)}
                       sx={{ 
@@ -207,24 +234,31 @@ const Wishlist = () => {
           </Table>
         </TableContainer>
       ) : (
-        <Box sx={{ textAlign: 'center', mt: 10 }}>
-          <FavoriteBorderIcon sx={{ fontSize: 80, color: '#ddd', mb: 2 }} />
-          <Typography variant="h5" color="text.secondary" gutterBottom>
+        // Giao diện khi trống
+        <Box sx={{ textAlign: 'center', mt: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box sx={{ bgcolor: '#f5f5f5', p: 4, borderRadius: '50%', mb: 2 }}>
+             <FavoriteBorderIcon sx={{ fontSize: 60, color: '#bdbdbd' }} />
+          </Box>
+          <Typography variant="h5" color="text.secondary" gutterBottom sx={{ fontWeight: 500 }}>
             Your wishlist is empty
           </Typography>
-          <Button variant="contained" onClick={() => navigate('/')} sx={{ mt: 2, bgcolor: 'teal' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Create your first wishlist request today.
+          </Typography>
+          <Button variant="contained" onClick={() => navigate('/')} sx={{ bgcolor: 'teal', px: 4, py: 1 }}>
             Continue Shopping
           </Button>
         </Box>
       )}
 
+      {/* Thông báo Snackbar */}
       <Snackbar 
         open={openSnackbar} 
         autoHideDuration={3000} 
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} variant="filled" sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

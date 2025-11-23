@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
+import { addUserAddress } from '../../../State/AuthSlice';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
 
 // Định nghĩa kiểu dữ liệu cho API địa chỉ
@@ -122,6 +123,16 @@ const AddressForm = ({ handleClose }: { handleClose: () => void }) => {
                     item.ward.toLowerCase().trim() === values.ward.toLowerCase().trim() &&
                     item.locality.toLowerCase().trim() === values.locality.toLowerCase().trim()
                 );
+            });
+            
+            dispatch(addUserAddress({
+                jwt: localStorage.getItem("jwt") || "",
+                address: values
+            })).then((action) => {
+                if (addUserAddress.fulfilled.match(action)) {
+                   // Thêm thành công thì đóng modal
+                   handleClose(); 
+                }
             });
 
             if (isDuplicate) {

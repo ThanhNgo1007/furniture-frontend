@@ -15,7 +15,7 @@ const AddressCard = ({ address }: AddressCardProps) => {
         
         {/* Hiển thị Địa chỉ chi tiết */}
         <p className='text-gray-600'>
-            {address?.address}, {address?.ward}, {address?.locality} {address?.pinCode}, {address?.city}
+            {address?.address}, {address?.ward}, {address?.locality}, {address?.city} - {address?.pinCode}
         </p>
         
         {/* Hiển thị Số điện thoại */}
