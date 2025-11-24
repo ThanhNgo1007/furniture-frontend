@@ -1,26 +1,19 @@
-import React from 'react';
 
 import RoomCategoryCard from './ShopByCategoryCard'; // Import the card component
-import bedImage from '@/assets/bed.jpg'; 
-import diningImage from '@/assets/pic4.jpg';
-import officeImage from '@/assets/home_office.jpg';
-import bathImage from '@/assets/bath.jpg';
-import livingImage from '@/assets/living.jpg';
-import kitchenImage from '@/assets/dining.jpg';
 // 1. Correctly import Swiper components and modules
-import { Swiper, SwiperSlide } from 'swiper/react';
 import { Scrollbar } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 
 
 // Sample data
 const roomInspirations = [
-  { name: 'Bedroom', image: bedImage },
-  { name: 'Living room', image: livingImage },
-  { name: 'Kitchen', image: kitchenImage },
-  { name: 'Dining', image: diningImage },
-  { name: 'Home office', image: officeImage },
-  { name: 'Bathroom', image: bathImage },
+  { name: 'Bedroom', image: 'https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif' },
+  { name: 'Living room', image: 'https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif' },
+  { name: 'Kitchen', image: 'https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif' },
+  { name: 'Dining', image: 'https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif' },
+  { name: 'Home office', image: 'https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif' },
+  { name: 'Bathroom', image: 'https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif' },
 ];
 
 const RoomCategory = () => {
