@@ -7,14 +7,17 @@ import type { User } from '../types/userTypes';
 // --- CÁC ACTION CŨ GIỮ NGUYÊN ---
 
 export const sendLoginSignupOtp = createAsyncThunk(
-  '/sellers/sendLoginSignupOtp',
-  async ({ email }: { email: string }, { rejectWithValue }) => {
+  '/auth/sendLoginSignupOtp',
+  // SỬA: Thêm tham số role vào payload
+  async ({ email, role }: { email: string; role?: string }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/auth/sent/login-signup-otp', { email })
+      // SỬA: Gửi cả email và role lên API
+      const response = await api.post('/auth/sent/login-signup-otp', { email, role })
       console.log('login otp', response)
+      return response.data
     } catch (error: any) {
       console.log('error', error)
-      return rejectWithValue(error.response?.data || "Failed to send OTP") // Thêm return lỗi để bắt ở rejected
+      return rejectWithValue(error.response?.data || "Failed to send OTP")
     }
   }
 )

@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, CircularProgress, TextField } from '@mui/material'
-import { useFormik } from 'formik'
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-// Nhớ import resetAuth từ slice
-import { resetAuth, sendLoginSignupOtp, signing } from '../../../State/AuthSlice'
-import { useAppDispatch, useAppSelector } from '../../../State/Store'
+import { Button, CircularProgress, TextField } from '@mui/material';
+import { useFormik } from 'formik';
+import { useEffect, useState } from 'react'; // Import useState
+import { useNavigate } from 'react-router-dom';
+import { resetAuth, sendLoginSignupOtp, signing } from '../../../State/AuthSlice';
+import { useAppDispatch, useAppSelector } from '../../../State/Store';
 
 const LoginForm = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { auth } = useAppSelector(store => store)
+  const [timer, setTimer] = useState(0) // State bộ đếm
 
   // 1. Tự động chuyển hướng khi isLoggedIn = true
   useEffect(() => {
@@ -19,12 +19,27 @@ const LoginForm = () => {
     }
   }, [auth.isLoggedIn, navigate])
 
-  // 2. Reset state (loading, error, otpSent) khi rời khỏi trang Login
+  // 2. Reset state
   useEffect(() => {
     return () => {
       dispatch(resetAuth())
     }
   }, [dispatch])
+
+  // 3. Logic đếm ngược
+  useEffect(() => {
+    let interval: any;
+
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1)
+      }, 1000)
+    }
+    
+    return () => {
+        if(interval) clearInterval(interval)
+    }
+  }, [timer])
 
   const formik = useFormik({
     initialValues: {
@@ -32,7 +47,6 @@ const LoginForm = () => {
       otp: ''
     },
     onSubmit: values => {
-      // Formik submit chỉ dùng để gọi hàm Login (Signing)
       dispatch(signing(values))
     }
   })
@@ -43,68 +57,62 @@ const LoginForm = () => {
       formik.setFieldError('email', 'Please enter a valid email address.')
       return
     }
-
-    // Không cần setIsSendingOtp, Redux sẽ tự set auth.loading = true khi action này chạy
+    
+    // Gọi action gửi OTP
     try {
-      await dispatch(sendLoginSignupOtp({ email: formik.values.email })).unwrap()
-    } catch (error: any) {
-      console.error('Failed to send OTP:', error)
-      formik.setFieldError('email', 'Failed to send OTP')
+        await dispatch(sendLoginSignupOtp({ email: formik.values.email })).unwrap()
+        setTimer(60) // Set 60 giây sau khi gửi thành công
+    } catch (error) {
+        console.error("Lỗi gửi OTP", error)
     }
-  }
-
-  // Hàm xử lý khi bấm "Change email"
-  const handleChangeEmail = () => {
-    dispatch(resetAuth()) // Reset otpSent về false thông qua Redux Action
-    formik.setFieldValue('otp', '') // Xóa giá trị OTP trong form
   }
 
   return (
     <div>
-      <h1 className="text-center font-bold text-xl text-[#E27E6A] pb-8">Login</h1>
-      <form onSubmit={formik.handleSubmit} className="space-y-6" noValidate>
-        {/* LOGIC HIỂN THỊ: Dựa hoàn toàn vào auth.otpSent */}
-        {!auth.otpSent ? (
-          <div className="space-y-6 flex flex-col gap-6">
-            <TextField
-              fullWidth
-              id="email"
-              name="email"
-              label="Email address"
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              helperText={formik.touched.email && formik.errors.email}
-              // Disabled khi đang loading (gửi OTP hoặc Login)
-              disabled={auth.loading}
-            />
+      <h1 className="text-center font-bold text-xl text-primary pb-5">
+        Login
+      </h1>
+      <form className="space-y-3" onSubmit={formik.handleSubmit}>
+        <TextField
+          fullWidth
+          name="email"
+          label="Email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.email && Boolean(formik.errors.email)}
+          helperText={formik.touched.email && formik.errors.email}
+        />
 
+        {/* Kiểm tra logic hiển thị nút Send OTP */}
+        {!auth.otpSent || timer > 0 ? (
             <Button
-              variant="contained"
-              onClick={handleSendOtp} // Nút này gọi hàm gửi OTP riêng
-              disabled={auth.loading} // Disable khi đang loading
-              className="w-full flex justify-center rounded-lg text-white py-4"
-              sx={{ py: '11px', color: 'white' }}
+                onClick={handleSendOtp}
+                fullWidth
+                variant="contained"
+                disabled={auth.loading || timer > 0} // Disable khi loading hoặc đang đếm
+                sx={{ py: '11px' }}
             >
-              {auth.loading ? <CircularProgress size={28} color="inherit" /> : 'Send OTP'}
+                {auth.loading ? (
+                    <CircularProgress size={24} color="inherit" />
+                ) : timer > 0 ? (
+                    `Resend OTP in ${timer}s`
+                ) : (
+                    'Send OTP'
+                )}
             </Button>
-          </div>
-        ) : (
-          <div className="space-y-6 flex flex-col gap-6">
-            <div className="text-center">
-              <p className="text-sm text-gray-600">An OTP has been sent to</p>
-              <p className="font-semibold text-gray-800">{formik.values.email}</p>
+        ) : null}
 
-              <Button
-                variant="text"
-                className="text-sm text-primary hover:underline mt-1 normal-case"
-                onClick={handleChangeEmail} // Gọi hàm reset thông qua Redux
-                disabled={auth.loading}
-              >
-                (Change email)
-              </Button>
-            </div>
+        {auth.otpSent && (
+          <div className="space-y-3">
+             {/* Nút gửi lại OTP nhỏ */}
+             {timer === 0 && (
+                <div className='text-right'>
+                    <Button size='small' onClick={handleSendOtp} disabled={auth.loading}>
+                        Resend OTP
+                    </Button>
+                </div>
+             )}
 
             <p className="font-medium text-sm opacity-60">
               Enter OTP sent to your email !
@@ -112,7 +120,6 @@ const LoginForm = () => {
 
             <TextField
               fullWidth
-              id="otp"
               name="otp"
               label="Enter OTP"
               value={formik.values.otp}
@@ -133,7 +140,7 @@ const LoginForm = () => {
             />
 
             <Button
-              type="submit" // Nút này kích hoạt formik.onSubmit (Login)
+              type="submit"
               variant="contained"
               disabled={auth.loading}
               className="w-full flex justify-center py-3 rounded-lg"
