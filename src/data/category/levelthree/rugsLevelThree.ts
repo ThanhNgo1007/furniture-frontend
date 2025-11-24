@@ -1,19 +1,19 @@
 export const rugsLevelThree = [
   {
-    "name": "Area rugs",
-    "categoryId": "area-rugs",
+    "name": "Medium, large and extra-large rugs",
+    "categoryId": "medium-large-extra-large-rugs",
     "parentCategoryId": "rugs_lv2",
     "parentCategoryName": "Rugs",
   },
   {
-    "name": "Runner rugs",
+    "name": "Runner & small rugs",
     "categoryId": "runner-rugs",
     "parentCategoryId": "rugs_lv2",
     "parentCategoryName": "Rugs",
   },
   {
-    "name": "Small rugs",
-    "categoryId": "small-rugs",
+    "name": "Outdoor rugs",
+    "categoryId": "outdoor-rugs",
     "parentCategoryId": "rugs_lv2",
     "parentCategoryName": "Rugs",
   },

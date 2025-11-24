@@ -2,11 +2,13 @@
 import { Button, CircularProgress, TextField } from '@mui/material'
 import { useFormik } from 'formik'
 import { useState } from 'react'
-import { sendLoginSignupOtp } from '../../../State/AuthSlice'
+import { useNavigate } from 'react-router-dom'
+import { sendLoginSignupOtp, signup } from '../../../State/AuthSlice'
 import { useAppDispatch } from '../../../State/Store'
 
 const RegisterForm = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [isOtpSent, setIsOtpSent] = useState(false)
   const [isSendingOtp, setIsSendingOtp] = useState(false)
 
@@ -16,8 +18,25 @@ const RegisterForm = () => {
       otp: '',
       fullName: ''
     },
-    onSubmit: values => {
-      console.log('form data', values)
+    onSubmit: (values) => {
+      const loginRequest = {
+        email: values.email,
+        otp: values.otp,
+        fullName: values.fullName 
+      }
+      
+      // Dispatch action gửi dữ liệu lên server
+      dispatch(signup(loginRequest))
+        .unwrap() // Dùng unwrap để bắt lỗi/thành công từ createAsyncThunk
+        .then(() => {
+             // Xử lý khi thành công (ví dụ: chuyển hướng hoặc đóng modal)
+             console.log("Đăng ký thành công");
+             navigate("/"); 
+        })
+        .catch((error) => {
+             // Xử lý khi lỗi
+             console.error("Đăng ký thất bại", error);
+        });
     }
   })
 

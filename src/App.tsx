@@ -24,30 +24,46 @@ import { fetchSellerProfile } from './State/seller/sellerSlice'
 import { useAppDispatch, useAppSelector } from './State/Store'
 import customTheme from './theme/customTheme'
 
+// --- HÀM GIẢI MÃ JWT (Không cần thư viện ngoài) ---
+const parseJwt = (token: string) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+};
+
 function App() {
   const dispatch = useAppDispatch()
-  const { seller, auth } = useAppSelector(store => store)
+  const { auth } = useAppSelector(store => store)
   const navigate = useNavigate()
 
-  //Fetch seller profile
+  // --- LOGIC MỚI: CHỈ GỌI 1 API DỰA TRÊN ROLE TRONG TOKEN ---
   useEffect(() => {
-    if (auth.jwt) {
-      dispatch(fetchSellerProfile(localStorage.getItem('jwt') || ''))
-    }
-  }, [])
+    const jwt = localStorage.getItem("jwt") || auth.jwt;
 
-  //When seller is logged in navigate to seller dashboard
-  useEffect(() => {
-    if (seller.profile) {
-      navigate('/seller')
-    }
-  }, [seller.profile])
+    if (jwt) {
+      const decodedJwt = parseJwt(jwt);
+      // Lấy role từ claim "authorities" (Do JwtProvider.java cấu hình)
+      // Cấu trúc thường là: authorities: [{authority: "ROLE_SELLER"}]
+      const role = decodedJwt?.authorities?.[0]?.authority;
 
-  useEffect(() => {
-    if (auth.jwt) {
-      dispatch(fetchUserProfile({ jwt: auth.jwt || localStorage.getItem('jwt') }))
+      if (role === "ROLE_SELLER") {
+        dispatch(fetchSellerProfile(jwt));
+        // Nếu đang ở trang chủ khách hàng, có thể redirect sang seller dashboard (Tuỳ chọn)
+        // navigate('/seller'); 
+      } 
+      else if (role === "ROLE_ADMIN") {
+        // Nếu có action fetchAdminProfile thì gọi ở đây
+        // navigate('/admin');
+      } 
+      else {
+        // Mặc định là Customer
+        dispatch(fetchUserProfile({ jwt }));
+      }
     }
-  }, [auth.jwt])
+  }, [auth.jwt, dispatch]); // Chỉ chạy lại khi jwt thay đổi
+  // -----------------------------------------------------------
 
   return (
     <ThemeProvider theme={customTheme}>

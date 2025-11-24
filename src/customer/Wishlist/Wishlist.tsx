@@ -1,14 +1,10 @@
-import CloseIcon from '@mui/icons-material/Close';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {
   Alert,
-  Avatar,
   Box,
   Button,
   CircularProgress,
   Container,
-  IconButton,
   Paper,
   Snackbar,
   Table,
@@ -25,7 +21,7 @@ import { addItemToCart } from '../../State/customer/cartSlice';
 import { getWishlistByUserId, removeProductFromWishlist } from '../../State/customer/wishlistSlice';
 import { useAppDispatch, useAppSelector } from '../../State/Store';
 import type { Product } from '../../types/ProductTypes';
-import { formatVND } from '../../Util/formatCurrency'; // Import hàm format tiền nếu có
+import WishlistItemRow from './WishlistItemRow';
 
 const Wishlist = () => {
   const navigate = useNavigate();
@@ -140,95 +136,7 @@ const Wishlist = () => {
             
             <TableBody>
               {wishlistItems.map((product) => (
-                <TableRow
-                  key={product.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 }, '&:hover': { bgcolor: '#fafafa' } }}
-                >
-                  {/* Cột Xóa */}
-                  <TableCell align="center">
-                    <IconButton 
-                        onClick={() => product.id && handleRemove(product.id)} 
-                        color="error" 
-                        size="small"
-                        sx={{ bgcolor: '#fff5f5', '&:hover': { bgcolor: '#fed7d7' } }}
-                    >
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-
-                  {/* Cột Ảnh */}
-                  <TableCell align="left">
-                    <Avatar
-                      variant="rounded"
-                      src={product.images?.[0] || ""}
-                      alt={product.title}
-                      sx={{ width: 70, height: 70, cursor: 'pointer', border: '1px solid #eee' }}
-                      onClick={() => product.id && navigate(`/product-details/${product.category?.categoryId}/${product.title}/${product.id}`)}
-                    />
-                  </TableCell>
-
-                  {/* Cột Tên */}
-                  <TableCell align="left">
-                    <Typography 
-                      variant="subtitle1" 
-                      sx={{ fontWeight: 600, cursor: 'pointer', '&:hover': { color: 'teal' } }}
-                      onClick={() => product.id && navigate(`/product-details/${product.category?.categoryId}/${product.title}/${product.id}`)}
-                    >
-                      {product.title}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                        {product.category?.name}
-                    </Typography>
-                  </TableCell>
-
-                  {/* Cột Giá */}
-                  <TableCell align="left">
-                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#333' }}>
-                      {/* Dùng hàm formatVND nếu có, không thì hiển thị số thường */}
-                      {typeof formatVND === 'function' ? formatVND(product.sellingPrice) : `${product.sellingPrice} đ`}
-                    </Typography>
-                    {product.msrpPrice > product.sellingPrice && (
-                        <Typography variant="caption" sx={{ textDecoration: 'line-through', color: 'gray' }}>
-                            {typeof formatVND === 'function' ? formatVND(product.msrpPrice) : `${product.msrpPrice} đ`}
-                        </Typography>
-                    )}
-                  </TableCell>
-
-                  {/* Cột Trạng thái kho */}
-                  <TableCell align="center">
-                    <span 
-                      style={{ 
-                        padding: '6px 12px', 
-                        borderRadius: '20px', 
-                        fontSize: '0.75rem',
-                        fontWeight: 'bold',
-                        backgroundColor: (product.quantity && product.quantity > 0) ? '#e6fffa' : '#fff5f5',
-                        color: (product.quantity && product.quantity > 0) ? '#047857' : '#c53030',
-                        border: `1px solid ${(product.quantity && product.quantity > 0) ? '#047857' : '#c53030'}`
-                      }}
-                    >
-                      {(product.quantity && product.quantity > 0) ? "In Stock" : "Out of Stock"}
-                    </span>
-                  </TableCell>
-
-                  {/* Cột Nút Mua */}
-                  <TableCell align="center">
-                    <Button
-                      variant="contained"
-                      disabled={product.quantity && product.quantity <= 0 || !product.id}
-                      startIcon={<ShoppingCartIcon />}
-                      onClick={() => handleAddToCart(product)}
-                      sx={{ 
-                        bgcolor: 'teal', 
-                        textTransform: 'none',
-                        boxShadow: 'none',
-                        '&:hover': { bgcolor: '#0d9488', boxShadow: 'none' } 
-                      }}
-                    >
-                      Add to Cart
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                <WishlistItemRow item={product} onRemove={handleRemove} onAddToCart={handleAddToCart} />
               ))}
             </TableBody>
           </Table>

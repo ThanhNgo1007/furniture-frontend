@@ -6,14 +6,14 @@ export const outdoorLevelThree = [
     "parentCategoryName": "Outdoor & Garden",
   },
   {
-    "name": "Patio Furniture",
-    "categoryId": "patio-furniture",
+    "name": "Outdoor umbrellas",
+    "categoryId": "outdoor-umbrellas",
     "parentCategoryId": "outdoor-garden-lv2",
     "parentCategoryName": "Outdoor & Garden",
   },
   {
-    "name": "Umberlla",
-    "categoryId": "umberlla",
+    "name": "Outdoor lighting",
+    "categoryId": "outdoor-lighting",
     "parentCategoryId": "outdoor-garden-lv2",
     "parentCategoryName": "Outdoor & Garden",
   }

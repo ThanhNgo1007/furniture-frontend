@@ -24,12 +24,20 @@ export const signing = createAsyncThunk<any, any>(
   async (loginRequest, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/signing', loginRequest)
-      console.log('login otp', response.data)
-      localStorage.setItem('jwt', response.data.jwt);
+      console.log('login success', response.data)
+
+      // 1. Lưu Access Token
+      localStorage.setItem('jwt', response.data.jwt)
+
+      // 2. Lưu Refresh Token (QUAN TRỌNG)
+      if (response.data.refreshToken) {
+        localStorage.setItem('refreshToken', response.data.refreshToken)
+      }
+
       return response.data.jwt
     } catch (error: any) {
       console.log('error', error)
-      return rejectWithValue(error.response?.data || "Failed to login") // Thêm return lỗi để bắt ở rejected
+      return rejectWithValue(error.response?.data || "Failed to login")
     }
   }
 )
@@ -198,9 +206,20 @@ const authSlice = createSlice({
       state.isLoggedIn = false
       state.error = action.payload as string
     })
+    builder.addCase(signup.pending, state => {
+      state.loading = true
+      state.error = null
+    })
     builder.addCase(signup.fulfilled, (state, action) => {
       state.jwt = action.payload
       state.isLoggedIn = true
+      state.loading = false
+      state.user = null
+    })
+    builder.addCase(signup.rejected, (state, action) => {
+      state.loading = false
+      state.isLoggedIn = false
+      state.error = action.payload as string
     })
     builder.addCase(fetchUserProfile.fulfilled, (state, action) => {
       state.user = action.payload

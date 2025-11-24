@@ -1,7 +1,7 @@
 export const lightingLevelThree = [
   {
-    "name": "Ceiling lights & chandeliers",
-    "categoryId": "ceiling-lights-chandeliers",
+    "name": "Smart lamps",
+    "categoryId": "smart-lamps",
     "parentCategoryId": "lighting-lv2",
     "parentCategoryName": "Lighting",
   },

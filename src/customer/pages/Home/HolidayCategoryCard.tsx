@@ -1,13 +1,27 @@
-import React from 'react'
-import treeImage from '@/assets/tree-ornaments-accessories-49155.jpeg';
+import React from 'react';
 
-const HolidayCategoryCard = () => {
+// Định nghĩa kiểu dữ liệu cho props
+interface HolidayCategoryCardProps {
+  item: {
+    name: string;
+    imageUrl: string;
+    categoryId: string;
+    // thêm các trường khác nếu cần
+  }
+}
+
+const HolidayCategoryCard: React.FC<HolidayCategoryCardProps> = ({ item }) => {
   return (
     <div className="cursor-pointer rounded-lg bg-gray-100 p-4 group 
     border border-transparent transition-all 
-    hover:border-black text-center hover:underline ">
-        <img className="object-contain h-10 mb-4 h-32 w-32" src={treeImage} alt=" " />
-        <h2 className='text-sm font-semi'>Holiday decor</h2>
+    hover:border-black text-center hover:underline max-w-[150px]"> 
+        {/* Sử dụng item.imageUrl và item.name từ props */}
+        <img 
+          className="object-contain h-10 mb-4 h-32 w-32 mx-auto" 
+          src={item.imageUrl} 
+          alt={item.name} 
+        />
+        <h2 className='text-sm font-semibold text-gray-700'>{item.name}</h2>
     </div>
   )
 }

@@ -2,22 +2,28 @@ import { Divider } from '@mui/material'
 import { useAppSelector } from '../../../State/Store'
 import { formatVND } from '../../../Util/formatCurrency'
 // 1. Import các hàm tính toán
+import { useMemo } from 'react'
 import { sumCartItemMsrpPrice, sumCartItemSellingPrice } from '../../../Util/sumCartItemMsrpPrice'
 
 const PricingCard = () => {
   const { cart } = useAppSelector(store => store.cart)
 
-  if (!cart) return null;
+  const { subtotal, total, totalDiscount } = useMemo(() => {
+      if (!cart) return { subtotal: 0, total: 0, totalDiscount: 0 };
 
-  // 2. Thay đổi logic tính toán: Tính trực tiếp từ danh sách item thay vì lấy field tĩnh
-  // const subtotal = cart.totalMsrpPrice || 0; 
-  // const total = cart.totalSellingPrice || 0;
-  
-  const subtotal = sumCartItemMsrpPrice(cart.cartItemsInBag || []);
-  const total = sumCartItemSellingPrice(cart.cartItemsInBag || []);
-  
-  // Tổng số tiền giảm (Sản phẩm + Coupon)
-  const totalDiscount = subtotal - total;
+      const items = cart.cartItemsInBag || [];
+      // Giả sử bạn import đúng hàm tính tổng
+      const sub = sumCartItemMsrpPrice(items);
+      const tot = sumCartItemSellingPrice(items);
+      
+      return {
+          subtotal: sub,
+          total: tot,
+          totalDiscount: sub - tot
+      };
+  }, [cart]); // Chỉ tính lại khi object cart thay đổi
+
+  if (!cart) return null;
 
   return (
     <div className='space-y-3 p-5 text-lg'>
