@@ -1,12 +1,11 @@
-import React from 'react'
-import deal_pic from '@/assets/PH206443.jpg'
+
 
 const DealCard = () => {
   return (
    <div className="group relative h-[20rem] cursor-pointer overflow-hidden rounded-lg shadow-lg">
       <img
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        src={deal_pic}
+        src="https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif"
         alt="Winter decor deal"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>

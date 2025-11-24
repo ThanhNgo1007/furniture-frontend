@@ -1,8 +1,8 @@
 import { Button } from '@mui/material'
-import React, { useState } from 'react'
-import DealTable from './DealTable'
-import DealCategoryTable from './DealCategoryTable'
+import { useState } from 'react'
 import CreateDealForm from './CreateDealForm'
+import DealCategoryTable from './DealCategoryTable'
+import DealTable from './DealTable'
 
 const tabs = [
   "Deals",

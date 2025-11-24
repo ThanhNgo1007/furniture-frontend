@@ -20,5 +20,15 @@
     "rights": "APTDECO, INC. BẢO LƯU MỌI QUYỀN",
     "privacy": "CHÍNH SÁCH BẢO MẬT",
     "terms": "ĐIỀU KHOẢN SỬ DỤNG"
-  }
+  },
+  "decor": {
+    "name": "Trang trí",
+    "accentpillow": "Gối trang trí",
+    "candles": "Nến",
+    "coatracks": "Móc áo",
+    "curtains": "Rèm",
+    "mirrors": "Gương",
+    "art": "Tranh",
+    "roomdividers": "Vách ngăn"
+}
 }

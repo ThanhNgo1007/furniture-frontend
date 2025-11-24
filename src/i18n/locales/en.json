@@ -20,5 +20,15 @@
     "rights": "APTDECO, INC. ALL RIGHTS RESERVED",
     "privacy": "PRIVACY",
     "terms": "TERMS AND CONDITIONS"
-  }
+  },
+  "decor": {
+    "name": "Decor", 
+    "accentpillow": "Accent Pillows",
+    "candles": "Candles",
+    "coatracks": "Coat Racks",
+    "curtains": "Curtains",
+    "mirrors": "Mirrors",
+    "art": "Art",
+    "roomdividers": "Room Dividers"
+}
 }

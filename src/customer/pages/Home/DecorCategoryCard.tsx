@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Định nghĩa kiểu dữ liệu cho props
-interface HolidayCategoryCardProps {
+interface DecorCategoryCardProps {
   item: {
     name: string;
     imageUrl: string;
@@ -10,7 +10,7 @@ interface HolidayCategoryCardProps {
   }
 }
 
-const HolidayCategoryCard: React.FC<HolidayCategoryCardProps> = ({ item }) => {
+const DecorCategoryCard: React.FC<DecorCategoryCardProps> = ({ item }) => {
   return (
     <div className="cursor-pointer rounded-lg bg-gray-100 p-4 group 
     border border-transparent transition-all 
@@ -26,4 +26,4 @@ const HolidayCategoryCard: React.FC<HolidayCategoryCardProps> = ({ item }) => {
   )
 }
 
-export default HolidayCategoryCard
+export default DecorCategoryCard

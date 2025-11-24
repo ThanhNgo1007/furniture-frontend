@@ -166,31 +166,42 @@ const Navbar = () => {
                 </div>
 
                 {/* RIGHT ICONS */}
-                <div className="flex items-center gap-1 lg:gap-6">
-                    <IconButton><SearchIcon className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
-                    {auth.isLoggedIn ? (
-                        <Button onClick={() => navigate('/account/orders')} className="gap-2 flex items-center" sx={{textTransform: 'none', color: 'black'}}>
-                            <Avatar src="https://avatar.iran.liara.run/public/boy" sx={{width: 32, height: 32}}/>
-                            <span className="font-semibold hidden lg:block ml-2 text-sm">{auth.user?.fullName}</span>
-                        </Button>
-                    ) : (
-                        <Button onClick={() => navigate('/login')} sx={{ textTransform: 'none', px: 2, borderRadius: '20px', '&:hover': { backgroundColor: '#f5f5f5' }, fontSize: 13, color: '#333', border: '1px solid #ddd' }} startIcon={<AccountCircleIcon />}>
-                            {t('navbar.login')}
-                        </Button>
-                    )}
-                    <IconButton onClick={() => navigate('/wishlist')}><FavoriteBorder className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
-                    <IconButton onClick={() => navigate('/cart')}><ShoppingBasketOutlinedIcon className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
-                    {isLarge && (
-                        <Button onClick={() => navigate('/become-seller')} startIcon={<Storefront />} variant="outlined" sx={{ borderRadius: '20px', textTransform: 'none', borderColor: 'black', color: 'black', '&:hover': { borderColor: '#E27E6A', color: '#E27E6A' }}}>
-                            {t('navbar.becomeSeller')}
-                        </Button>
-                    )}
-                </div>
+<div className="flex items-center gap-1 lg:gap-6">
+    <IconButton><SearchIcon className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
+    
+    {/* CHỈ HIỆN KHI MÀN HÌNH LỚN (DESKTOP) */}
+    {isLarge && (
+        auth.isLoggedIn ? (
+            <Button onClick={() => navigate('/account/orders')} className="gap-2 flex items-center" sx={{textTransform: 'none', color: 'black'}}>
+                <Avatar src="https://avatar.iran.liara.run/public/boy" sx={{width: 32, height: 32}}/>
+                <span className="font-semibold hidden lg:block ml-2 text-sm">{auth.user?.fullName}</span>
+            </Button>
+        ) : (
+            <Button
+                onClick={() => navigate('/login')}
+                sx={{ textTransform: 'none', px: 2, borderRadius: '20px', '&:hover': { backgroundColor: '#f5f5f5' }, fontSize: 13, color: '#333', border: '1px solid #ddd' }}
+                startIcon={<AccountCircleIcon />}
+            >
+                {t('navbar.login')}
+            </Button>
+        )
+    )}
+
+    <IconButton onClick={() => navigate('/wishlist')}><FavoriteBorder className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
+    <IconButton onClick={() => navigate('/cart')}><ShoppingBasketOutlinedIcon className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
+    
+    {isLarge && (
+        <Button onClick={() => navigate('/become-seller')} startIcon={<Storefront />} variant="outlined" sx={{ borderRadius: '20px', textTransform: 'none', borderColor: 'black', color: 'black', '&:hover': { borderColor: '#E27E6A', color: '#E27E6A' }}}>
+            {t('navbar.becomeSeller')}
+        </Button>
+    )}
+</div>
             </div>
 
             <Drawer anchor="left" open={openMobileMenu} onClose={() => setOpenMobileMenu(false)}>
-                <MobileNavbar />
-            </Drawer>
+    {/* Truyền hàm đóng vào props */}
+    <MobileNavbar handleClose={() => setOpenMobileMenu(false)} />
+</Drawer>
 
             {/* MEGA MENU SHEET DESKTOP */}
             {activeCategoryId && !activeCategoryId.includes('support') && (

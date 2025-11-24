@@ -1,10 +1,5 @@
-import React from 'react';
 import Slider from "react-slick";
 import DealCard from './DealCard';
-
-// Import CSS (đảm bảo bạn đã import ở file main.tsx hoặc App.tsx)
-// import "slick-carousel/slick/slick.css"; 
-// import "slick-carousel/slick/slick-theme.css";
 
 const Deal = () => {
   const settings = {
@@ -13,7 +8,7 @@ const Deal = () => {
     speed: 500,
     slidesToShow: 6, // Hiển thị 6 slide trên màn hình lớn nhất
     slidesToScroll: 2, // Lướt 2 slide một lần
-     autoplay: true,          // Bật tính năng tự động chuyển slide
+    autoplay: true,          // Bật tính năng tự động chuyển slide
     autoplaySpeed: 5000,     // Thời gian chờ giữa các lần chuyển (2000ms = 2 giây)
     pauseOnHover: true,      // Tạm dừng khi di chuột vào slider (khuyên dùng)
     responsive: [ // Cấu hình responsive
@@ -39,9 +34,16 @@ const Deal = () => {
         }
       },
       {
-        breakpoint: 640, // Dưới 640px
+        breakpoint: 680, // Dưới 680px
         settings: {
           slidesToShow: 2,
+          slidesToScroll: 1
+        }
+      },
+      {
+        breakpoint: 525, // Dưới 640px
+        settings: {
+          slidesToShow: 1,
           slidesToScroll: 1
         }
       }
