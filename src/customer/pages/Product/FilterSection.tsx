@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
@@ -44,6 +45,7 @@ const FilterSection = () => {
   // Chỉ cần set searchParams về rỗng, các RadioGroup sẽ tự động cập nhật
   const clearAllFilters = () => {
     setSearchParams({})
+    setExpendColor(false) // Reset cả UI mở rộng màu nếu cần
   }
 
   return (
@@ -173,6 +175,10 @@ const FilterSection = () => {
                   value={item.value}
                   control={<Radio size="small" />}
                   label={item.name}
+                  sx={{
+                    pb: '10px',
+                    pt: '10px'
+                  }}
                 />
               ))}
             </RadioGroup>

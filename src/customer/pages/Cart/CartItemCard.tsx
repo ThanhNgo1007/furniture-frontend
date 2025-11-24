@@ -1,7 +1,7 @@
 import { Add, Close, Remove } from '@mui/icons-material';
 import { Button, Divider, IconButton, Typography } from '@mui/material';
 // 1. Import thêm deleteCartItem
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { deleteCartItem, updateCartItem } from '../../../State/customer/cartSlice';
 import { useAppDispatch } from '../../../State/Store';
 import { type CartItem } from '../../../types/cartTypes';
@@ -122,4 +122,4 @@ const CartItemCard = ({item}: {item: CartItem}) => {
   )
 }
 
-export default CartItemCard
+export default memo(CartItemCard)

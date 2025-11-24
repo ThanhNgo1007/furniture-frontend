@@ -1,47 +1,52 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { api } from '../../config/Api'
-import type { Product } from '../../types/ProductTypes'
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { api } from '../../config/Api';
+import type { Product } from '../../types/ProductTypes';
 
 const API_URL = '/products'
 
-export const fetchProductById = createAsyncThunk(
+// Định nghĩa kiểu dữ liệu trả về cho phân trang (khớp với Page<Product> của Spring Boot)
+interface ProductsResponse {
+  content: Product[];
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  size: number;
+  number: number;
+}
+
+export const fetchProductById = createAsyncThunk<Product, any>(
   'products/fetchProductById',
   async (productId, { rejectWithValue }) => {
     try {
       const response = await api.get(`${API_URL}/${productId}`)
-
-      const data = response.data
-      console.log('Product details data', data)
-      return data
+      console.log('Product details data', response.data)
+      return response.data
     } catch (error: any) {
-      console.log('error:' + error)
-      rejectWithValue(error.message)
+      console.log('error:', error)
+      // SỬA LỖI: Phải có return rejectWithValue
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   }
 )
 
-export const searchProduct = createAsyncThunk(
+export const searchProduct = createAsyncThunk<Product[], string>(
   'products/searchProduct',
   async (query, { rejectWithValue }) => {
     try {
       const response = await api.get(`${API_URL}/search`, {
-        params: {
-          query
-        }
+        params: { query }
       })
-
-      const data = response.data
-      console.log('search product data:', data)
-      return data
+      console.log('search product data:', response.data)
+      return response.data
     } catch (error: any) {
-      console.log('error:' + error)
-      rejectWithValue(error.message)
+      console.log('error:', error)
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   }
 )
 
-export const fetchAllProducts = createAsyncThunk<any, any>(
+export const fetchAllProducts = createAsyncThunk<ProductsResponse, any>(
   'products/fetchAllProducts',
   async (params, { rejectWithValue }) => {
     try {
@@ -51,13 +56,11 @@ export const fetchAllProducts = createAsyncThunk<any, any>(
           pageNumber: params.pageNumber || 0
         }
       })
-
-      const data = response.data
-      console.log('All product data:', data)
-      return data
+      console.log('All product data:', response.data)
+      return response.data
     } catch (error: any) {
-      console.log('error:' + error)
-      rejectWithValue(error.message)
+      console.log('error:', error)
+      return rejectWithValue(error.response?.data?.message || error.message)
     }
   }
 )
@@ -67,7 +70,7 @@ interface ProductState {
   products: Product[]
   totalPages: number
   loading: boolean
-  error: string | null | undefined | any
+  error: string | null
   searchProduct: Product[]
 }
 
@@ -85,40 +88,49 @@ const productSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: builder => {
+    // Fetch Product By ID
     builder.addCase(fetchProductById.pending, state => {
       state.loading = true
+      state.error = null
     })
-    builder.addCase(fetchProductById.fulfilled, (state, action) => {
+    builder.addCase(fetchProductById.fulfilled, (state, action: PayloadAction<Product>) => {
       state.loading = false
       state.product = action.payload
     })
     builder.addCase(fetchProductById.rejected, (state, action) => {
       state.loading = false
-      state.error = action.payload
+      state.error = action.payload as string
     })
 
+    // Fetch All Products
     builder.addCase(fetchAllProducts.pending, state => {
       state.loading = true
+      state.error = null
     })
-    builder.addCase(fetchAllProducts.fulfilled, (state, action) => {
+    builder.addCase(fetchAllProducts.fulfilled, (state, action: PayloadAction<ProductsResponse>) => {
       state.loading = false
+      // Cập nhật danh sách sản phẩm
       state.products = action.payload.content
+      // SỬA LỖI: Cập nhật tổng số trang để Pagination hoạt động
+      state.totalPages = action.payload.totalPages
     })
     builder.addCase(fetchAllProducts.rejected, (state, action) => {
       state.loading = false
-      state.error = action.payload
+      state.error = action.payload as string
     })
 
+    // Search Product
     builder.addCase(searchProduct.pending, state => {
       state.loading = true
+      state.error = null
     })
-    builder.addCase(searchProduct.fulfilled, (state, action) => {
+    builder.addCase(searchProduct.fulfilled, (state, action: PayloadAction<Product[]>) => {
       state.loading = false
       state.searchProduct = action.payload
     })
     builder.addCase(searchProduct.rejected, (state, action) => {
       state.loading = false
-      state.error = action.payload
+      state.error = action.payload as string
     })
   }
 })
