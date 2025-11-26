@@ -18,6 +18,10 @@ import {
 import { useFormik } from 'formik'
 import { useState } from 'react'
 import { furnituresLevelThree } from '../../../data/category/levelthree/furnituresLevelThree'
+import { lightingLevelThree } from '../../../data/category/levelthree/lightingLevelThree'
+import { outdoorLevelThree } from '../../../data/category/levelthree/outdoorLevelThree'
+import { rugsLevelThree } from '../../../data/category/levelthree/rugsLevelThree'
+import { decorLevelTwo } from '../../../data/category/leveltwo/decorLevelTwo'
 import { furnituresLevelTwo } from '../../../data/category/leveltwo/furnituresLevelTwo'
 import { lightingLevelTwo } from '../../../data/category/leveltwo/lightingLevelTwo'
 import { outdoorLevelTwo } from '../../../data/category/leveltwo/outdoorLevelTwo'
@@ -32,11 +36,16 @@ const categoryTwo: { [key: string]: any[] } = {
   furnitures: furnituresLevelTwo,
   rugs: rugsLevelTwo,
   lighting: lightingLevelTwo,
-  outdoor: outdoorLevelTwo
+  outdoor: outdoorLevelTwo,
+  decor: decorLevelTwo
 }
 
 const categoryThree: { [key: string]: any[] } = {
-  furnitures: furnituresLevelThree
+  furnitures: furnituresLevelThree,
+  rugs: rugsLevelThree,
+  lighting: lightingLevelThree,
+  outdoor: outdoorLevelThree
+  // Note: decor only has level 2 categories, no level 3
 }
 
 const AddProduct = () => {
@@ -331,7 +340,6 @@ const AddProduct = () => {
             <FormControl
               fullWidth
               error={formik.touched.category && Boolean(formik.errors.category)}
-              required
             >
               <InputLabel id="category-label">Third Category</InputLabel>
               <Select

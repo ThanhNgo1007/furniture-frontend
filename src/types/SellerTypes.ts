@@ -5,7 +5,7 @@ export interface PickupAddress {
   address: string
   locality: string
   city: string
-  state: string
+  ward: string
 }
 
 export interface BanksDetails {
@@ -14,8 +14,8 @@ export interface BanksDetails {
   swiftCode: string
 }
 
-export interface BussinessDetails {
-  bussinessName: string
+export interface BusinessDetails {
+  businessName: string
 }
 
 export interface Seller {
@@ -27,7 +27,7 @@ export interface Seller {
   bankDetails: BanksDetails
   sellerName: string
   email: string
-  bussinessDetails: BussinessDetails
+  businessDetails: BusinessDetails
   password: string
   accountStatus?: string
 }

@@ -37,15 +37,12 @@ const SellerLoginForm = () => {
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       setSubmitting(true)
       try {
-        // --- SỬA LẠI TẠI ĐÂY: ---
-        // KHÔNG thêm prefix "seller_" nữa, gửi nguyên values
         await dispatch(sellerLogin(values)).unwrap()
-        
-        // alert('Login Success')
         navigate('/seller')
       } catch (error: any) {
-        // Set lỗi chung chung hoặc lấy từ response
-        setFieldError('otp', 'Wrong OTP or Email') 
+        // Hiển thị message từ backend (bao gồm cả thông báo chưa verify)
+        const errorMsg = typeof error === 'string' ? error : (error?.message || 'Login Failed');
+        setFieldError('otp', errorMsg) 
       } finally {
         setSubmitting(false)
       }
