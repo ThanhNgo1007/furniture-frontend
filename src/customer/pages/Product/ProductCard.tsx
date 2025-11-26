@@ -135,7 +135,7 @@ const ProductCard = ({ item }: { item: Product }) => {
             <h1 className="text-sm text-gray-500">
               Sold by
               <span className="text-[#E27E6A] ml-1 font-medium">
-                {item.seller?.bussinessDetails?.bussinessName}
+                {item.seller?.businessDetails?.businessName}
               </span>
             </h1>
             <p className="text-lg font-bold line-clamp-1">{item.title}</p>

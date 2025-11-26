@@ -53,7 +53,7 @@ const CartItemCard = ({item}: {item: CartItem}) => {
             <div className="space-y-2">
                 <h1 className='font-semibold text-lg'>{item.product.title}</h1>
                 <p className='text-gray-600 font-medium text-sm line-clamp-1'>{item.product.description}</p>
-                <p className='text-gray-400 text-xs'><strong>Sold by: </strong>{item.product.seller?.bussinessDetails.bussinessName}</p>
+                <p className='text-gray-400 text-xs'><strong>Sold by: </strong>{item.product.seller?.businessDetails.businessName}</p>
                 <p className='text-sm'>7 days replacement available</p>
                 <p className='text-sm text-gray-500'><strong>quantity: </strong>{item.quantity}</p>
             </div>

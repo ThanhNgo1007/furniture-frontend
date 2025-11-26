@@ -134,7 +134,7 @@ const ProductDetails = () => {
             <h1 className="font-bold text-lg">
               Sold by{' '}
               <span className="text-[#E27E6A]">
-                {product.product?.seller?.bussinessDetails.bussinessName}
+                {product.product?.seller?.businessDetails.businessName}
               </span>
             </h1>
           </div>
