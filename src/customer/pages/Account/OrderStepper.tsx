@@ -16,16 +16,15 @@ const OrderStepper = ({ orderStatus, orderDate, deliveryDate }: any) => {
 
     // Định nghĩa các bước với dữ liệu ngày động
     const steps = [
-        { name: "Order Placed", description: `on ${formatDate(orderDate)}`, value: "PLACED" },
-        { name: "Packed", description: "Item Packed", value: "CONFIRMED" },
+        { name: "Wait for pending", description: `on ${formatDate(orderDate)}`, value: "PENDING" },
+        { name: "Confirmed", description: "Order confirmed", value: "CONFIRMED" },
+        { name: "Packing", description: "Seller packing", value: "PLACED" },
         { name: "Shipped", description: "On the way", value: "SHIPPED" },
-        { name: "Arriving", description: "Expected soon", value: "ARRIVING" }, // Hoặc logic +1 ngày từ Shipped
-        { name: "Arrived", description: `by ${formatDate(deliveryDate)}`, value: "DELIVERED" },
+        { name: "Delivered", description: `by ${formatDate(deliveryDate)}`, value: "DELIVERED" },
     ];
 
     const canceledStep = [
-        { name: "Order Placed", description: `on ${formatDate(orderDate)}`, value: "PLACED" },
-        { name: "Order Cancelled", description: `on ${formatDate(orderDate)}`, value: "CANCELLED" },
+        { name: "Cancelled", description: `on ${formatDate(orderDate)}`, value: "CANCELLED" },
     ];
 
     const [statusStep, setStatusStep] = useState(steps);
@@ -39,10 +38,9 @@ const OrderStepper = ({ orderStatus, orderDate, deliveryDate }: any) => {
             // Xác định bước hiện tại dựa trên orderStatus
             const stepMap: { [key: string]: number } = {
                 'PENDING': 0,
-                'PLACED': 0,
                 'CONFIRMED': 1,
-                'SHIPPED': 2,
-                'ARRIVING': 3,
+                'PLACED': 2,
+                'SHIPPED': 3,
                 'DELIVERED': 4,
                 'COMPLETED': 4
             };

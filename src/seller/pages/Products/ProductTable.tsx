@@ -45,13 +45,13 @@ export default function ProductTable() {
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Images</StyledTableCell>
-            <StyledTableCell align="center">Title</StyledTableCell>
-            <StyledTableCell align="right">MSRP</StyledTableCell>
-            <StyledTableCell align="right">Selling Price</StyledTableCell>
-            <StyledTableCell align="right">Color</StyledTableCell>
-            <StyledTableCell align="right">Update Stock</StyledTableCell>
-            <StyledTableCell align="right">Update</StyledTableCell>
+            <StyledTableCell>Ảnh</StyledTableCell>
+            <StyledTableCell align="center">Tên sản phẩm</StyledTableCell>
+            <StyledTableCell align="right">Giá gốc</StyledTableCell>
+            <StyledTableCell align="right">Giá bán</StyledTableCell>
+            <StyledTableCell align="right">Màu</StyledTableCell>
+            <StyledTableCell align="right">Số lượng</StyledTableCell>
+            <StyledTableCell align="right">Cập nhật</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -69,7 +69,7 @@ export default function ProductTable() {
               <StyledTableCell align="right">{item.sellingPrice}</StyledTableCell>
               <StyledTableCell align="right">{item.color}</StyledTableCell>
               <StyledTableCell align="right">
-                {<Button size="small">in_stock</Button>}
+                {<Button size="small">{item.quantity}</Button>}
               </StyledTableCell>
               <StyledTableCell align="right">
                 {

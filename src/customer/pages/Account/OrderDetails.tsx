@@ -3,14 +3,14 @@
 import PaymentsIcon from '@mui/icons-material/Payments';
 import { Box, Button, Divider } from '@mui/material';
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 // Import thêm action cancelOrder
 import { cancelOrder, fetchOrderById, fetchOrderItemById } from '../../../State/customer/orderSlice';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
+import { formatVND } from '../../../Util/formatCurrency';
 import OrderStepper from './OrderStepper';
 
 const OrderDetails = () => {
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { orderId, orderItemId } = useParams();
     const { order } = useAppSelector(store => store)
@@ -20,10 +20,6 @@ const OrderDetails = () => {
         dispatch(fetchOrderItemById({ orderItemId: Number(orderItemId), jwt: localStorage.getItem('jwt') || '' }))
 
     }, [dispatch, orderId, orderItemId])
-
-    const formatVND = (price: any) => {
-        return new Intl.NumberFormat('vi-VN').format(price) + "đ"
-    }
 
     // --- THÊM HÀM XỬ LÝ HỦY ĐƠN ---
     const handleCancelOrder = () => {
@@ -54,17 +50,26 @@ const OrderDetails = () => {
 
     return (
         <Box className="space-y-5">
-            {/* ... (Phần hiển thị thông tin sản phẩm giữ nguyên) ... */}
-            <section className='flex flex-col gap-5 justify-center items-center'>
-                <img className="w-[100px]" src={currentItem?.product.images[0]} alt="" />
-                <div className='text-sm space-y-1 text-center'>
-                    <h1 className='font-bold'>{currentItem?.product.title}</h1>
-                    <p className='line-clamp-1 text-gray-500'>{currentItem?.product.description}</p>
-                </div>
-                <div>
-                    <Button onClick={() => navigate(`/review/${currentItem?.product.id}/create`)}>Write Review</Button>
+            {/* Product List Section with Collapse/Expand */}
+            <section className='border p-5'>
+                <h1 className="font-bold pb-3">Order Items ({currentOrder?.orderItems?.length || 0})</h1>
+                <div className="space-y-3">
+                    {currentOrder?.orderItems?.map((item) => (
+                        <div key={item.id} className='flex gap-3 p-3 bg-gray-50 rounded-md'>
+                            <img className="w-[80px] h-[80px] object-cover rounded" src={item.product.images[0]} alt={item.product.title} />
+                            <div className='flex-1 space-y-1'>
+                                <h2 className='font-bold text-sm'>{item.product.title}</h2>
+                                <p className='text-xs text-gray-500 line-clamp-2'>{item.product.description}</p>
+                                <div className="flex justify-between items-center">
+                                    <p className='text-xs text-gray-600'>Quantity: {item.quantity}</p>
+                                    <p className='font-medium text-sm'>{formatVND(item.sellingPrice)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
+
 
             <section className='border-p5'>
                 <OrderStepper 
@@ -110,7 +115,7 @@ const OrderDetails = () => {
                 </div>
                 <Divider />
                 <div className='px-5 p-5'>
-                    <p className="text-xs"><strong>Sold By: </strong>{currentItem?.product.seller?.bussinessDetails.bussinessName}</p>
+                    <p className="text-xs"><strong>Sold By: </strong>{currentItem?.product.seller?.businessDetails.businessName}</p>
                 </div>
                 
                 {/* --- SỬA LOGIC HIỂN THỊ NÚT CANCEL TẠI ĐÂY --- */}

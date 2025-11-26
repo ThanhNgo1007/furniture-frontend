@@ -12,11 +12,11 @@ const UserDetails = () => {
 
             </div>
             <div className='space-y-5'>
-                <ProfileFieldCard keys="Name" value={auth.user?.fullName} />
+                <ProfileFieldCard keys="Name" value={auth.user?.fullName || ""} />
                 <Divider/>
-                <ProfileFieldCard keys="Mobile" value={auth.user?.mobile} />
+                <ProfileFieldCard keys="Mobile" value={auth.user?.mobile || ""} />
                  <Divider/>
-                <ProfileFieldCard keys="Email" value={auth.user?.email} />
+                <ProfileFieldCard keys="Email" value={auth.user?.email || ""} />
             </div>
         </div>
     </div>

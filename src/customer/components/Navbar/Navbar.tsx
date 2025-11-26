@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
-import Storefront from '@mui/icons-material/Storefront';
 import {
-    Avatar, Box, Button,
+    Box,
     Drawer, IconButton,
     Menu, MenuItem, useMediaQuery, useTheme
 } from '@mui/material';
@@ -21,6 +16,26 @@ import SellerDrawerList from '../../../seller/components/SellerDrawerList/Seller
 import { useAppSelector } from '../../../State/Store';
 import CategorySheet from './CategorySheet';
 import MobileNavbar from './MobileNavbar';
+import RightMenuDrawer from './RightMenuDrawer';
+import SearchBar from './SearchBar';
+
+const parseJwt = (token: string) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+};
+
+const isTokenExpired = (token: string) => {
+  try {
+    const decoded = parseJwt(token);
+    if (!decoded || !decoded.exp) return true;
+    return decoded.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
 
 const Navbar = () => {
     const { t } = useTranslation();
@@ -28,6 +43,9 @@ const Navbar = () => {
     const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
     const navigate = useNavigate();
     const location = useLocation();
+    
+    // --- SỬA LỖI REDUX TẠI ĐÂY ---
+    // Chỉ lấy slice auth để tránh re-render toàn bộ và mất cảnh báo console
     const { auth } = useAppSelector(store => store);
 
     const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
@@ -38,6 +56,18 @@ const Navbar = () => {
     
     // State cho Mobile Menu
     const [openMobileMenu, setOpenMobileMenu] = useState(false);
+    
+    const isAuthenticated = useMemo(() => {
+        const jwt = localStorage.getItem('jwt');
+        
+        // Nếu không có JWT hoặc JWT hết hạn → Not authenticated
+        if (!jwt || isTokenExpired(jwt)) {
+            return false;
+        }
+        
+        // Kiểm tra Redux state
+        return auth.isLoggedIn && auth.user !== null;
+    }, [auth.isLoggedIn, auth.user]);
 
     const mainCategory = useMemo(() => {
     return navigation.map((item) => ({
@@ -48,7 +78,7 @@ const Navbar = () => {
             name: t(sub.key)
         }))
     }));
-}, [t]); // Chỉ tính lại khi hàm dịch t thay đổi
+}, [t]); 
 
     const handleClickServices = (event: React.MouseEvent<HTMLDivElement>) => {
         setAnchorEl(event.currentTarget);
@@ -80,29 +110,35 @@ const Navbar = () => {
     }, []);
     
 
-    // --- Logic Seller/Admin & Render Desktop (Giữ nguyên) ---
+    // --- Logic Seller/Admin ---
     const isSeller = location.pathname.startsWith("/seller");
     const isAdmin = location.pathname.startsWith("/admin");
     
     if (isSeller || isAdmin) {
-        // ... (Code Navbar quản lý)
         return (
              <div className="shadow-sm bg-white sticky top-0 z-50 h-[70px] flex items-center px-5 justify-between border-b border-gray-200 relative">
                 <div className="flex items-center gap-3">
-                    <IconButton onClick={() => setOpenDrawer(true)}>
-                        <MenuIcon sx={{ fontSize: 30, color: "teal" }} />
-                    </IconButton>
+                    {/* --- SỬA LOGIC ẨN HAMBURGER --- */}
+                    {/* Chỉ hiển thị nút Menu khi màn hình nhỏ (!isLarge) */}
+                    {!isLarge && (
+                        <IconButton onClick={() => setOpenDrawer(true)}>
+                            <MenuIcon sx={{ fontSize: 30, color: "black" }} />
+                        </IconButton>
+                    )}
+                    
                     <h1 onClick={() => navigate('/')} className="logo cursor-pointer text-2xl md:text-4xl text-[#E27E6A] pl-2">
                         AptDeco
                     </h1>
                 </div>
                 <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
                     <span onClick={() => navigate(isSeller ? '/seller' : '/admin')} className="font-bold text-xl text-gray-600 cursor-pointer hover:text-teal-600 transition-colors">
-                        {isSeller ? "Seller Center" : "Admin Dashboard"}
+                        {isSeller ? "QUẢN LÝ KINH DOANH" : "QUẢN TRỊ VIÊN"}
                     </span>
                 </div>
+                
+                {/* Drawer cho Mobile */}
                 <Drawer open={openDrawer} onClose={() => setOpenDrawer(false)} anchor="left">
-                    <Box sx={{ width: 250 }} role="presentation">
+                    <Box sx={{ width: 400 }} role="presentation">
                         {isSeller ? <SellerDrawerList toggleDrawer={() => setOpenDrawer(false)} /> : <AdminDrawerList toggleDrawer={() => setOpenDrawer(false)} />}
                     </Box>
                 </Drawer>
@@ -110,6 +146,7 @@ const Navbar = () => {
         );
     }
 
+    // --- Logic Khách Hàng (Customer) ---
     return (
         <Box
             onMouseLeave={handleMouseLeave}
@@ -123,9 +160,9 @@ const Navbar = () => {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <h1 onClick={() => navigate('/')} className="logo cursor-pointer text-2xl md:text-4xl text-[#E27E6A]">
+                        {isLarge ? <h1 onClick={() => navigate('/')} className="logo cursor-pointer text-2xl md:text-4xl text-[#E27E6A]">
                             AptDeco
-                        </h1>
+                        </h1> : ""}
                     </div>
 
                     {/* DESKTOP MENU */}
@@ -166,44 +203,16 @@ const Navbar = () => {
                 </div>
 
                 {/* RIGHT ICONS */}
-<div className="flex items-center gap-1 lg:gap-6">
-    <IconButton><SearchIcon className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
-    
-    {/* CHỈ HIỆN KHI MÀN HÌNH LỚN (DESKTOP) */}
-    {isLarge && (
-        auth.isLoggedIn ? (
-            <Button onClick={() => navigate('/account/orders')} className="gap-2 flex items-center" sx={{textTransform: 'none', color: 'black'}}>
-                <Avatar src="https://avatar.iran.liara.run/public/boy" sx={{width: 32, height: 32}}/>
-                <span className="font-semibold hidden lg:block ml-2 text-sm">{auth.user?.fullName}</span>
-            </Button>
-        ) : (
-            <Button
-                onClick={() => navigate('/login')}
-                sx={{ textTransform: 'none', px: 2, borderRadius: '20px', '&:hover': { backgroundColor: '#f5f5f5' }, fontSize: 13, color: '#333', border: '1px solid #ddd' }}
-                startIcon={<AccountCircleIcon />}
-            >
-                {t('navbar.login')}
-            </Button>
-        )
-    )}
-
-    <IconButton onClick={() => navigate('/wishlist')}><FavoriteBorder className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
-    <IconButton onClick={() => navigate('/cart')}><ShoppingBasketOutlinedIcon className="text-gray-700" sx={{ fontSize: 29 }} /></IconButton>
-    
-    {isLarge && (
-        <Button onClick={() => navigate('/become-seller')} startIcon={<Storefront />} variant="outlined" sx={{ borderRadius: '20px', textTransform: 'none', borderColor: 'black', color: 'black', '&:hover': { borderColor: '#E27E6A', color: '#E27E6A' }}}>
-            {t('navbar.becomeSeller')}
-        </Button>
-    )}
-</div>
+                <div className="flex items-center gap-2">
+                    <SearchBar />
+                    {isLarge && <RightMenuDrawer />}
+                </div>
             </div>
 
             <Drawer anchor="left" open={openMobileMenu} onClose={() => setOpenMobileMenu(false)}>
-    {/* Truyền hàm đóng vào props */}
-    <MobileNavbar handleClose={() => setOpenMobileMenu(false)} />
-</Drawer>
+                <MobileNavbar handleClose={() => setOpenMobileMenu(false)} />
+            </Drawer>
 
-            {/* MEGA MENU SHEET DESKTOP */}
             {activeCategoryId && !activeCategoryId.includes('support') && (
                 <div className="categorySheet absolute top-[70px] left-0 right-0 z-10 border-t border-gray-100 shadow-lg" onMouseLeave={() => setActiveCategoryId(null)}>
                     <CategorySheet selectedCategory={activeCategoryId} handleClose={() => setActiveCategoryId(null)} />

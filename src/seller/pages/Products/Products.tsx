@@ -1,10 +1,9 @@
-import React from 'react'
 import ProductTable from './ProductTable'
 
 const Products = () => {
   return (
     <div>
-        <h1 className="font-bold mb-5 text-2xl">All Products</h1>
+        <h1 className="font-bold mb-5 text-2xl">Các sản phẩm của bạn</h1>
         <ProductTable/>
     </div>
   )

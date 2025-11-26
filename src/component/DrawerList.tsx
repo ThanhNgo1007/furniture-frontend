@@ -62,7 +62,7 @@ const DrawerList = ({ menu, menu2, toggleDrawer }: DrawerListProp) => {
               key={index}
               className="pr-12 cursor-pointer"
             >
-              <p
+              <div
                 className={`${
                   item.path == location.pathname
                     ? 'bg-teal-600 text-white'
@@ -74,7 +74,7 @@ const DrawerList = ({ menu, menu2, toggleDrawer }: DrawerListProp) => {
                   {item.path == location.pathname ? item.activeIcon : item.icon}
                 </ListItemIcon>
                 <ListItemText primary={item.name} />
-              </p>
+              </div>
             </div>
           ))}
         </div>

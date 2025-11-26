@@ -1,10 +1,19 @@
 import { Button } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'; // Import useEffect
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import SellerAccountForm from './SellerAccountForm'
 import SellerLoginForm from './SellerLoginForm'
 
 const BecomeSeller = () => {
   const [isLogin, setIsLogin] = useState(false)
+  const location = useLocation(); // Hook để lấy dữ liệu truyền qua navigate
+
+  // Logic: Nếu có state "login: true" được truyền tới -> Bật form Login
+  useEffect(() => {
+    if (location.state?.login) {
+      setIsLogin(true);
+    }
+  }, [location.state]);
 
   const handleShowPage = () => {
     setIsLogin(!isLogin)
@@ -38,10 +47,10 @@ const BecomeSeller = () => {
             <p className="text-4xl">Join AptDeco Bussiness</p>
             <p className="text-xl text-teal-500">Boost your sales today</p>
           </div>
-          <img
-            src="https://res.cloudinary.com/dtlxpw3eh/image/upload/v1762946103/Becoming_an_online_seller_ndq5bx.jpg"
-            alt="img"
-          />
+            <img
+                src="https://res.cloudinary.com/dtlxpw3eh/image/upload/v1762946103/Becoming_an_online_seller_ndq5bx.jpg"
+                alt="img"
+            />
         </div>
       </section>
     </div>

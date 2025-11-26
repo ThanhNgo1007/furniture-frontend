@@ -1,5 +1,4 @@
 import axios from 'axios';
-// Import store và action logout để xử lý khi refresh thất bại
 
 export const API_BASE_URL = 'http://localhost:5454';
 
@@ -10,70 +9,157 @@ export const api = axios.create({
   }
 });
 
-// --- 1. REQUEST INTERCEPTOR: Luôn gắn Access Token mới nhất ---
+// Biến để tránh gọi refresh nhiều lần đồng thời
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// --- 1. REQUEST INTERCEPTOR ---
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("jwt");
+    const token = localStorage.getItem('jwt');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('[API Request Error]', error);
+    return Promise.reject(error);
+  }
 );
 
-// --- 2. RESPONSE INTERCEPTOR: Xử lý Refresh Token khi lỗi 401 ---
+// --- 2. RESPONSE INTERCEPTOR ---
 api.interceptors.response.use(
-  (response) => response, // Nếu thành công thì trả về luôn
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Kiểm tra nếu lỗi là 401 (Unauthorized) và chưa từng thử lại (để tránh lặp vô hạn)
-    if (error.response && (error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {
-      originalRequest._retry = true; // Đánh dấu đã thử lại
+    // 1. Chặn redirect nếu đang ở trang Login (để Form hiển thị lỗi đỏ)
+    if (originalRequest && (
+      originalRequest.url?.includes('/auth/signing') ||
+      originalRequest.url?.includes('/sellers/login') ||
+      originalRequest.url?.includes('/auth/sent/login-signup-otp') ||
+      originalRequest.url?.includes('/auth/refresh') // Thêm: Không retry refresh endpoint
+    )) {
+      console.error('[API] Auth endpoint failed:', error.response?.status);
+      return Promise.reject(error);
+    }
+
+    // 2. Xử lý Token hết hạn (401/403)
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403) &&
+      !originalRequest._retry
+    ) {
+      // Nếu đang refresh, đợi kết quả
+      if (isRefreshing) {
+        console.log('[API] Waiting for token refresh...');
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem("refreshToken");
+
+      if (!refreshToken) {
+        // Không có refresh token, logout ngay
+        console.error('[API] No refresh token found. Logging out...');
+        isRefreshing = false;
+        handleLogout();
+        return Promise.reject(new Error("No refresh token available"));
+      }
+
+      console.log('[API] Attempting to refresh access token...');
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
-
-        // Nếu không có refresh token thì chịu thua -> Logout
-        if (!refreshToken) {
-          throw new Error("No refresh token available");
-        }
-
-        // Gọi API Refresh Token (Lưu ý: API này không dùng instance 'api' để tránh lặp interceptor)
+        // Gọi API Refresh (không dùng instance api để tránh loop)
         const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
           refreshToken: refreshToken
         });
 
-        const { jwt } = response.data;
+        const { jwt: newAccessToken, refreshToken: newRefreshToken } = response.data;
 
-        // 1. Lưu token mới vào localStorage
-        localStorage.setItem("jwt", jwt);
+        console.log('[API] ✅ Token refreshed successfully');
 
-        // 2. Cập nhật header cho request đang bị lỗi
-        originalRequest.headers.Authorization = `Bearer ${jwt}`;
+        // Lưu token mới
+        localStorage.setItem("jwt", newAccessToken);
 
-        // 3. Cập nhật header mặc định cho các request sau
-        api.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+        // Nếu backend trả về refresh token mới thì cập nhật
+        if (newRefreshToken) {
+          localStorage.setItem("refreshToken", newRefreshToken);
+        }
 
-        // 4. Gọi lại request ban đầu với token mới
+        // Cập nhật header mặc định
+        api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+        // Xử lý các request đang chờ
+        processQueue(null, newAccessToken);
+        isRefreshing = false;
+
+        // Retry request gốc
+        console.log('[API] 🔄 Retrying original request with new token');
         return api(originalRequest);
 
-      } catch (refreshError) {
-        // Nếu Refresh Token cũng hết hạn hoặc không hợp lệ -> Logout bắt buộc
-        console.log("Session expired or Refresh failed. Logging out...");
+      } catch (refreshError: any) {
+        // Refresh thất bại - Token hết hạn hoàn toàn
+        processQueue(refreshError, null);
+        isRefreshing = false;
 
-        // Xóa dữ liệu local
-        localStorage.clear();
-
-        // Điều hướng về trang chủ hoặc login (dùng window.location để reload sạch sẽ)
-        window.location.href = "/login";
+        console.error('[API] ❌ Token refresh failed:', refreshError.response?.status, refreshError.response?.data);
+        handleLogout();
 
         return Promise.reject(refreshError);
       }
     }
 
-    // Nếu lỗi không phải 401 hoặc đã thử refresh mà vẫn lỗi
     return Promise.reject(error);
   }
 );
+
+// Hàm logout tự động
+const handleLogout = () => {
+  // 1. Xóa toàn bộ storage
+  localStorage.clear();
+
+  // 2. Dispatch event để Redux Store nhận biết
+  window.dispatchEvent(new CustomEvent('auth:logout'));
+
+  // 3. Redirect dựa vào role/path hiện tại
+  const currentPath = window.location.pathname;
+
+  if (currentPath.startsWith('/seller') || currentPath.startsWith('/admin')) {
+    // Seller/Admin -> về trang become-seller hoặc login
+    window.location.href = "/login";
+  } else {
+    // User thường -> về trang chủ hoặc login
+    window.location.href = "/login";
+  }
+};
+
+export default api;

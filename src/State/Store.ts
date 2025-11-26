@@ -5,8 +5,10 @@ import cartSlice from './customer/cartSlice'
 import orderSlice from './customer/orderSlice'
 import productSlice from './customer/ProductSlice'
 import wishlistSlice from './customer/wishlistSlice'
+import sellerOrderSlice from './seller/sellerOrderSlice'
 import sellerProductSlice from './seller/sellerProductSlice'
 import sellerSlice from './seller/sellerSlice'
+import transactionSlice from './seller/transactionSlice'
 
 const rootReducer = combineReducers({
   //Store seller login state
@@ -17,7 +19,9 @@ const rootReducer = combineReducers({
   auth: authSlice,
   cart: cartSlice,
   order: orderSlice,
-  wishlist: wishlistSlice
+  wishlist: wishlistSlice,
+  sellerOrder: sellerOrderSlice,
+  transactions: transactionSlice
 })
 
 const store = configureStore({
