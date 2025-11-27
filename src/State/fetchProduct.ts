@@ -1,6 +1,8 @@
 import axios from 'axios'
+import { API_BASE_URL } from '../config/Api'
 
-const api = 'http://localhost:5454/products'
+const api = `${API_BASE_URL}/products`
+
 
 export const fetchProduct = async () => {
   try {

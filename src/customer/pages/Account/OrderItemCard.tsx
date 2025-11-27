@@ -52,7 +52,7 @@ const OrderItemCard = ({item, order}: {item: OrderItem, order: Order}) => {
           <img className="w-[70px] h-[70px] object-cover rounded" src={item.product.images[0]} alt="" />
         </div>
         <div className='w-full space-y-2'>
-          <h1 className='font-bold'>{item.product.seller?.bussinessDetails.bussinessName}</h1>
+          <h1 className='font-bold'>{item.product.seller?.businessDetails.businessName}</h1>
           <p className='line-clamp-2'>{item.product.title}</p>
         </div>
       </div>

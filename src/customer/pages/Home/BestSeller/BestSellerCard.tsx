@@ -1,12 +1,11 @@
-import React from 'react';
 
 // Define the types for the props this component will receive
-interface RoomCategoryCardProps {
+interface BestSellerCardProps {
   name: string;
   image: string;
 }
 
-const RoomCategoryCard = ({ name, image }: RoomCategoryCardProps) => {
+const BestSellerCard = ({ name, image }: BestSellerCardProps) => {
   return (
     <div className="flex flex-col cursor-pointer group">
       <img
@@ -24,4 +23,4 @@ const RoomCategoryCard = ({ name, image }: RoomCategoryCardProps) => {
   );
 };
 
-export default RoomCategoryCard;
+export default BestSellerCard;

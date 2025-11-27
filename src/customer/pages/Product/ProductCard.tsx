@@ -2,6 +2,7 @@ import { Favorite, FavoriteBorder, ModeComment } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { teal } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { addProductToWishlist } from '../../../State/customer/wishlistSlice';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
@@ -9,12 +10,16 @@ import type { Product } from '../../../types/ProductTypes';
 import { formatVND } from '../../../Util/formatCurrency';
 import './ProductCard.css';
 
-const ProductCard = ({ item }: { item: Product }) => {
+const ProductCard = ({ item, isBestSeller }: { item: Product; isBestSeller?: boolean }) => {
+  const { t } = useTranslation();
   const [currentImage, setCurrentImage] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
   const navigate = useNavigate()
   const dispatch = useAppDispatch();
   
+  // Check if this product is a best seller from Redux - OPTIMIZED SELECTOR
+  const bestSellerIds = useAppSelector(store => store.product.bestSellerIds);
+  const isProductBestSeller = isBestSeller || (item.id !== undefined && bestSellerIds.includes(item.id));
   // 1. LẤY DANH SÁCH WISHLIST TỪ STORE (Thay vì dùng useState)
   const { wishlist } = useAppSelector(store => store.wishlist);
 
@@ -63,6 +68,13 @@ const ProductCard = ({ item }: { item: Product }) => {
         onClick={handleNavigate}
         className="group p-4 relative cursor-pointer"
       >
+        {/* Best Seller Badge - First element for proper z-index */}
+        {isProductBestSeller && (
+          <div className="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-md shadow-lg z-1">
+            {t('product.bestSeller')}
+          </div>
+        )}
+
         <div
           className="card"
           onMouseEnter={() => setIsHovered(true)}
@@ -133,7 +145,7 @@ const ProductCard = ({ item }: { item: Product }) => {
           {/* Phần tên và mô tả */}
           <div className="name">
             <h1 className="text-sm text-gray-500">
-              Sold by
+              {t('product.soldBy')}
               <span className="text-[#E27E6A] ml-1 font-medium">
                 {item.seller?.businessDetails?.businessName}
               </span>

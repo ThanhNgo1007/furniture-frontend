@@ -1,35 +1,51 @@
+import { useNavigate } from 'react-router-dom';
 
+interface DealCardProps {
+  categoryName: string;
+  categoryId: string;
+  discountPercent: number;
+  imageUrl: string;
+  parentCategoryId?: string;
+}
 
-const DealCard = () => {
+const DealCard = ({ categoryName, categoryId, discountPercent, imageUrl, parentCategoryId }: DealCardProps) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    // Navigate to products page with category filter
+    if (parentCategoryId) {
+      navigate(`/products/${parentCategoryId}/${categoryId}`);
+    } else {
+      navigate(`/products/${categoryId}`);
+    }
+  };
+
   return (
-   <div className="group relative h-[20rem] cursor-pointer overflow-hidden rounded-lg shadow-lg">
+    <div 
+      onClick={handleClick}
+      className="group relative h-[20rem] cursor-pointer overflow-hidden rounded-lg shadow-lg transition-transform hover:scale-[1.02]"
+    >
       <img
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        src="https://res.cloudinary.com/dtlxpw3eh/image/upload/v1760811575/qc_jawh94.avif"
-        alt="Winter decor deal"
+        src={imageUrl}
+        alt={categoryName}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
 
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-        <p className="mb-2 text-xl font-bold leading-tight">Winter decor</p>
+        <p className="mb-2 text-xl font-bold leading-tight line-clamp-2">{categoryName}</p>
 
-        {/* --- PHẦN ĐƯỢC CẬP NHẬT --- */}
-        {/* Container chính: Đẩy 2 khối con ra hai bên */}
         <div className="flex items-start justify-between">
-          
-          {/* Khối bên trái: Chứa 2 dòng text */}
           <div>
             <p className="text-xs">Sale up to</p>
-            <p className="text-lg font-bold">40%</p>
+            <p className="text-lg font-bold">{Math.round(discountPercent)}%</p>
           </div>
 
-          {/* Khối bên phải: Nút "Shop now" */}
-          <p className="text-sm font-semibold hover:underline">Shop now</p>
-
+          <p className="text-sm font-semibold hover:underline">Shop now →</p>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DealCard
+export default DealCard;

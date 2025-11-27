@@ -19,7 +19,7 @@ const OrderStepper = ({ orderStatus, orderDate, deliveryDate }: any) => {
         { name: "Wait for pending", description: `on ${formatDate(orderDate)}`, value: "PENDING" },
         { name: "Confirmed", description: "Order confirmed", value: "CONFIRMED" },
         { name: "Packing", description: "Seller packing", value: "PLACED" },
-        { name: "Shipped", description: "On the way", value: "SHIPPED" },
+        { name: "Shipping", description: "On the way", value: "SHIPPED" },
         { name: "Delivered", description: `by ${formatDate(deliveryDate)}`, value: "DELIVERED" },
     ];
 

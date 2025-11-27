@@ -11,11 +11,12 @@ import {
 import FavoriteIcon from '@mui/icons-material/Favorite'; // Import thêm icon tim đầy
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import StarIcon from '@mui/icons-material/Star';
-import { Box, Button, Divider, Typography } from '@mui/material';
+import { Alert, Box, Button, Divider, Snackbar, Typography } from '@mui/material';
 import { orange, teal } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { addItemToCart } from '../../../State/customer/cartSlice';
+import { addItemToCart, fetchUserCart } from '../../../State/customer/cartSlice';
 import { fetchProductById } from '../../../State/customer/ProductSlice';
 import { addProductToWishlist, getWishlistByUserId } from '../../../State/customer/wishlistSlice'; // Import action Wishlist
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
@@ -24,6 +25,7 @@ import ReviewCard from '../Product/Review/ReviewCard';
 import SimilarProduct from './SimilarProduct';
 
 const ProductDetails = () => {
+  const { t } = useTranslation();
   const [quantity, setQuantity] = useState(1)
   const [quantityError, setQuantityError] = useState<string>('')
   const dispatch = useAppDispatch()
@@ -36,6 +38,11 @@ const ProductDetails = () => {
 
   const [activeImage, setActiveImage] = useState(0)
   const navigate = useNavigate()
+
+  // Snackbar state for notifications
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "warning" | "error">("success");
 
   useEffect(() => {
     if (!productId) return
@@ -83,16 +90,28 @@ const ProductDetails = () => {
     }
 
     if (product.product?.id) {
-        // Kiểm tra xem trong giỏ đã có chưa (để cảnh báo nếu cần, hoặc cứ thêm cộng dồn)
-        // Logic backend addCartItem đã xử lý cộng dồn hoặc update
+        // Backend sẽ tự động cộng dồn quantity nếu sản phẩm đã có trong giỏ
         dispatch(addItemToCart({
             jwt,
             request: {
                 productId: product.product.id,
                 quantity: quantity
             }
-        }));
-        // Optional: navigate("/cart") hoặc hiện thông báo thành công
+        })).then((action) => {
+            if (addItemToCart.fulfilled.match(action)) {
+                setSnackbarMessage(t('notifications.addedToCart', { quantity: quantity }));
+                setSnackbarSeverity("success");
+                
+                // Refresh cart data để cập nhật quantity trong Cart page
+                dispatch(fetchUserCart(jwt));
+            } else if (addItemToCart.rejected.match(action)) {
+                // Hiển thị error message từ backend
+                const errorMsg = action.payload as string || t('notifications.cannotAddToCart');
+                setSnackbarMessage(errorMsg);
+                setSnackbarSeverity("error");
+            }
+            setOpenSnackbar(true);
+        });
     }
   }
 
@@ -289,6 +308,18 @@ const ProductDetails = () => {
           <SimilarProduct />
         </div>
       </div>
+
+      {/* Snackbar for notifications */}
+      <Snackbar 
+        open={openSnackbar} 
+        autoHideDuration={3000} 
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} variant="filled" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }

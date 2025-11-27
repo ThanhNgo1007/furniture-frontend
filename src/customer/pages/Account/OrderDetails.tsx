@@ -35,16 +35,29 @@ const OrderDetails = () => {
     const savedAmount = msrpPrice - sellingPrice;
 
     const getPaymentMethodText = () => {
-        const pStatus = currentOrder?.paymentDetails?.status;
-        const oStatus = currentOrder?.orderStatus;
+        const paymentMethod = currentOrder?.paymentDetails?.paymentMethod;
+        const paymentStatus = currentOrder?.paymentStatus;
+        const paymentDetailsStatus = currentOrder?.paymentDetails?.status;
+        const orderStatus = currentOrder?.orderStatus;
 
-        // Nếu thanh toán thành công
-        if (pStatus === 'COMPLETED') return "Paid Online (VNPay)";
+        // Check cancelled first
+        if (orderStatus === 'CANCELLED') {
+            return "Order Cancelled";
+        }
+
+        // Check payment method
+        if (paymentMethod === 'VNPAY') {
+            // VNPay payment - check status
+            if (paymentStatus === 'COMPLETED' || paymentDetailsStatus === 'COMPLETED') {
+                return "Paid Online (VNPay)";
+            } else if (paymentStatus === 'FAILED' || paymentDetailsStatus === 'FAILED') {
+                return "Payment Failed (VNPay)";
+            } else {
+                return "Pending Payment (VNPay)";
+            }
+        }
         
-        // Nếu thanh toán thất bại hoặc đơn đã hủy
-        if (pStatus === 'FAILED' || oStatus === 'CANCELLED') return "Payment Failed / Cancelled";
-        
-        // Mặc định là COD (chỉ khi PENDING và chưa thanh toán)
+        // Default: COD
         return "Cash On Delivery";
     }
 
@@ -138,7 +151,7 @@ const OrderDetails = () => {
                 )}
 
                 {/* Nếu trạng thái là SHIPPED hoặc ARRIVING nhưng chưa DELIVERED */}
-                { (currentOrder?.orderStatus === 'SHIPPED' || currentOrder?.orderStatus === 'ARRIVING') && (
+                { (currentOrder?.orderStatus === 'SHIPPED') && (
                     <div className='p-10 text-center text-gray-500 font-medium'>
                          Order cannot be cancelled as it has been shipped.
                     </div>
@@ -148,6 +161,7 @@ const OrderDetails = () => {
                 {currentOrder?.orderStatus === 'CANCELLED' && (
                     <div className='p-10 text-center text-red-500 font-bold'>
                         Order Cancelled
+                        
                     </div>
                 )}
 

@@ -1,8 +1,8 @@
+import BestSeller from './BestSeller/BestSeller'
 import CategoryGrid from './CategoryGrid/CategoryGrid'
 import CommunityImpact from './CommunityImpact'
 import Deal from './Deal/Deal'
 import DecorCategory from './DecorCategory'
-import RoomCategory from './ShopByCategory/ShopByCategory'
 
 const Home = () => {
   return (
@@ -12,7 +12,7 @@ const Home = () => {
             <CategoryGrid/>
             <Deal/>
             <CommunityImpact/>
-            <RoomCategory/>
+            <BestSeller/>
         </div>
           </>
       

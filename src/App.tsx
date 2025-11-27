@@ -22,6 +22,7 @@ import Wishlist from './customer/Wishlist/Wishlist'
 import './index.css'
 import SellerDashboard from './seller/pages/SellerDashboard/SellerDashboard'
 import { fetchUserProfile } from './State/AuthSlice'
+import { loadBestSellers } from './State/customer/ProductSlice'
 import { fetchSellerProfile } from './State/seller/sellerSlice'
 import { useAppDispatch, useAppSelector } from './State/Store'
 import customTheme from './theme/customTheme'
@@ -55,13 +56,16 @@ function App() {
   // Optional: Auto logout khi token hết hạn
   // useAuthChecker();
   
-  // Redux state
-  const { auth, seller } = useAppSelector(store => ({
-    auth: store.auth,
-    seller: store.seller
-  }))
+  // Redux state - OPTIMIZED SELECTORS
+  const auth = useAppSelector(store => store.auth);
+  const seller = useAppSelector(store => store.seller);
   
   const [isInitializing, setIsInitializing] = useState(true)
+
+  // ===== LOAD BEST SELLERS FROM LOCALSTORAGE ON MOUNT =====
+  useEffect(() => {
+    dispatch(loadBestSellers());
+  }, [dispatch]);
 
   // ===== 1. LẮNG NGHE AUTO LOGOUT TỪ INTERCEPTOR =====
   useEffect(() => {

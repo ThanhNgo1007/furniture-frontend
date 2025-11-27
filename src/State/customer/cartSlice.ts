@@ -52,7 +52,9 @@ export const addItemToCart = createAsyncThunk<CartItem, {
       return response.data
     } catch (error: any) {
       console.log('Item added to cart error', error.response)
-      return rejectWithValue("Failed to add item to cart")
+      // Return backend error message
+      const errorMessage = error.response?.data?.message || error.response?.data || "Failed to add item to cart";
+      return rejectWithValue(errorMessage)
     }
   })
 

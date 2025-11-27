@@ -72,6 +72,7 @@ interface ProductState {
   loading: boolean
   error: string | null
   searchProduct: Product[]
+  bestSellerIds: number[] // Track best seller product IDs
 }
 
 const initialState: ProductState = {
@@ -80,13 +81,27 @@ const initialState: ProductState = {
   totalPages: 1,
   loading: false,
   error: null,
-  searchProduct: []
+  searchProduct: [],
+  bestSellerIds: []
 }
 
 const productSlice = createSlice({
   name: 'products',
   initialState,
-  reducers: {},
+  reducers: {
+    setBestSellers: (state, action: PayloadAction<number[]>) => {
+      state.bestSellerIds = action.payload;
+      // Persist to localStorage
+      localStorage.setItem('bestSellerIds', JSON.stringify(action.payload));
+    },
+    loadBestSellers: (state) => {
+      // Load from localStorage on app init
+      const stored = localStorage.getItem('bestSellerIds');
+      if (stored) {
+        state.bestSellerIds = JSON.parse(stored);
+      }
+    }
+  },
   extraReducers: builder => {
     // Fetch Product By ID
     builder.addCase(fetchProductById.pending, state => {
@@ -135,4 +150,5 @@ const productSlice = createSlice({
   }
 })
 
+export const { setBestSellers, loadBestSellers } = productSlice.actions
 export default productSlice.reducer

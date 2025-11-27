@@ -11,6 +11,13 @@ export interface OrderState {
   orderCanceled: boolean,
 }
 
+export interface PaymentDetails {
+  paymentId?: string;
+  paymentLinkId?: string;
+  status?: 'PENDING' | 'COMPLETED' | 'FAILED';
+  paymentMethod?: 'VNPAY' | 'COD';
+}
+
 export interface Order {
   id: number,
   orderId: string,
@@ -19,7 +26,8 @@ export interface Order {
   orderItems: OrderItem[],
   orderDate: string,
   shippingAddress: Address,
-  paymentDetails: any,
+  paymentDetails: PaymentDetails,
+  paymentStatus?: string, // PENDING, COMPLETED, FAILED
   totalMsrpPrice: number,
   totalSellingPrice?: number,
   discount?: number,
@@ -30,15 +38,11 @@ export interface Order {
 
 export enum OrderStatus {
   PENDING = "PENDING",
-  PLACED = "PLACED",         // <--- Thêm cái này
-  CONFIRMED = "CONFIRMED",   // <--- Thêm cái này
+  PLACED = "PLACED",
+  CONFIRMED = "CONFIRMED",
   SHIPPED = "SHIPPED",
   DELIVERED = "DELIVERED",
-  CANCELLED = "CANCELLED",   // <--- Sửa thành 2 chữ L (khớp Backend)
-
-  // Lưu ý: Backend không có ARRIVING, nhưng nếu bạn muốn giữ logic FE không lỗi đỏ thì cứ thêm vào.
-  // Tuy nhiên, logic check (orderStatus === 'ARRIVING') sẽ không bao giờ true nếu BE không trả về.
-  ARRIVING = "ARRIVING",
+  CANCELLED = "CANCELLED",
   FAILED = "FAILED"
 }
 
