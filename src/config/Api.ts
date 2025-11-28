@@ -34,7 +34,6 @@ api.interceptors.request.use(
     const token = localStorage.getItem('jwt');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
     }
     return config;
   },

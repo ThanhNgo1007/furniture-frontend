@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../State/Store';
 const LoginForm = () => {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-  const { auth } = useAppSelector(store => store)
+  const auth = useAppSelector(store => store.auth)
   const [timer, setTimer] = useState(0) // State bộ đếm
 
   // 1. Tự động chuyển hướng khi isLoggedIn = true

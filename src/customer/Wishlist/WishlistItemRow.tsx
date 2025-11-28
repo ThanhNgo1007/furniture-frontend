@@ -32,7 +32,7 @@ const WishlistItemRow = ({ item, onRemove, onAddToCart }: any) => {
                       src={item.images?.[0] || ""}
                       alt={item.title}
                       sx={{ width: 70, height: 70, cursor: 'pointer', border: '1px solid #eee' }}
-                      onClick={() => item.id && navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}
+                      onClick={() => item.id && navigate(`/product-details/${item.category?.parentCategory?.categoryId}/${item.category?.categoryId}/${item.title}/${item.id}`)}
                     />
                   </TableCell>
 
@@ -41,7 +41,7 @@ const WishlistItemRow = ({ item, onRemove, onAddToCart }: any) => {
                     <Typography 
                       variant="subtitle1" 
                       sx={{ fontWeight: 600, cursor: 'pointer', '&:hover': { color: 'teal' } }}
-                      onClick={() => item.id && navigate(`/product-details/${item.category?.categoryId}/${item.title}/${item.id}`)}
+                      onClick={() => item.id && navigate(`/product-details/${item.category?.parentCategory?.categoryId}/${item.category?.categoryId}/${item.title}/${item.id}`)}
                     >
                       {item.title}
                     </Typography>

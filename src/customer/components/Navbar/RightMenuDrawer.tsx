@@ -12,7 +12,7 @@ import { useAppSelector } from '../../../State/Store';
 const RightMenuDrawer = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const { auth } = useAppSelector(store => store);
+  const auth = useAppSelector(store => store.auth);
 
   const isAuthenticated = auth.isLoggedIn && auth.user !== null;
 

@@ -51,8 +51,6 @@ const categoryThree: { [key: string]: any[] } = {
 const AddProduct = () => {
   const [uploadImage, setUploadingImage] = useState(false)
 
-  const [snackbarOpen, setOpenSnackbar] = useState(false)
-
   const dispatch = useAppDispatch()
 
   const formik = useFormik({
@@ -117,10 +115,7 @@ const AddProduct = () => {
     })
   }
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false)
-  }
-
+  
   return (
     <div>
       <form onSubmit={formik.handleSubmit} className="space-y-4 p-4">
@@ -202,7 +197,14 @@ const AddProduct = () => {
               value={formik.values.description}
               onChange={formik.handleChange}
               error={formik.touched.description && Boolean(formik.errors.description)}
-              helperText={formik.touched.description && formik.errors.description}
+              helperText={
+                formik.touched.description && formik.errors.description
+                  ? formik.errors.description
+                  : `${formik.values.description.length}/2000 characters`
+              }
+              inputProps={{
+                maxLength: 2000
+              }}
               required
             />
           </Grid>
@@ -264,7 +266,7 @@ const AddProduct = () => {
                   <em>None</em>
                 </MenuItem>
 
-                {colors.map((color, index) => (
+                {colors.map((color) => (
                   <MenuItem value={color.name}>
                     <div className="flex gap-3">
                       <span

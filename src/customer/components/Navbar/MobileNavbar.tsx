@@ -158,7 +158,7 @@ const MobileNavbar = ({ handleClose }: MobileNavbarProps) => {
                                                                 onClick={() => {
                                                                     if (hasLevel3) handleToggleLevel2(sub.categoryId);
                                                                     else {
-                                                                        const path = item.categoryId === 'support' ? `/support/${sub.categoryId}` : `/products/${sub.categoryId}`;
+                                                                        const path = item.categoryId === 'support' ? `/support/${sub.categoryId}` : `/products/${item.categoryId}/${sub.categoryId}`;
                                                                         handleLinkClick(path);
                                                                     }
                                                                 }}
@@ -175,7 +175,7 @@ const MobileNavbar = ({ handleClose }: MobileNavbarProps) => {
                                                                             <ListItemButton
                                                                                 key={l3.categoryId}
                                                                                 sx={{ pl: 8, bgcolor: '#fff' }} 
-                                                                                onClick={() => handleLinkClick(`/products/${l3.categoryId}`)}
+                                                                                onClick={() => handleLinkClick(`/products/${l3.parentCategoryId}/${l3.categoryId}`)}
                                                                             >
                                                                                 <ListItemText primary={l3.name} primaryTypographyProps={{ fontSize: '0.85rem', color: '#666' }} />
                                                                             </ListItemButton>

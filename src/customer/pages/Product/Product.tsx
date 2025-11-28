@@ -14,15 +14,15 @@ import {
   Select,
   useMediaQuery,
   useTheme
-} from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
-import { useAppDispatch, useAppSelector } from '../../../State/Store'
-import { fetchAllProducts } from '../../../State/customer/ProductSlice'
-import { getWishlistByUserId } from '../../../State/customer/wishlistSlice'
+} from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../../State/Store';
+import { fetchAllProducts } from '../../../State/customer/ProductSlice';
+import { getWishlistByUserId } from '../../../State/customer/wishlistSlice';
 
-import FilterSection from './FilterSection'
-import ProductCard from './ProductCard'
+import FilterSection from './FilterSection';
+import ProductCard from './ProductCard';
 
 const Product = () => {
   const theme = useTheme()
@@ -32,7 +32,7 @@ const Product = () => {
   const dispatch = useAppDispatch()
   const [searchParam] = useSearchParams() 
   const { category } = useParams()
-  const { product } = useAppSelector(store => store)
+  const product = useAppSelector(store => store.product)
   
   // --- STATE MỚI: Quản lý đóng/mở Filter trên Mobile ---
   const [openFilter, setOpenFilter] = useState(false);
@@ -140,7 +140,7 @@ const Product = () => {
 
           <div className="flex justify-center py-10">
             <Pagination
-              onChange={(e, value) => handlePageChange(value)}
+              onChange={(_e, value) => handlePageChange(value)}
               count={product.totalPages || 1} 
               color="primary"
               page={page}

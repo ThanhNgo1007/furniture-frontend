@@ -1,6 +1,6 @@
 import { Box, CircularProgress, ThemeProvider } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import CustomerLayout from './admin/components/Layout'
 import ManagementLayout from './admin/components/ManagementLayout'
 import AdminDashboard from './admin/Pages/Dashboard/AdminDashboard'
@@ -52,6 +52,43 @@ const isTokenExpired = (token: string) => {
 function App() {
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // ===== PROTECT SELLER ROUTES =====
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    const isSellerRoute = location.pathname.startsWith('/seller');
+
+    if (jwt) {
+      const decoded = parseJwt(jwt);
+      let role = null;
+      if (decoded) {
+        if (Array.isArray(decoded.authorities)) {
+          role = decoded.authorities[0]?.authority;
+        } else if (typeof decoded.authorities === 'string') {
+          role = decoded.authorities.split(',')[0];
+        }
+      }
+
+      // Case 1: Seller trying to access Customer pages -> Redirect to Dashboard
+      if (role === 'ROLE_SELLER' && !isSellerRoute) {
+        console.warn("🚫 Seller restricted from customer pages. Redirecting to Dashboard.");
+        navigate('/seller/dashboard');
+      }
+
+      // Case 2: Customer trying to access Seller pages -> Redirect to Become Seller
+      if (role !== 'ROLE_SELLER' && isSellerRoute) {
+        console.warn("🚫 Customer restricted from seller pages. Redirecting to Become Seller.");
+        navigate('/become-seller');
+      }
+    } else {
+      // Case 3: Unauthenticated user trying to access Seller pages -> Redirect to Login
+      if (isSellerRoute) {
+        console.warn("🚫 Unauthenticated access to seller pages. Redirecting to Login.");
+        navigate('/');
+      }
+    }
+  }, [location.pathname, navigate]);
   
   // Optional: Auto logout khi token hết hạn
   // useAuthChecker();
@@ -203,7 +240,9 @@ function App() {
                  <Route path="/payment/success" element={<PaymentSuccess />} />
                  <Route path="/payment/failed" element={<PaymentFailed />} />
                  <Route path="/products/:category" element={<Product />} />
+                 <Route path="/products/:parentCategory/:category" element={<Product />} />
                  <Route path="/product-details/:categoryId/:name/:productId" element={<ProductDetails />} />
+                 <Route path="/product-details/:parentCategory/:categoryId/:name/:productId" element={<ProductDetails />} />
                  <Route path="/cart" element={<Cart />} />
                  <Route path="/wishlist" element={<Wishlist />} />
                  <Route path="/account/*" element={<Account />} />

@@ -14,7 +14,7 @@ const BecomeSellerFormStep3: React.FC<BecomeSellerFormStep3Props> = ({ formik })
         label="Account Number"
         value={formik.values.bankDetails.accountNumber}
         onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
+        
         error={
           formik.touched.bankDetails?.accountNumber &&
           Boolean(formik.errors.bankDetails?.accountNumber)
@@ -31,7 +31,7 @@ const BecomeSellerFormStep3: React.FC<BecomeSellerFormStep3Props> = ({ formik })
         label="SWIFT Code"
         value={formik.values.bankDetails.swiftCode}
         onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
+        
         error={
           formik.touched.bankDetails?.swiftCode &&
           Boolean(formik.errors.bankDetails?.swiftCode)
@@ -48,7 +48,7 @@ const BecomeSellerFormStep3: React.FC<BecomeSellerFormStep3Props> = ({ formik })
         label="Account Holder Name"
         value={formik.values.bankDetails.accountHolderName}
         onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
+        
         error={
           formik.touched.bankDetails?.accountHolderName &&
           Boolean(formik.errors.bankDetails?.accountHolderName)

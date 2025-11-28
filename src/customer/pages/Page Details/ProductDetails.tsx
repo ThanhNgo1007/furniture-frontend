@@ -45,6 +45,7 @@ const ProductDetails = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "warning" | "error">("success");
 
   useEffect(() => {
+    window.scrollTo(0, 0); // Scroll lên đầu trang
     if (!productId) return
     dispatch(fetchProductById(Number(productId) as any))
     

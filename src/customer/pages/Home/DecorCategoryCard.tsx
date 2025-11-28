@@ -7,6 +7,7 @@ interface DecorCategoryCardProps {
     name: string;
     imageUrl: string;
     categoryId: string;
+    parentCategoryId?: string;
     // thêm các trường khác nếu cần
   }
 }
@@ -16,7 +17,11 @@ const DecorCategoryCard: React.FC<DecorCategoryCardProps> = ({ item }) => {
 
   const handleClick = () => {
     // Navigate to products page with category filter
-    navigate(`/products/${item.categoryId}`);
+    if (item.parentCategoryId) {
+        navigate(`/products/${item.parentCategoryId}/${item.categoryId}`);
+    } else {
+        navigate(`/products/${item.categoryId}`);
+    }
   };
 
   return (

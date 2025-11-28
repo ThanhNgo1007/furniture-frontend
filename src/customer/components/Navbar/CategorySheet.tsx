@@ -62,7 +62,7 @@ const CategorySheet = ({ selectedCategory, handleClose }: any) => {
                       <li
                         onClick={() => {
                             // 1. Điều hướng đến trang sản phẩm
-                            navigate(`/products/${childItem.categoryId}`)
+                            navigate(`/products/${childItem.parentCategoryId}/${childItem.categoryId}`)
                             // 2. Đóng CategorySheet
                             if (handleClose) handleClose();
                         }}

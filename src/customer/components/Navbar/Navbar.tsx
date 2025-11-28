@@ -46,7 +46,7 @@ const Navbar = () => {
     
     // --- SỬA LỖI REDUX TẠI ĐÂY ---
     // Chỉ lấy slice auth để tránh re-render toàn bộ và mất cảnh báo console
-    const { auth } = useAppSelector(store => store);
+    const auth = useAppSelector(store => store.auth);
 
     const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

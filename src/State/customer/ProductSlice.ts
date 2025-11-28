@@ -56,7 +56,7 @@ export const fetchAllProducts = createAsyncThunk<ProductsResponse, any>(
           pageNumber: params.pageNumber || 0
         }
       })
-      console.log('All product data:', response.data)
+
       return response.data
     } catch (error: any) {
       console.log('error:', error)

@@ -1,5 +1,4 @@
 import { Box, TextField } from '@mui/material'
-import React from 'react'
 
 const BecomSellerFormStep1 = ({formik}:any) => {
   return (
@@ -15,7 +14,7 @@ const BecomSellerFormStep1 = ({formik}:any) => {
                     label="Mobile"
                     value={formik.values.mobile}
                     onChange={formik.handleChange}
-                    error={formik.touched.city && Boolean(formik.errors.mobile)}
+                    error={formik.touched.mobile && Boolean(formik.errors.mobile)}
                     helperText={formik.touched.mobile && formik.errors.mobile}
                     sx={{mb:4}}
 
