@@ -43,6 +43,9 @@ const ProductDetails = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "warning" | "error">("success");
+  
+  // State for collapsible description
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll lên đầu trang
@@ -294,15 +297,51 @@ const ProductDetails = () => {
             )}
           </div>
 
-          <div className="mt-5">
-            <p>{product.product?.description}</p>
-          </div>
-          <div className="mt-7 space-y-5">
-            <ReviewCard />
-            <Divider />
-          </div>
+
         </section>
       </div>
+
+      {/* NEW SECTION: DESCRIPTION & REVIEWS */}
+      <section className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
+          {/* LEFT: DESCRIPTION */}
+          <div>
+              <h1 className="font-bold text-lg mb-3">Description</h1>
+              <div className={`relative overflow-hidden transition-all duration-300 ${isDescriptionExpanded ? '' : 'max-h-[100px]'}`}>
+                  <p className="text-gray-600 text-justify">
+                      {product.product?.description}
+                  </p>
+                  {!isDescriptionExpanded && (
+                      <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent"></div>
+                  )}
+              </div>
+              <Button 
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  sx={{ mt: 1, textTransform: 'none', fontWeight: 'bold' }}
+              >
+                  {isDescriptionExpanded ? "Thu gọn" : "Xem thêm"}
+              </Button>
+          </div>
+
+          {/* RIGHT: REVIEWS */}
+          <div>
+              <h1 className="font-bold text-lg mb-3">Reviews</h1>
+              
+              <div className="relative border rounded-lg p-4 max-h-[200px] overflow-hidden">
+                  <ReviewCard />
+                  
+                  {/* Gradient Fade & See More Button */}
+                  <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-2">
+                      <Button 
+                          onClick={() => navigate(`/reviews/${productId}`)}
+                          sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                      >
+                          See More
+                      </Button>
+                  </div>
+              </div>
+          </div>
+      </section>
+
       <div className="mt-20">
         <h1 className="text-lg font-bold">Similar Product</h1>
         <div className="pt-5">

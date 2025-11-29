@@ -18,6 +18,7 @@ import PaymentSuccess from './customer/pages/CheckoutSuccess/PaymentSuccess'
 import Home from './customer/pages/Home/Home'
 import ProductDetails from './customer/pages/Page Details/ProductDetails'
 import Product from './customer/pages/Product/Product'
+import Review from './customer/pages/Product/Review/Review'
 import Wishlist from './customer/Wishlist/Wishlist'
 import './index.css'
 import SellerDashboard from './seller/pages/SellerDashboard/SellerDashboard'
@@ -249,6 +250,7 @@ function App() {
                  <Route path="/become-seller" element={<BecomeSeller />} />
                  <Route path="/order-success" element={<OrderSuccess />} />
                  <Route path="/verify-seller/:otp" element={<VerifySeller />} />
+                 <Route path="/reviews/:productId" element={<Review />} />
               </Route>
 
               <Route element={<ManagementLayout />}>

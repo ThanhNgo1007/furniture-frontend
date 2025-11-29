@@ -115,7 +115,6 @@ const AddProduct = () => {
     })
   }
 
-  
   return (
     <div>
       <form onSubmit={formik.handleSubmit} className="space-y-4 p-4">
