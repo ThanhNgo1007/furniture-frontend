@@ -79,89 +79,166 @@ const SellerLoginForm = () => {
 
   return (
     <div>
-      <h1 className="text-center font-bold text-xl text-primary pb-5">
-        Login As Seller
-      </h1>
-      <form className="space-y-3" onSubmit={formik.handleSubmit}>
+      <div className="mb-8">
+        <h1 className="text-center font-bold text-3xl text-teal-600 pb-3">
+          Seller Login
+        </h1>
+        <p className="text-center text-gray-500 text-base">Access your seller dashboard</p>
+      </div>
+
+      <form className="space-y-8" onSubmit={formik.handleSubmit}>
         <TextField
           fullWidth
           name="email"
-          label="Email"
+          label="Email Address"
+          variant="outlined"
           value={formik.values.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           error={formik.touched.email && Boolean(formik.errors.email)}
           helperText={formik.touched.email && formik.errors.email}
+          disabled={isOtpSent}
+          InputProps={{
+            style: { borderRadius: '8px', fontSize: '1.1rem' }
+          }}
+          InputLabelProps={{ style: { fontSize: '1.1rem' } }}
         />
 
         {/* 4. Logic hiển thị nút Send OTP / Resend countdown */}
         {!isOtpSent || timer > 0 ? (
-            <Button
-                onClick={handleSendOtp}
-                fullWidth
-                variant="contained"
-                disabled={isSendingOtp || timer > 0} // Disable khi đang gửi hoặc đang đếm
-                sx={{ py: '11px' }}
-            >
-                {isSendingOtp ? (
-                    <CircularProgress size={24} color="inherit" />
-                ) : timer > 0 ? (
-                    `Resend OTP in ${timer}s`
-                ) : (
-                    'Send OTP'
-                )}
-            </Button>
+            <div className="pt-8"> {/* Increased padding top container */}
+                <Button
+                    onClick={handleSendOtp}
+                    fullWidth
+                    variant="contained"
+                    disabled={isSendingOtp || timer > 0} // Disable khi đang gửi hoặc đang đếm
+                    sx={{ 
+                    py: '14px', 
+                    bgcolor: '#0d9488', 
+                    '&:hover': { bgcolor: '#0f766e' },
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontSize: '1.1rem',
+                    fontWeight: 600,
+                    boxShadow: '0 4px 6px -1px rgba(13, 148, 136, 0.4)',
+                    }}
+                >
+                    {isSendingOtp ? (
+                        <CircularProgress size={24} color="inherit" />
+                    ) : timer > 0 ? (
+                        `Resend OTP in ${timer}s`
+                    ) : (
+                        'Send OTP'
+                    )}
+                </Button>
+            </div>
         ) : null}
 
         {isOtpSent && (
-          <div className="space-y-3">
-            {/* 5. Nút Resend nhỏ hiển thị khi hết giờ */}
-             {timer === 0 && (
-                <div className='text-right'>
-                    <Button size='small' onClick={handleSendOtp}>
-                         Resend OTP
+          <div className="space-y-6 animate-fade-in">
+            {timer > 0 ? (
+                <>
+                    <div className="bg-teal-50 p-4 rounded-lg border border-teal-100 text-center">
+                    <p className="font-medium text-base text-teal-800">
+                        Enter the 6-digit OTP sent to your email
+                    </p>
+                    </div>
+
+                    <TextField
+                    fullWidth
+                    id="otp"
+                    name="otp"
+                    label="OTP Code"
+                    value={formik.values.otp}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.otp && Boolean(formik.errors.otp)}
+                    helperText={formik.touched.otp && formik.errors.otp}
+                    disabled={formik.isSubmitting}
+                    InputProps={{
+                        style: { borderRadius: '8px', fontSize: '1.1rem' }
+                    }}
+                    InputLabelProps={{ style: { fontSize: '1.1rem' } }}
+                    inputProps={{
+                        maxLength: 6,
+                        style: {
+                        textAlign: 'center',
+                        fontSize: '1.8rem',
+                        fontFamily: 'monospace',
+                        letterSpacing: '0.5em',
+                        fontWeight: 'bold'
+                        }
+                    }}
+                    />
+
+                    <div className="pt-6">
+                        <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={formik.isSubmitting}
+                        fullWidth
+                        sx={{ 
+                            py: '14px', 
+                            bgcolor: '#0d9488', 
+                            '&:hover': { bgcolor: '#0f766e' },
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            boxShadow: '0 4px 6px -1px rgba(13, 148, 136, 0.4)'
+                        }}
+                        >
+                        {formik.isSubmitting ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            'Verify & Login'
+                        )}
+                        </Button>
+                    </div>
+                </>
+            ) : (
+                <div className="flex flex-col gap-4 pt-4">
+                    <div className="text-center text-red-500 text-base font-medium mb-2">
+                        OTP has expired. Please resend or change email.
+                    </div>
+                    <Button
+                        onClick={handleSendOtp}
+                        fullWidth
+                        variant="contained"
+                        sx={{ 
+                            py: '14px', 
+                            bgcolor: '#0d9488', 
+                            '&:hover': { bgcolor: '#0f766e' },
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            fontSize: '1.1rem',
+                            fontWeight: 600
+                        }}
+                    >
+                        Resend OTP
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setIsOtpSent(false);
+                            setTimer(0);
+                        }}
+                        fullWidth
+                        variant="outlined"
+                        sx={{ 
+                            py: '14px', 
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            color: '#0d9488',
+                            borderColor: '#0d9488',
+                            '&:hover': { borderColor: '#0f766e', bgcolor: 'rgba(13, 148, 136, 0.04)' }
+                        }}
+                    >
+                        Change Email
                     </Button>
                 </div>
-             )}
-
-            <p className="font-medium text-sm opacity-60">
-              Enter OTP sent to your email !
-            </p>
-            <TextField
-              fullWidth
-              id="otp"
-              name="otp"
-              label="Enter OTP"
-              value={formik.values.otp}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.otp && Boolean(formik.errors.otp)}
-              helperText={formik.touched.otp && formik.errors.otp}
-              disabled={formik.isSubmitting}
-              inputProps={{
-                maxLength: 6,
-                style: {
-                  textAlign: 'center',
-                  fontSize: '1.5rem',
-                  fontFamily: 'monospace',
-                  letterSpacing: '0.4em'
-                }
-              }}
-            />
-
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={formik.isSubmitting}
-              className="w-full flex justify-center py-3 rounded-lg"
-              sx={{ py: '11px' }}
-            >
-              {formik.isSubmitting ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'Verify & Login'
-              )}
-            </Button>
+            )}
           </div>
         )}
       </form>

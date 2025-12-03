@@ -1,15 +1,18 @@
 import { ElectricBolt, ExpandMore } from '@mui/icons-material';
 import { Accordion, AccordionDetails, AccordionSummary, Avatar, Chip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { Order } from '../../../types/orderTypes';
 
 const OrderCard = ({ order }: { order: Order }) => {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+    return date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
 
   // Logic kiểm tra trạng thái lỗi/hủy
@@ -69,19 +72,19 @@ const OrderCard = ({ order }: { order: Order }) => {
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <h1 className={`font-bold ${statusColor.text}`}>
-                {order.orderStatus}
+                {t(`orders.${order.orderStatus.toLowerCase()}`)}
               </h1>
               <Chip 
-                label={`${order.orderItems?.length || 0} items`} 
+                label={`${order.orderItems?.length || 0} ${t('orders.items')}`} 
                 size="small" 
                 variant="outlined"
               />
             </div>
             <p className="text-gray-500 text-sm">
-              Order #{order.id} • {formatDate(order.orderDate)}
+              {t('orders.orderId')}{order.id} • {formatDate(order.orderDate)}
             </p>
             <p className="text-gray-500 text-xs">
-              Arriving Latest By {formatDate(order.deliveryDate)}
+              {t('orders.arrivingBy')} {formatDate(order.deliveryDate)}
             </p>
           </div>
         </div>
@@ -109,7 +112,7 @@ const OrderCard = ({ order }: { order: Order }) => {
                   {item.product.title}
                 </p>
                 <p className='text-xs text-gray-500'>
-                  Quantity: {item.quantity}
+                  {t('product.quantity')}: {item.quantity}
                 </p>
               </div>
             </div>
@@ -120,7 +123,7 @@ const OrderCard = ({ order }: { order: Order }) => {
             onClick={handleOrderClick}
             className="w-full mt-3 py-2 px-4 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-colors"
           >
-            View Order Details
+            {t('orders.viewDetails')}
           </button>
         </div>
       </AccordionDetails>

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Divider } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { logout } from '../../../State/AuthSlice'
 import { useAppDispatch } from '../../../State/Store'
@@ -8,18 +9,20 @@ import OrderDetails from './OrderDetails'
 import Orders from './Orders'
 import UserDetails from './UserDetails'
 
-const menu = [
-  { name: 'Orders', path: '/account/orders' },
-  { name: 'Profile', path: '/account' },
-  { name: 'Saved Card', path: '/account/saved-card' },
-  { name: 'Addresses', path: '/account/addresses' },
-  { name: 'Logout', path: '/' }
-]
-
 const Account = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const dispatch = useAppDispatch()
+  const { t } = useTranslation()
+
+  const menu = [
+    { name: t('account.orders'), path: '/account/orders' },
+    { name: t('account.profile'), path: '/account' },
+    { name: t('account.savedCard'), path: '/account/saved-card' },
+    { name: t('account.addresses'), path: '/account/addresses' },
+    { name: t('account.logout'), path: '/' }
+  ]
+
   const handleClick = (item: any) => {
     if (item.path === '/') {
       dispatch(logout(navigate))
