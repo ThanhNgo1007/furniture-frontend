@@ -11,10 +11,10 @@ const SimilarProduct = () => {
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    if (product?.category?.name) {
-      // Fetch products with the same category
+    if (product?.category) {
+      // Fetch products with the same category (prioritize categoryId)
       dispatch(fetchAllProducts({ 
-        category: product.category.name,
+        category: product.category.categoryId || product.category.name,
         pageSize: 6 
       }));
     }

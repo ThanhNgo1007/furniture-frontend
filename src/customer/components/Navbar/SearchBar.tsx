@@ -123,11 +123,10 @@ const SearchBar = () => {
                   top: '45px',
                   left: 0,
                   right: 0,
-                  maxHeight: 400,
-                  overflowY: 'auto',
                   zIndex: 1000,
                   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                   borderRadius: '8px',
+                  overflow: 'hidden' // Hide overflow for Paper to contain blur
                 }}
               >
                 {loading ? (
@@ -138,38 +137,46 @@ const SearchBar = () => {
                     </div>
                   </div>
                 ) : searchResults.length > 0 ? (
-                  <div className="py-2">
-                    {searchResults.map((product: Product) => (
-                      <div
-                        key={product.id}
-                        onClick={() => handleProductClick(product.id || 0, product)}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-teal-50 cursor-pointer transition-colors border-b border-gray-100 last:border-0"
-                      >
-                        <img
-                          src={product.images[0]}
-                          alt={product.title}
-                          className="w-14 h-14 object-cover rounded-md shadow-sm"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-sm font-semibold text-gray-900 truncate">
-                            {product.title}
-                          </h3>
-                          <p className="text-xs text-gray-500 truncate">
-                            {product.seller?.businessDetails?.businessName}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-teal-600">
-                            {formatVND(product.sellingPrice)}
-                          </p>
-                          {product.msrpPrice > product.sellingPrice && (
-                            <p className="text-xs text-gray-400 line-through">
-                              {formatVND(product.msrpPrice)}
-                            </p>
-                          )}
-                        </div>
+                  <div className="relative">
+                    <div className="max-h-[160px] overflow-y-auto">
+                      <div className="py-2">
+                        {searchResults.map((product: Product) => (
+                          <div
+                            key={product.id}
+                            onClick={() => handleProductClick(product.id || 0, product)}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-teal-50 cursor-pointer transition-colors border-b border-gray-100 last:border-0"
+                          >
+                            <img
+                              src={product.images[0]}
+                              alt={product.title}
+                              className="w-14 h-14 object-cover rounded-md shadow-sm"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-semibold text-gray-900 truncate">
+                                {product.title}
+                              </h3>
+                              <p className="text-xs text-gray-500 truncate">
+                                {product.seller?.businessDetails?.businessName}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-teal-600">
+                                {formatVND(product.sellingPrice)}
+                              </p>
+                              {product.msrpPrice > product.sellingPrice && (
+                                <p className="text-xs text-gray-400 line-through">
+                                  {formatVND(product.msrpPrice)}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </div>
+                    {/* Blur Effect Overlay - Only show if more than 2 results */}
+                    {searchResults.length > 2 && (
+                      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+                    )}
                   </div>
                 ) : (
                   <div className="p-4 text-center text-gray-500">

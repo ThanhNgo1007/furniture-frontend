@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useAppDispatch, useAppSelector } from '../../../../State/Store';
-import { fetchAllProducts, setBestSellers } from '../../../../State/customer/ProductSlice';
+import { fetchAllProducts } from '../../../../State/customer/ProductSlice';
 import type { Product } from '../../../../types/ProductTypes';
 import ProductCard from '../../Product/ProductCard';
 
@@ -20,20 +20,14 @@ const BestSeller = () => {
 
   useEffect(() => {
     if (products && products.length > 0) {
-      // Sort products by discount percentage (as proxy for best sellers)
-      // In real app, you would sort by actual sales quantity
+      // Sort by discount percentage and take top 12
       const sorted = [...products]
-        .filter(p => p.discountPercent > 0) // Only products with discount
         .sort((a, b) => b.discountPercent - a.discountPercent)
-        .slice(0, 12); // Top 12 best sellers
+        .slice(0, 12);
       
       setBestSellerProducts(sorted);
-      
-      // Store best seller IDs in Redux for global access
-      const bestSellerIds = sorted.map(p => p.id).filter((id): id is number => id !== undefined);
-      dispatch(setBestSellers(bestSellerIds));
     }
-  }, [products, dispatch]);
+  }, [products]);
 
   if (bestSellerProducts.length === 0) {
     return null;

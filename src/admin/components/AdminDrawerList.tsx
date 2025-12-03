@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AccountBox, Add, Category, Chair, Dashboard, Group, Home, IntegrationInstructions, LocalOffer, Logout } from '@mui/icons-material';
+import { AccountBox, Add, Dashboard, Group, Home, IntegrationInstructions, LocalOffer, Logout } from '@mui/icons-material';
 import DrawerList from '../../component/DrawerList';
 
 const menu = [
@@ -22,32 +22,20 @@ const menu = [
         activeIcon: <Add className='text-white'/>
     },
     {
-        name: "Home Page",
+        name: "Home Page Grid",
         path: "/admin/home-grid",
         icon: <Home className='text-teal-600'/>,
         activeIcon: <Home className='text-white'/>
     },
     {
-        name: "Decors Category",
-        path: "/admin/decors-table",
-        icon: <Chair className='text-teal-600'/>,
-        activeIcon: <Chair className='text-white'/>
-    },
-    {
-        name: "Shop By Category",
-        path: "/admin/shop-by-category",
-        icon: <Category className='text-teal-600'/>,
-        activeIcon: <Category className='text-white'/>
-    },
-    {
-        name: "Deals",
-        path: "/admin/deals",
+        name: "Deal Management",
+        path: "/admin/deal-management",
         icon: <LocalOffer className='text-teal-600'/>,
         activeIcon: <LocalOffer className='text-white'/>
     },
     {
-        name: "Customers", // Mục quản lý user
-        path: "/admin/customers",
+        name: "Users Management",
+        path: "/admin/users",
         icon: <Group className="text-teal-600" />,
         activeIcon: <Group className="text-white" />
     },

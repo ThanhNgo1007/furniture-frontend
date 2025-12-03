@@ -1,12 +1,10 @@
-import React from 'react'
 import { Route, Routes } from 'react-router-dom'
-import SellersTable from '../admin/Pages/Sellers/SellersTable'
-import Coupon from '../admin/Pages/Coupon/Coupon'
 import AddNewCouponForm from '../admin/Pages/Coupon/AddNewCouponForm'
-import GridTable from '../admin/Pages/HomePage/GridTable'
-import DecorsTable from '../admin/Pages/HomePage/DecorsTable'
-import ShopByCategoryTable from '../admin/Pages/HomePage/ShopByCategoryTable'
+import Coupon from '../admin/Pages/Coupon/Coupon'
 import Deal from '../admin/Pages/HomePage/Deal'
+import DealManagement from '../admin/Pages/HomePage/DealManagement'
+import GridTable from '../admin/Pages/HomePage/GridTable'
+import SellersTable from '../admin/Pages/Sellers/SellersTable'
 
 const AdminRoutes = () => {
   return (
@@ -17,11 +15,8 @@ const AdminRoutes = () => {
             <Route path="/coupon" element={<Coupon/>}/>
             <Route path="/add-coupon" element={<AddNewCouponForm/>}/>
             <Route path="/home-grid" element={<GridTable/>}/>
-            <Route path="/decors-table" element={<DecorsTable/>}/>
-            <Route path="/shop-by-category" element={<ShopByCategoryTable/>}/>
             <Route path="/deals" element={<Deal/>}/>
-            
-
+            <Route path="/deal-management" element={<DealManagement/>}/>
             
         </Routes>
     </div>
