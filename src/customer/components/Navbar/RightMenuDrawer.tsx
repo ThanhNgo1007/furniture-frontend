@@ -5,6 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ShoppingBasketOutlinedIcon from '@mui/icons-material/ShoppingBasketOutlined';
 import Storefront from '@mui/icons-material/Storefront';
 import { Avatar, Button, Divider, Drawer, IconButton } from '@mui/material';
+import { t } from 'i18next';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../../State/Store';
@@ -86,7 +87,7 @@ const RightMenuDrawer = () => {
               }
             }}
           >
-            Login / Sign Up
+            {t("navbar.login")}
           </Button>
         )}
 
@@ -100,7 +101,7 @@ const RightMenuDrawer = () => {
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
           >
             <FavoriteBorder className="text-gray-700" />
-            <span className="font-medium text-sm">Wishlist</span>
+            <span className="font-medium text-sm">{t("navbar.wishlist")}</span>
           </div>
 
           {/* Cart */}
@@ -109,7 +110,7 @@ const RightMenuDrawer = () => {
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
           >
             <ShoppingBasketOutlinedIcon className="text-gray-700" />
-            <span className="font-medium text-sm">Shopping Cart</span>
+            <span className="font-medium text-sm">{t("navbar.cart")}</span>
           </div>
 
           <Divider sx={{ my: 2 }} />
@@ -121,8 +122,8 @@ const RightMenuDrawer = () => {
           >
             <Storefront className="text-teal-600" />
             <div className="flex-1">
-              <p className="font-semibold text-sm text-teal-600">Become a Seller</p>
-              <p className="text-xs text-gray-500">Start selling today</p>
+              <p className="font-semibold text-sm text-teal-600">{t("navbar.becomeSeller")}</p>
+              <p className="text-xs text-gray-500">{t("navbar.start")}</p>
             </div>
           </div>
         </div>

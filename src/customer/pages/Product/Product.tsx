@@ -16,6 +16,7 @@ import {
   useTheme
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
 import { fetchAllProducts } from '../../../State/customer/ProductSlice';
@@ -33,6 +34,7 @@ const Product = () => {
   const [searchParam] = useSearchParams() 
   const { category } = useParams()
   const product = useAppSelector(store => store.product)
+  const { t } = useTranslation()
   
   // --- STATE MỚI: Quản lý đóng/mở Filter trên Mobile ---
   const [openFilter, setOpenFilter] = useState(false);
@@ -89,7 +91,16 @@ const Product = () => {
     <div className="-z-10 mt-10">
       <div>
         <h1 className="text-3xl font-bold text-center pb-5 px-9 uppercase space-x-2">
-          {category?.replace(/-/g, " ")}
+          {(() => {
+            if (!category) return "";
+            if (t(`category.level2.${category}`) !== `category.level2.${category}`) {
+              return t(`category.level2.${category}`);
+            }
+            if (t(`category.level3.${category}`) !== `category.level3.${category}`) {
+              return t(`category.level3.${category}`);
+            }
+            return category.replace(/-/g, " ");
+          })()}
         </h1>
       </div>
       <div className="lg:flex">
@@ -111,22 +122,22 @@ const Product = () => {
                         <FilterAlt />
                     </IconButton>
                     <span className="text-sm font-bold hover:text-teal-600 transition-colors">
-                        Filters
+                        {t('product_listing.filters')}
                     </span>
                  </div>
               )}
             </div>
             
             <FormControl size="small" sx={{ width: '200px' }}>
-              <InputLabel>Sort</InputLabel>
+              <InputLabel>{t('product_listing.sort')}</InputLabel>
               <Select
                 value={sort}
-                label="Sort"
+                label={t('product_listing.sort')}
                 onChange={handleSortChange}
               >
-                <MenuItem value={'price_low'}>Price: Low - High</MenuItem>
-                <MenuItem value={'price_high'}>Price: High - Low</MenuItem>
-                <MenuItem value={'newest'}>Newest</MenuItem>
+                <MenuItem value={'price_low'}>{t('product_listing.price_low_high')}</MenuItem>
+                <MenuItem value={'price_high'}>{t('product_listing.price_high_low')}</MenuItem>
+                <MenuItem value={'newest'}>{t('product_listing.newest')}</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -165,7 +176,7 @@ const Product = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* Header của Drawer */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: '1px solid #e0e0e0' }}>
-                <span className="text-xl font-bold text-gray-800">Filter Products</span>
+                <span className="text-xl font-bold text-gray-800">{t('product_listing.filter_products')}</span>
                 <IconButton onClick={() => setOpenFilter(false)}>
                     <Close />
                 </IconButton>
@@ -191,7 +202,7 @@ const Product = () => {
                         '&:hover': { bgcolor: '#0d9488' } 
                     }}
                  >
-                    Show Results
+                    {t('product_listing.show_results')}
                  </Button>
             </Box>
         </Box>

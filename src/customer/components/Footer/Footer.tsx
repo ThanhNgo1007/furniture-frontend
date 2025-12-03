@@ -9,10 +9,10 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
 const footerLinks = [
-    "About Aptdeco", "How Aptdeco Works", "Reviews", "Blog", "Sustainability Focus",
-    "Selling on Aptdeco", "Money Back Guarantee", "Pickup & Delivery Locations",
-    "Meet Our Delivery Team", "Design Trade", "Partner with Aptdeco", "Locations",
-    "Press", "Careers", "Contact Us", "FAQ"
+    "about", "howItWorks", "reviews", "blog", "sustainability",
+    "selling", "moneyBack", "pickupDelivery",
+    "deliveryTeam", "designTrade", "partner", "locations",
+    "press", "careers", "contact", "faq"
 ];
 
 // --- START: Custom Switch (Style phẳng, hiện đại) ---
@@ -125,7 +125,7 @@ const Footer = () => {
                                             '&:hover': { color: 'warning.main' }
                                         }}
                                     >
-                                        {link}
+                                        {t(`footer.${link}`)}
                                     </Link>
                                 </Grid>
                             ))}
@@ -146,17 +146,17 @@ const Footer = () => {
                                 gap: 0.5
                             }}
                         >
-                            <span>Sell on AptDeco</span>
+                            <span>{t('footer.sellOn')}</span>
                             <ArrowForwardIcon sx={{ fontSize: '1.2rem' }} />
                         </Link>
                     </Box>
 
                     <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        © {new Date().getFullYear()} APTDECO, INC. ALL RIGHTS RESERVED
+                        © {new Date().getFullYear()} APTDECO, INC. {t('footer.rightsReserved')}
                         <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}> | </Box>
-                        <Link href="#" underline="hover" color="inherit">PRIVACY</Link>
+                        <Link href="#" underline="hover" color="inherit">{t('footer.privacy')}</Link>
                         <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}> | </Box>
-                        <Link href="#" underline="hover" color="inherit">TERMS AND CONDITIONS</Link>
+                        <Link href="#" underline="hover" color="inherit">{t('footer.terms')}</Link>
                     </Typography>
                 </Container>
 

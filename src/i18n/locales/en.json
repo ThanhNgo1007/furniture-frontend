@@ -1,15 +1,18 @@
 {
   "navbar": {
-    "login": "Log in or Sign up",
+    "login": "Login/ Sign up",
     "search": "Search...",
-    "becomeSeller": "Seller Channel",
+    "becomeSeller": "Become a Seller",
     "furniture": "Furniture",
     "rugs": "Rugs",
     "lighting": "Lighting",
     "outdoor": "Outdoor & Garden",
     "guides": "Seller's Guide",
     "works": "How It Works",
-    "support": "Support"
+    "support": "Support",
+    "wishlist": "Wishlist",
+    "cart": "Shopping Cart",
+    "start": "Start selling today"
   },
   "footer": {
     "about": "About Aptdeco",
@@ -19,7 +22,9 @@
     "sell": "Sell on AptDeco",
     "rights": "APTDECO, INC. ALL RIGHTS RESERVED",
     "privacy": "PRIVACY",
-    "terms": "TERMS AND CONDITIONS"
+    "terms": "TERMS AND CONDITIONS",
+    "contact": "Contact Us"
+    
   },
   "decor": {
     "name": "Decor", 
@@ -71,7 +76,12 @@
     "codAvailable": "Cash On Delivery available",
     "description": "Description",
     "similarProducts": "Similar Products",
-    "bestSeller": "Best Seller"
+    "bestSeller": "Best Seller",
+    "off": "OFF",
+    "stabilityStandard": "Designed to meet the US Federal Stability Standard",
+    "quantityError": "Only {{quantity}} items left",
+    "reviews": "Reviews",
+    "seeMore": "See More"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -101,9 +111,9 @@
     "orderItems": "Order Items",
     "orderStatus": "Order Status",
     "pending": "Pending",
-    "placed": "Packing",
+    "placed": "Placed",
     "confirmed": "Confirmed",
-    "shipped": "Shipping",
+    "shipped": "Shipped",
     "delivered": "Delivered",
     "cancelled": "Cancelled",
     "cancelOrder": "Cancel Order",
@@ -113,7 +123,30 @@
     "paidOnline": "Paid Online (VNPay)",
     "paymentFailed": "Payment Failed (VNPay)",
     "pendingPayment": "Pending Payment (VNPay)",
-    "cashOnDelivery": "Cash On Delivery"
+    "cashOnDelivery": "Cash On Delivery",
+    "allOrders": "All Orders",
+    "fromAnytime": "from anytime",
+    "showMore": "Show More",
+    "noOrders": "No orders found with status",
+    "arrivingBy": "Arriving Latest By",
+    "items": "items",
+    "viewDetails": "View Order Details",
+    "totalItemPrice": "Total Item Price",
+    "youSaved": "You saved",
+    "onThisItem": "on this item",
+    "soldBy": "Sold By",
+    "deliveryAddress": "Delivery Address",
+    "orderId": "Order #",
+    "on": "on",
+    "by": "by",
+    "stepper": {
+      "waitPending": "Wait for pending",
+      "confirmed": "Order confirmed",
+      "packing": "Seller packing",
+      "shipping": "On the way",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    }
   },
   "wishlist": {
     "title": "My Wishlist",
@@ -144,7 +177,13 @@
     "wishlist": "Wishlist",
     "savedAddress": "Saved Address",
     "logout": "Logout",
-    "profile": "Profile"
+    "profile": "Profile",
+    "savedCard": "Saved Card",
+    "addresses": "Addresses",
+    "personalDetails": "Personal Details",
+    "name": "Name",
+    "mobile": "Mobile",
+    "email": "Email"
   },
   "notifications": {
     "addedToCart": "Added {{quantity}} products to cart!",
@@ -155,5 +194,110 @@
     "removedFromWishlist": "Removed from wishlist",
     "addedToCartSuccess": "Added to cart successfully!",
     "cannotAddToCartError": "Cannot add to cart."
-  }
+  },
+  "category": {
+    "storage": "Storage & Organization",
+    "sofas": "Sofas",
+    "beds": "Beds",
+    "tables": "Tables",
+    "chairs": "Chairs",
+    "level2": {
+      "storage-organization": "Storage & Organization",
+      "sofas": "Sofas",
+      "beds": "Beds",
+      "tables": "Tables",
+      "chairs": "Chairs",
+      "lighting-lv2": "Lighting",
+      "outdoor-garden-lv2": "Outdoor & Garden",
+      "rugs_lv2": "Rugs"
+    },
+    "level3": {
+      "piece-sectionals-sofas": "Piece sectionals sofas",
+      "three-seater-sofas": "Three-seater sofas",
+      "chaise-lounges": "Chaise lounges",
+      "futons": "Futons",
+      "loveseats": "Loveseats",
+      "sleeper-sofas": "Sleeper sofas",
+      "coffe-tables": "Coffee tables",
+      "desks-computer-desks": "Desks & computer desks",
+      "dining-tables": "Dining tables",
+      "kids-tables": "Kids tables",
+      "kitchen-islands": "Kitchen Islands",
+      "armchairs-accent-chairs": "Armchairs & accent chairs",
+      "benches": "Benches",
+      "dining-chairs": "Dining chairs",
+      "childrens-chairs": "Children's chairs",
+      "ottomans-footstools": "Ottomans & footstools",
+      "office-chairs": "Office chairs",
+      "cribs": "Cribs",
+      "daybeds": "Daybeds",
+      "nightstands": "Nightstands",
+      "headboards": "Headboards",
+      "mattresses": "Mattresses",
+      "armoires-wardrobes": "Armoires & wardrobes",
+      "shelving-furnitures": "Shelving furnitures",
+      "dressers-storage-drawers": "Dressers & storage drawers",
+      "filing-storage-cabinets": "Filing & storage cabinets",
+      "wall-shelves": "Wall shelves",
+      "tv-stands-media-consoles-cabinets": "TV & media furniture",
+      "smart-lamps": "Smart lamps",
+      "floor-lamps": "Floor lamps",
+      "table-desk-lamps": "Table & desk lamps",
+      "wall-lighting": "Wall lighting",
+      "planters": "Planters",
+      "outdoor-umbrellas": "Outdoor umbrellas",
+      "outdoor-lighting": "Outdoor lighting",
+      "medium-large-extra-large-rugs": "Medium, large and extra-large rugs",
+      "runner-rugs": "Runner & small rugs",
+      "outdoor-rugs": "Outdoor rugs"
+    }
+  },
+  "product_listing": {
+    "filters": "Filters",
+    "sort": "Sort",
+    "price_low_high": "Price: Low - High",
+    "price_high_low": "Price: High - Low",
+    "newest": "Newest",
+    "filter_products": "Filter Products",
+    "show_results": "Show Results",
+    "clear_all": "Clear all",
+    "color": "Color",
+    "price": "Price",
+    "discount": "Discount",
+    "show_less": "Show less",
+    "more": "More"
+  },
+  "colors": {
+    "white": "White",
+    "black": "Black",
+    "gray": "Gray",
+    "beige": "Beige",
+    "brown": "Brown",
+    "green": "Green",
+    "blue": "Blue",
+    "orange": "Orange"
+  },
+  "footer": {
+    "about": "About Aptdeco",
+    "howItWorks": "How Aptdeco Works",
+    "reviews": "Reviews",
+    "blog": "Blog",
+    "sustainability": "Sustainability Focus",
+    "selling": "Selling on Aptdeco",
+    "moneyBack": "Money Back Guarantee",
+    "pickupDelivery": "Pickup & Delivery Locations",
+    "deliveryTeam": "Meet Our Delivery Team",
+    "designTrade": "Design Trade",
+    "partner": "Partner with Aptdeco",
+    "locations": "Locations",
+    "press": "Press",
+    "careers": "Careers",
+    "contact": "Contact Us",
+    "faq": "FAQ",
+    "sellOn": "Sell on AptDeco",
+    "rightsReserved": "ALL RIGHTS RESERVED",
+    "privacy": "PRIVACY",
+    "terms": "TERMS AND CONDITIONS"
+  },
+  "discount_more": "{{value}}% or more"
 }

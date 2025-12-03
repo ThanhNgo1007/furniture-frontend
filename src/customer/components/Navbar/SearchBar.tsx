@@ -1,6 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import { ClickAwayListener, IconButton, InputBase, Paper } from '@mui/material';
+import { t } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchProduct } from '../../../State/customer/ProductSlice';
@@ -101,7 +102,7 @@ const SearchBar = () => {
               <SearchIcon sx={{ color: '#E27E6A', mr: 1 }} />
               <InputBase
                 inputRef={inputRef}
-                placeholder="Search products..."
+                placeholder={t('navbar.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 sx={{ flex: 1, fontSize: 14 }}

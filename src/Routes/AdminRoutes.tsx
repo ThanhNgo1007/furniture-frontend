@@ -5,6 +5,7 @@ import Deal from '../admin/Pages/HomePage/Deal'
 import DealManagement from '../admin/Pages/HomePage/DealManagement'
 import GridTable from '../admin/Pages/HomePage/GridTable'
 import SellersTable from '../admin/Pages/Sellers/SellersTable'
+import UsersTable from '../admin/Pages/Users/UsersTable'
 
 const AdminRoutes = () => {
   return (
@@ -12,6 +13,8 @@ const AdminRoutes = () => {
         <Routes>
 
             <Route path="/" element={<SellersTable/>}/>
+            <Route path="/sellers" element={<SellersTable/>}/>
+            <Route path="/users" element={<UsersTable/>}/>
             <Route path="/coupon" element={<Coupon/>}/>
             <Route path="/add-coupon" element={<AddNewCouponForm/>}/>
             <Route path="/home-grid" element={<GridTable/>}/>

@@ -2,21 +2,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  Button,
-  Divider,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup
+    Button,
+    Divider,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Radio,
+    RadioGroup
 } from '@mui/material'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { colors } from '../../../data/filter/color'
 import { discount } from '../../../data/filter/discount'
 import { price } from '../../../data/filter/price'
 
 const FilterSection = () => {
+  const { t } = useTranslation()
   const [expendColor, setExpendColor] = useState(false)
   const handleColorToggle = () => {
     setExpendColor(!expendColor)
@@ -51,13 +53,13 @@ const FilterSection = () => {
   return (
     <div className="-z-50 space-y-5">
       <div className="flex items-center justify-between h-[40px] px-9 lg:border-r">
-        <p className="text-lg font-semibold">Filters</p>
+        <p className="text-lg font-semibold">{t('product_listing.filters')}</p>
         <Button
           onClick={clearAllFilters}
           size="small"
           className="cursor-pointer font-semibold"
         >
-          Clear all
+          {t('product_listing.clear_all')}
         </Button>
       </div>
       <Divider />
@@ -74,7 +76,7 @@ const FilterSection = () => {
               className="text-2xl font-semibold"
               id="color"
             >
-              Color
+              {t('product_listing.color')}
             </FormLabel>
             <RadioGroup
               aria-labelledby="color"
@@ -90,7 +92,7 @@ const FilterSection = () => {
                   key={item.name}
                   label={
                     <div className="flex items-center gap-3">
-                      <p>{item.name}</p>
+                      <p>{t(`colors.${item.name.toLowerCase()}`)}</p>
                       <span
                         style={{ backgroundColor: item.hex }}
                         className={`h-5 w-5 rounded-full ${
@@ -108,7 +110,7 @@ const FilterSection = () => {
               onClick={handleColorToggle}
               className="text-gray-500 flex item-center cursor-pointer hover:text-yellow-400"
             >
-              {expendColor ? 'Show less' : `+${colors.length - 3} More`}
+              {expendColor ? t('product_listing.show_less') : `+${colors.length - 3} ${t('product_listing.more')}`}
             </button>
           </div>
         </section>
@@ -127,7 +129,7 @@ const FilterSection = () => {
             >
               {' '}
               {/* Sửa id cho đúng */}
-              Discount {/* Sửa lỗi copy-paste: "Color" -> "Discount" */}
+              {t('product_listing.discount')}
             </FormLabel>
             <RadioGroup
               aria-labelledby="discount"
@@ -136,12 +138,12 @@ const FilterSection = () => {
               // BƯỚC 3: Dùng `value={discountParam}` thay vì `defaultValue`
               value={discountParam}
             >
-              {discount.map((item, index) => (
+              {discount.map((item) => (
                 <FormControlLabel
                   key={item.name}
                   value={item.value}
                   control={<Radio size="small" />}
-                  label={item.name}
+                  label={t('discount_more', { value: item.value })}
                 />
               ))}
             </RadioGroup>
@@ -160,7 +162,7 @@ const FilterSection = () => {
               className="text-2xl font-semibold"
               id="price"
             >
-              Price
+              {t('product_listing.price')}
             </FormLabel>
             <RadioGroup
               aria-labelledby="price"

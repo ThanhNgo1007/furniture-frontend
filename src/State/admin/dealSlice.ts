@@ -75,6 +75,25 @@ export const deleteDeal = createAsyncThunk<ApiResponse, number>(
   }
 )
 
+export const bulkDeleteDeals = createAsyncThunk(
+  "deals/bulkDeleteDeals",
+  async (ids: number[], { rejectWithValue }) => {
+    try {
+      const response = await api.delete('/admin/deals/bulk', {
+        data: ids,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`
+        }
+      });
+      console.log("bulk delete deals", response.data);
+      return { ids, response: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to bulk delete deals");
+    }
+  }
+)
+
 const dealSlice = createSlice({
   name: "deals",
   initialState,
@@ -149,6 +168,20 @@ const dealSlice = createSlice({
     builder.addCase(deleteDeal.rejected, (state, action) => {
       state.loading = false
       state.error = action.payload as string
+    })
+
+    // Bulk Delete Deals
+    builder.addCase(bulkDeleteDeals.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    builder.addCase(bulkDeleteDeals.fulfilled, (state, action) => {
+      state.loading = false;
+      state.deals = state.deals.filter((deal) => !action.payload.ids.includes(deal.id!));
+    })
+    builder.addCase(bulkDeleteDeals.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
     })
   }
 })

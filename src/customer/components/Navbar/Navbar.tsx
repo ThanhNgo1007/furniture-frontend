@@ -126,12 +126,12 @@ const Navbar = () => {
                         </IconButton>
                     )}
                     
-                    <h1 onClick={() => navigate('/')} className="logo cursor-pointer text-2xl md:text-4xl text-[#E27E6A] pl-2">
+                    <h1 className="logo text-2xl md:text-4xl text-[#E27E6A] pl-2">
                         AptDeco
                     </h1>
                 </div>
                 <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <span onClick={() => navigate(isSeller ? '/seller' : '/admin')} className="font-bold text-xl text-gray-600 cursor-pointer hover:text-teal-600 transition-colors">
+                    <span className="font-bold text-xl text-gray-600">
                         {isSeller ? "QUẢN LÝ KINH DOANH" : "QUẢN TRỊ VIÊN"}
                     </span>
                 </div>

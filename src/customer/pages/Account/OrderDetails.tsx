@@ -5,6 +5,7 @@ import { Box, Button, Divider } from '@mui/material';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 // Import thêm action cancelOrder
+import { useTranslation } from 'react-i18next';
 import { cancelOrder, fetchOrderById, fetchOrderItemById } from '../../../State/customer/orderSlice';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
 import { formatVND } from '../../../Util/formatCurrency';
@@ -13,7 +14,8 @@ import OrderStepper from './OrderStepper';
 const OrderDetails = () => {
     const dispatch = useAppDispatch();
     const { orderId, orderItemId } = useParams();
-    const { order } = useAppSelector(store => store)
+    const { currentOrder, orderItem: currentItem } = useAppSelector(store => store.order)
+    const { t } = useTranslation();
 
     useEffect(() => {
         dispatch(fetchOrderById({ orderId: Number(orderId), jwt: localStorage.getItem('jwt') || '' }))
@@ -26,8 +28,6 @@ const OrderDetails = () => {
         dispatch(cancelOrder(Number(orderId)));
     }
 
-    const currentOrder = order.currentOrder;
-    const currentItem = order.orderItem;
     const shippingAddress = currentOrder?.shippingAddress;
 
     const msrpPrice = currentItem?.msrpPrice || 0;
@@ -42,30 +42,30 @@ const OrderDetails = () => {
 
         // Check cancelled first
         if (orderStatus === 'CANCELLED') {
-            return "Order Cancelled";
+            return t('orders.orderCancelled');
         }
 
         // Check payment method
         if (paymentMethod === 'VNPAY') {
             // VNPay payment - check status
             if (paymentStatus === 'COMPLETED' || paymentDetailsStatus === 'COMPLETED') {
-                return "Paid Online (VNPay)";
+                return t('orders.paidOnline');
             } else if (paymentStatus === 'FAILED' || paymentDetailsStatus === 'FAILED') {
-                return "Payment Failed (VNPay)";
+                return t('orders.paymentFailed');
             } else {
-                return "Pending Payment (VNPay)";
+                return t('orders.pendingPayment');
             }
         }
         
         // Default: COD
-        return "Cash On Delivery";
+        return t('orders.cashOnDelivery');
     }
 
     return (
         <Box className="space-y-5">
             {/* Product List Section with Collapse/Expand */}
             <section className='border p-5'>
-                <h1 className="font-bold pb-3">Order Items ({currentOrder?.orderItems?.length || 0})</h1>
+                <h1 className="font-bold pb-3">{t('orders.orderItems')} ({currentOrder?.orderItems?.length || 0})</h1>
                 <div className="space-y-3">
                     {currentOrder?.orderItems?.map((item) => (
                         <div key={item.id} className='flex gap-3 p-3 bg-gray-50 rounded-md'>
@@ -74,7 +74,7 @@ const OrderDetails = () => {
                                 <h2 className='font-bold text-sm'>{item.product.title}</h2>
                                 <p className='text-xs text-gray-500 line-clamp-2'>{item.product.description}</p>
                                 <div className="flex justify-between items-center">
-                                    <p className='text-xs text-gray-600'>Quantity: {item.quantity}</p>
+                                    <p className='text-xs text-gray-600'>{t('product.quantity')}: {item.quantity}</p>
                                     <p className='font-medium text-sm'>{formatVND(item.sellingPrice)}</p>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@ const OrderDetails = () => {
 
             {/* ... (Phần địa chỉ giữ nguyên) ... */}
             <div className='border p-5'>
-                <h1 className="font-bold pb-3">Delivery Address</h1>
+                <h1 className="font-bold pb-3">{t('orders.deliveryAddress')}</h1>
                 <div className="text-sm space-y-2">
                     <div className="flex gap-5 font-medium">
                         <p>{shippingAddress?.name}</p>
@@ -112,8 +112,8 @@ const OrderDetails = () => {
                 {/* ... (Phần giá tiền giữ nguyên) ... */}
                 <div className="flex justify-between text-sm pt-5 px-5">
                     <div className="space-y-1">
-                        <p className='font-bold'>Total Item Price</p>
-                        <p>You saved <span className='text-green-500 font-medium text-xs'>{formatVND(savedAmount)}</span> on this item</p>
+                        <p className='font-bold'>{t('orders.totalItemPrice')}</p>
+                        <p>{t('orders.youSaved')} <span className='text-green-500 font-medium text-xs'>{formatVND(savedAmount)}</span> {t('orders.onThisItem')}</p>
                     </div>
                     <p className='font-medium text-lg'>{formatVND(currentOrder?.totalSellingPrice || 0)}</p>
                 </div>
@@ -128,7 +128,7 @@ const OrderDetails = () => {
                 </div>
                 <Divider />
                 <div className='px-5 p-5'>
-                    <p className="text-xs"><strong>Sold By: </strong>{currentItem?.product.seller?.businessDetails.businessName}</p>
+                    <p className="text-xs"><strong>{t('orders.soldBy')}: </strong>{currentItem?.product.seller?.businessDetails.businessName}</p>
                 </div>
                 
                 {/* --- SỬA LOGIC HIỂN THỊ NÚT CANCEL TẠI ĐÂY --- */}
@@ -145,7 +145,7 @@ const OrderDetails = () => {
                             variant='outlined'
                             fullWidth
                         >
-                            Cancel Order
+                            {t('orders.cancelOrder')}
                         </Button>
                     </div>
                 )}
@@ -153,14 +153,14 @@ const OrderDetails = () => {
                 {/* Nếu trạng thái là SHIPPED hoặc ARRIVING nhưng chưa DELIVERED */}
                 { (currentOrder?.orderStatus === 'SHIPPED') && (
                     <div className='p-10 text-center text-gray-500 font-medium'>
-                         Order cannot be cancelled as it has been shipped.
+                         {t('orders.cannotCancel')}
                     </div>
                 )}
 
                 {/* Hiển thị thông báo đã hủy */}
                 {currentOrder?.orderStatus === 'CANCELLED' && (
                     <div className='p-10 text-center text-red-500 font-bold'>
-                        Order Cancelled
+                        {t('orders.orderCancelled')}
                         
                     </div>
                 )}

@@ -3,28 +3,31 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const OrderStepper = ({ orderStatus, orderDate, deliveryDate }: any) => {
     const [currentStep, setCurrentStep] = useState(0);
+    const { t, i18n } = useTranslation();
 
     // Hàm format ngày
     const formatDate = (dateString: string) => {
         if (!dateString) return "";
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+        const locale = i18n.language?.startsWith('vi') ? 'vi-VN' : 'en-US';
+        return date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
     }
 
     // Định nghĩa các bước với dữ liệu ngày động
     const steps = [
-        { name: "Wait for pending", description: `on ${formatDate(orderDate)}`, value: "PENDING" },
-        { name: "Confirmed", description: "Order confirmed", value: "CONFIRMED" },
-        { name: "Packing", description: "Seller packing", value: "PLACED" },
-        { name: "Shipping", description: "On the way", value: "SHIPPED" },
-        { name: "Delivered", description: `by ${formatDate(deliveryDate)}`, value: "DELIVERED" },
+        { name: t('orders.stepper.waitPending'), description: `${t('orders.on')} ${formatDate(orderDate)}`, value: "PENDING" },
+        { name: t('orders.stepper.confirmed'), description: t('orders.stepper.confirmed'), value: "CONFIRMED" },
+        { name: t('orders.stepper.packing'), description: t('orders.stepper.packing'), value: "PLACED" },
+        { name: t('orders.stepper.shipping'), description: t('orders.stepper.shipping'), value: "SHIPPED" },
+        { name: t('orders.stepper.delivered'), description: `${t('orders.by')} ${formatDate(deliveryDate)}`, value: "DELIVERED" },
     ];
 
     const canceledStep = [
-        { name: "Cancelled", description: `on ${formatDate(orderDate)}`, value: "CANCELLED" },
+        { name: t('orders.stepper.cancelled'), description: `${t('orders.on')} ${formatDate(orderDate)}`, value: "CANCELLED" },
     ];
 
     const [statusStep, setStatusStep] = useState(steps);
@@ -46,7 +49,7 @@ const OrderStepper = ({ orderStatus, orderDate, deliveryDate }: any) => {
             };
             setCurrentStep(stepMap[orderStatus] || 0);
         }
-    }, [orderStatus, orderDate, deliveryDate]);
+    }, [orderStatus, orderDate, deliveryDate, t, i18n.language]); // Added dependencies
 
     return (
         <Box className="my-10">

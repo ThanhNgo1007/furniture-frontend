@@ -35,7 +35,7 @@ export const useAuthChecker = () => {
       if (jwt && isTokenExpired(jwt) && !refreshToken) {
         console.log('🔴 Token expired without refresh token - Logging out');
         dispatch({ type: 'auth/logoutSync' });
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     }, 5000); // Check every 5 seconds
 

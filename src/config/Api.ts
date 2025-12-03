@@ -150,16 +150,14 @@ const handleLogout = () => {
   // 2. Dispatch event để Redux Store nhận biết
   window.dispatchEvent(new CustomEvent('auth:logout'));
 
-  // 3. Redirect dựa vào role/path hiện tại
+  // 3. Redirect về home nếu đang ở seller/admin routes
   const currentPath = window.location.pathname;
 
-  if (currentPath.startsWith('/seller') || currentPath.startsWith('/admin')) {
-    // Seller/Admin -> về trang become-seller hoặc login
-    window.location.href = "/login";
-  } else {
-    // User thường -> về trang chủ hoặc login
-    window.location.href = "/login";
+  // Chỉ redirect nếu KHÔNG phải đang ở trang home
+  if (currentPath !== '/' && (currentPath.startsWith('/seller') || currentPath.startsWith('/admin'))) {
+    window.location.href = "/";
   }
+  // Nếu đã ở trang home hoặc customer routes, không cần redirect
 };
 
 export default api;

@@ -1,8 +1,8 @@
 
 import { Add, Delete, Edit } from "@mui/icons-material";
-import { Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Paper, Select, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
+import { Button, Checkbox, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Paper, Select, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
-import { createDeal, deleteDeal, fetchDeals, updateDeal } from "../../../State/admin/dealSlice";
+import { bulkDeleteDeals, createDeal, deleteDeal, fetchDeals, updateDeal } from "../../../State/admin/dealSlice";
 import { fetchAllProducts } from "../../../State/customer/ProductSlice";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import type { Deal } from "../../../types/dealTypes";
@@ -48,6 +48,10 @@ export default function DealManagement() {
     image: ''
   });
   const [maxDiscount, setMaxDiscount] = useState(100);
+
+  // Bulk Delete State
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   useEffect(() => {
     dispatch(fetchDeals());
@@ -170,18 +174,96 @@ export default function DealManagement() {
     }
   };
 
+  // Bulk Delete Handlers
+  const handleToggleDeleteMode = () => {
+    setIsDeleteMode(!isDeleteMode);
+    setSelectedIds([]);
+  };
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const allIds = deals.map((deal) => deal.id!).filter((id) => id !== undefined);
+      setSelectedIds(allIds);
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (id: number) => {
+    const selectedIndex = selectedIds.indexOf(id);
+    let newSelected: number[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selectedIds, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selectedIds.slice(1));
+    } else if (selectedIndex === selectedIds.length - 1) {
+      newSelected = newSelected.concat(selectedIds.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selectedIds.slice(0, selectedIndex),
+        selectedIds.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedIds(newSelected);
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length === 0) {
+      alert('Please select at least one deal to delete');
+      return;
+    }
+
+    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} deal(s)?`)) {
+      await dispatch(bulkDeleteDeals(selectedIds));
+      setSelectedIds([]);
+      setIsDeleteMode(false);
+    }
+  };
+
   return (
     <>
-      <div style={{ marginBottom: '16px' }}>
-        <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleCreate}>
-          Create New Deal
-        </Button>
+      <div style={{ marginBottom: '16px', display: 'flex', gap: '10px' }}>
+        {!isDeleteMode ? (
+          <>
+            <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleCreate}>
+              Create New Deal
+            </Button>
+            <Button variant="outlined" color="error" startIcon={<Delete />} onClick={handleToggleDeleteMode}>
+              Delete
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button variant="contained" color="error" onClick={handleDeleteSelected}>
+              Delete Selected ({selectedIds.length})
+            </Button>
+            <Button variant="outlined" onClick={handleToggleDeleteMode}>
+              Cancel
+            </Button>
+          </>
+        )}
       </div>
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="deals table">
           <TableHead>
             <TableRow>
+              {isDeleteMode && (
+                <StyledTableCell padding="checkbox">
+                  <Checkbox
+                    color="primary"
+                    indeterminate={selectedIds.length > 0 && selectedIds.length < deals.length}
+                    checked={deals.length > 0 && selectedIds.length === deals.length}
+                    onChange={handleSelectAll}
+                    inputProps={{
+                      'aria-label': 'select all deals',
+                    }}
+                    sx={{ color: 'white' }}
+                  />
+                </StyledTableCell>
+              )}
               <StyledTableCell>No</StyledTableCell>
               <StyledTableCell>ID</StyledTableCell>
               <StyledTableCell>Image</StyledTableCell>
@@ -192,9 +274,30 @@ export default function DealManagement() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {deals.map((deal, index) => (
-              <StyledTableRow key={deal.id}>
-                <StyledTableCell>{index + 1}</StyledTableCell>
+            {deals.map((deal, index) => {
+              const isItemSelected = selectedIds.indexOf(deal.id!) !== -1;
+              return (
+                <StyledTableRow 
+                  key={deal.id}
+                  hover
+                  onClick={() => isDeleteMode && handleSelectRow(deal.id!)}
+                  role="checkbox"
+                  aria-checked={isItemSelected}
+                  selected={isItemSelected}
+                  sx={{ cursor: isDeleteMode ? 'pointer' : 'default' }}
+                >
+                  {isDeleteMode && (
+                    <StyledTableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isItemSelected}
+                        inputProps={{
+                          'aria-labelledby': `enhanced-table-checkbox-${index}`,
+                        }}
+                      />
+                    </StyledTableCell>
+                  )}
+                  <StyledTableCell>{index + 1}</StyledTableCell>
                 <StyledTableCell>{deal.id}</StyledTableCell>
                 <StyledTableCell>
                   <img src={deal.image || deal.category.image} alt={deal.category.name} style={{ width: 50, height: 50, objectFit: 'cover' }} 
@@ -214,7 +317,7 @@ export default function DealManagement() {
                   </Button>
                 </StyledTableCell>
               </StyledTableRow>
-            ))}
+            )})}
           </TableBody>
         </Table>
       </TableContainer>

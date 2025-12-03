@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux'
+import adminSellerSlice from './admin/adminSellerSlice'
 import dealSlice from './admin/dealSlice'
 import authSlice from './AuthSlice'
 import cartSlice from './customer/cartSlice'
@@ -25,7 +26,8 @@ const rootReducer = combineReducers({
   sellerOrder: sellerOrderSlice,
   transactions: transactionSlice,
   home: customerSlice,
-  deal: dealSlice
+  deal: dealSlice,
+  adminSeller: adminSellerSlice
 })
 
 const store = configureStore({

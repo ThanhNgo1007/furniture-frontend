@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Box } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { furnituresLevelThree } from '../../../data/category/levelthree/furnituresLevelThree'
 import { lightingLevelThree } from '../../../data/category/levelthree/lightingLevelThree'
@@ -27,6 +28,7 @@ const categoryThree: { [key: string]: any[] } = {
 
 const CategorySheet = ({ selectedCategory, handleClose }: any) => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   // Helper function
   const childCategory = (category: any, parentCategoryId: any): any[] => {
@@ -54,7 +56,7 @@ const CategorySheet = ({ selectedCategory, handleClose }: any) => {
                 index % 2 === 1 ? 'bg-slate-50' : 'bg-white'
               }`}
             >
-              <p className="mb-5 font-bold text-lg">{item.name}</p>
+              <p className="mb-5 font-bold text-lg">{t(`category.level2.${item.categoryId}`)}</p>
               <ul className="space-y-3">
                 {childCategory(categoryThree[selectedCategory], item.categoryId).map(
                   (childItem: any) => (
@@ -68,7 +70,7 @@ const CategorySheet = ({ selectedCategory, handleClose }: any) => {
                         }}
                         className="hover:text-[#E27E6A] cursor-pointer text-gray-600 transition-colors"
                       >
-                        {childItem.name}
+                        {t(`category.level3.${childItem.categoryId}`)}
                       </li>
                     </div>
                   )

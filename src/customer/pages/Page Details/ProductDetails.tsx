@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  Add,
-  LocalShipping,
-  Remove,
-  Shield,
-  ShoppingBag,
-  Wallet,
-  WorkspacePremium
+    Add,
+    LocalShipping,
+    Remove,
+    Shield,
+    ShoppingBag,
+    Wallet,
+    WorkspacePremium
 } from '@mui/icons-material';
 import FavoriteIcon from '@mui/icons-material/Favorite'; // Import thêm icon tim đầy
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -75,7 +75,7 @@ const ProductDetails = () => {
         setQuantity(quantity + 1);
         setQuantityError("");
     } else {
-        setQuantityError(`Sản phẩm chỉ còn lại ${stockQuantity} món`);
+        setQuantityError(t('product.quantityError', { quantity: stockQuantity }));
     }
   }
   
@@ -155,7 +155,7 @@ const ProductDetails = () => {
         <section className="">
           <div className="flex justify-between">
             <h1 className="font-bold text-lg">
-              Sold by{' '}
+              {t('product.soldBy')}{' '}
               <span className="text-[#E27E6A]">
                 {product.product?.seller?.businessDetails.businessName}
               </span>
@@ -169,45 +169,45 @@ const ProductDetails = () => {
               <StarIcon sx={{ color: orange[500], fontSize: '17px' }} />
             </div>
             <Divider orientation="vertical" flexItem />
-            <span>123 Ratings</span>
+            <span>123 {t('product.ratings')}</span>
           </div>
           <div>
             <div className="price font-bold text-3xl mt-5 space-x-6">
               <span>{formatVND(product.product?.sellingPrice || 0)}</span>
               <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded ">
-                {product.product?.discountPercent}% OFF
+                {product.product?.discountPercent}% {t('product.off')}
               </span>
               <div className="original-price text-base text-gray-500 line-through">
                 {formatVND(product.product?.msrpPrice || 0)}
               </div>
             </div>
             <p className="text-md font-semibold text-gray-500 mt-2">
-                {isOutOfStock ? <span className="text-red-600 font-bold">HẾT HÀNG</span> : `Quantity Available: ${stockQuantity}`}
+                {isOutOfStock ? <span className="text-red-600 font-bold">{t('product.outOfStock')}</span> : `${t('product.quantityAvailable')}: ${stockQuantity}`}
             </p>
-            <p className="text-xs mt-1">Designed to meet the US Federal Stability Standard</p>
+            <p className="text-xs mt-1">{t('product.stabilityStandard')}</p>
           </div>
           
           <div className="mt-7 space-y-3">
             <div className="flex items-center gap-4">
               <Shield sx={{ color: teal[500] }} />
-              <p>Quality Assured</p>
+              <p>{t('product.qualityAssured')}</p>
             </div>
             <div className="flex items-center gap-4">
               <WorkspacePremium sx={{ color: teal[500] }} />
-              <p>100% money back guarantee</p>
+              <p>{t('product.moneyBackGuarantee')}</p>
             </div>
             <div className="flex items-center gap-4">
               <LocalShipping sx={{ color: teal[500] }} />
-              <p>Nationwide Shipping</p>
+              <p>{t('product.nationwideShipping')}</p>
             </div>
             <div className="flex items-center gap-4">
               <Wallet sx={{ color: teal[500] }} />
-              <p>Cash On Delivery available</p>
+              <p>{t('product.codAvailable')}</p>
             </div>
           </div>
 
           <div className="mt-7 space-y-2">
-            <h1>QUANTITY</h1>
+            <h1>{t('product.quantity').toUpperCase()}</h1>
             <div className="flex items-center gap-2 justify-between">
               <Box
                 sx={{
@@ -260,7 +260,7 @@ const ProductDetails = () => {
                 }}
               >
                 <ShoppingBag sx={{ mr: 1 }} />
-                {isOutOfStock ? "Out of Stock" : "Add to Bag"}
+                {isOutOfStock ? t('product.outOfStock') : t('product.addToCart')}
               </Button>
 
               {/* NÚT WISHLIST */}
@@ -286,7 +286,7 @@ const ProductDetails = () => {
                 }}
               >
                 {isWishlisted ? <FavoriteIcon sx={{ mr: 1, color: 'red' }} /> : <FavoriteBorderIcon sx={{ mr: 1 }} />}
-                {isWishlisted ? "WISHLISTED" : "WISHLIST"}
+                {isWishlisted ? t('product.wishlisted') : t('product.addToWishlist')}
               </Button>
             </div>
 
@@ -305,7 +305,7 @@ const ProductDetails = () => {
       <section className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* LEFT: DESCRIPTION */}
           <div>
-              <h1 className="font-bold text-lg mb-3">Description</h1>
+              <h1 className="font-bold text-lg mb-3">{t('product.description')}</h1>
               <div className={`relative overflow-hidden transition-all duration-300 ${isDescriptionExpanded ? '' : 'max-h-[100px]'}`}>
                   <p className="text-gray-600 text-justify">
                       {product.product?.description}
@@ -318,13 +318,13 @@ const ProductDetails = () => {
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
                   sx={{ mt: 1, textTransform: 'none', fontWeight: 'bold' }}
               >
-                  {isDescriptionExpanded ? "Thu gọn" : "Xem thêm"}
+                  {isDescriptionExpanded ? t('product_listing.show_less') : t('product_listing.more')}
               </Button>
           </div>
 
           {/* RIGHT: REVIEWS */}
           <div>
-              <h1 className="font-bold text-lg mb-3">Reviews</h1>
+              <h1 className="font-bold text-lg mb-3">{t('product.reviews')}</h1>
               
               <div className="relative border rounded-lg p-4 max-h-[200px] overflow-hidden">
                   <ReviewCard />
@@ -335,7 +335,7 @@ const ProductDetails = () => {
                           onClick={() => navigate(`/reviews/${productId}`)}
                           sx={{ textTransform: 'none', fontWeight: 'bold' }}
                       >
-                          See More
+                          {t('product.seeMore')}
                       </Button>
                   </div>
               </div>
@@ -343,7 +343,7 @@ const ProductDetails = () => {
       </section>
 
       <div className="mt-20">
-        <h1 className="text-lg font-bold">Similar Product</h1>
+        <h1 className="text-lg font-bold">{t('product.similarProducts')}</h1>
         <div className="pt-5">
           <SimilarProduct />
         </div>

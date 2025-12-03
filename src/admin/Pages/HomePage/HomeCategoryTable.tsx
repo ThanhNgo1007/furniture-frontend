@@ -241,11 +241,9 @@ export default function HomeCategoryTable() {
                 </StyledTableCell>
               )}
               <StyledTableCell>No</StyledTableCell>
-              <StyledTableCell>ID</StyledTableCell>
               <StyledTableCell>Image</StyledTableCell>
               <StyledTableCell>Name</StyledTableCell>
               <StyledTableCell>Category ID</StyledTableCell>
-              <StyledTableCell>Section</StyledTableCell>
               <StyledTableCell>Order</StyledTableCell>
               <StyledTableCell>Status</StyledTableCell>
               <StyledTableCell align="right">Actions</StyledTableCell>
@@ -278,15 +276,11 @@ export default function HomeCategoryTable() {
                   <StyledTableCell component="th" scope="row">
                     {index + 1}
                   </StyledTableCell>
-                  <StyledTableCell>{category.id}</StyledTableCell>
                   <StyledTableCell>
                     <img src={category.image} alt={category.name} style={{ width: 50, height: 50, objectFit: 'cover' }} />
                   </StyledTableCell>
                   <StyledTableCell>{category.name}</StyledTableCell>
                   <StyledTableCell>{category.categoryId}</StyledTableCell>
-                  <StyledTableCell>
-                    <Chip label={category.section} color="primary" size="small" />
-                  </StyledTableCell>
                   <StyledTableCell>{category.displayOrder}</StyledTableCell>
                   <StyledTableCell>
                     <Chip 

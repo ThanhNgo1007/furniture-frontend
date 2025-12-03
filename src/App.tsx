@@ -55,10 +55,11 @@ function App() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // ===== PROTECT SELLER ROUTES =====
+  // ===== PROTECT ROUTES BASED ON ROLE =====
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     const isSellerRoute = location.pathname.startsWith('/seller');
+    const isAdminRoute = location.pathname.startsWith('/admin');
 
     if (jwt) {
       const decoded = parseJwt(jwt);
@@ -71,22 +72,46 @@ function App() {
         }
       }
 
-      // Case 1: Seller trying to access Customer pages -> Redirect to Dashboard
-      if (role === 'ROLE_SELLER' && !isSellerRoute) {
-        console.warn("🚫 Seller restricted from customer pages. Redirecting to Dashboard.");
-        navigate('/seller/dashboard');
+      // ADMIN: Only allow /admin/* routes
+      if (role === 'ROLE_ADMIN') {
+        if (!isAdminRoute) {
+          console.warn("🚫 Admin restricted from non-admin pages. Redirecting to Admin Dashboard.");
+          navigate('/admin');
+          return;
+        }
       }
 
-      // Case 2: Customer trying to access Seller pages -> Redirect to Become Seller
-      if (role !== 'ROLE_SELLER' && isSellerRoute) {
-        console.warn("🚫 Customer restricted from seller pages. Redirecting to Become Seller.");
-        navigate('/become-seller');
+      // SELLER: Only allow /seller/* routes
+      else if (role === 'ROLE_SELLER') {
+        if (!isSellerRoute) {
+          console.warn("🚫 Seller restricted from non-seller pages. Redirecting to Seller Dashboard.");
+          navigate('/seller/dashboard');
+          return;
+        }
+      }
+
+      // CUSTOMER: Cannot access /seller or /admin routes
+      else if (role === 'ROLE_CUSTOMER') {
+        if (isSellerRoute) {
+          console.warn("🚫 Customer restricted from seller pages. Redirecting to Become Seller.");
+          navigate('/become-seller');
+          return;
+        } else if (isAdminRoute) {
+          console.warn("🚫 Customer restricted from admin pages. Redirecting to Home.");
+          navigate('/');
+          return;
+        }
       }
     } else {
-      // Case 3: Unauthenticated user trying to access Seller pages -> Redirect to Login
+      // Unauthenticated users: Block /seller and /admin routes
       if (isSellerRoute) {
-        console.warn("🚫 Unauthenticated access to seller pages. Redirecting to Login.");
+        console.warn("🚫 Unauthenticated access to seller pages. Redirecting to Home.");
         navigate('/');
+        return;
+      } else if (isAdminRoute) {
+        console.warn("🚫 Unauthenticated access to admin pages. Redirecting to Home.");
+        navigate('/');
+        return;
       }
     }
   }, [location.pathname, navigate]);
@@ -178,7 +203,16 @@ function App() {
       const hasSellerData = seller.seller !== null;
 
       try {
-        if (role === "ROLE_SELLER") {
+        if (role === "ROLE_ADMIN") {
+          if (hasUserData && !isTokenExpired(jwt)) {
+            console.log("✅ Admin profile already in Redux with valid token");
+          } else {
+            console.log("🔄 Fetching admin profile...");
+            await dispatch(fetchUserProfile({})).unwrap();
+            console.log("✅ Admin profile loaded");
+          }
+        }
+        else if (role === "ROLE_SELLER") {
           if (hasSellerData && !isTokenExpired(jwt)) {
             console.log("✅ Seller profile already in Redux with valid token");
           } else {
@@ -203,7 +237,7 @@ function App() {
         if (error?.status === 500 || error?.message?.includes('not found')) {
           console.error("⚠️ Data mismatch - Logging out");
           dispatch({ type: 'auth/logoutSync' });
-          navigate('/login');
+          navigate('/');
         }
       }
 
