@@ -1,10 +1,9 @@
-import { useFormik } from 'formik'
-import { Dayjs } from 'dayjs'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import React from 'react'
 import { Box, Button, Grid, TextField } from '@mui/material';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { Dayjs } from 'dayjs';
+import { useFormik } from 'formik';
 
 interface CouponFormValue {
     code: string,
@@ -45,7 +44,7 @@ const AddNewCouponForm = () => {
                             <TextField
                                 fullWidth
                                 name="code"
-                                label="code"
+                                label="Mã giảm giá"
                                 value={formik.values.code}
                                 onChange={formik.handleChange}
                                 error={formik.touched.code && Boolean(formik.errors.code)}
@@ -56,7 +55,7 @@ const AddNewCouponForm = () => {
                             <TextField
                                 fullWidth
                                 name="discountPercentage"
-                                label="Discount Percentage"
+                                label="Phần trăm giảm giá"
                                 value={formik.values.discountPercentage}
                                 onChange={formik.handleChange}
                                 error={formik.touched.discountPercentage && Boolean(formik.errors.discountPercentage)}
@@ -66,7 +65,7 @@ const AddNewCouponForm = () => {
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <DatePicker 
                             sx={{width:'100%'}}
-                            label="Validity Start Date"
+                            label="Ngày bắt đầu"
                             name='validityStartDate'
                             onChange={formik.handleChange}
                             value={formik.values.validityStartDate}
@@ -75,7 +74,7 @@ const AddNewCouponForm = () => {
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <DatePicker 
                             sx={{width:'100%'}}
-                            label="Validity End Date"
+                            label="Ngày kết thúc"
                             name='validityEndDate'
                             onChange={formik.handleChange}
                             value={formik.values.validityEndDate}
@@ -85,7 +84,7 @@ const AddNewCouponForm = () => {
                             <TextField
                                 fullWidth
                                 name="minimumOrderValue"
-                                label="Minimum Order Value"
+                                label="Giá trị đơn tối thiểu"
                                 value={formik.values.minimumOrderValue}
                                 onChange={formik.handleChange}
                                 error={formik.touched.minimumOrderValue && Boolean(formik.errors.minimumOrderValue)}
@@ -94,7 +93,7 @@ const AddNewCouponForm = () => {
                         </Grid>
                         <Grid size={{xs:12}}>
                             <Button variant='contained' fullWidth sx={{py:".8rem"}}>
-                                Create Coupon
+                                Tạo mã giảm giá
                             </Button>
 
                         </Grid>

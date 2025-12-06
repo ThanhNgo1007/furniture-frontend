@@ -16,6 +16,7 @@ export interface Conversation {
   unreadCountUser: number;
   unreadCountSeller: number;
   lastMessagePreview: string;
+  lastMessageSenderType?: "USER" | "SELLER";
 }
 
 export interface Message {
@@ -27,6 +28,7 @@ export interface Message {
   content: string;
   messageType: "TEXT" | "IMAGE" | "ORDER_LINK" | "PRODUCT";
   isRead: boolean;
+  readAt?: string;
   createdAt: string;
 }
 
@@ -48,6 +50,13 @@ export interface ChatMessageRequest {
   orderId?: number;
   content: string;
   messageType?: "TEXT" | "IMAGE" | "ORDER_LINK";
+}
+
+export interface ReadReceipt {
+  type: "READ_RECEIPT";
+  conversationId: number;
+  readBy: "USER" | "SELLER";
+  readAt: string;
 }
 
 export interface ChatHistoryResponse {

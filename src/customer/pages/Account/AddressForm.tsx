@@ -1,7 +1,7 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import axios from 'axios';
 import { useFormik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 
 interface AddressFormProps {
@@ -37,7 +37,7 @@ const AddressFormSchema = Yup.object().shape({
     locality: Yup.string().required("Province (Tỉnh/Thành phố) is required"),
 });
 
-const AddressForm: React.FC<AddressFormProps> = ({ open, handleClose, handleSubmit, initialValues, title }) => {
+const AddressForm = ({ open, handleClose, handleSubmit, initialValues, title }: AddressFormProps) => {
     const [provinces, setProvinces] = useState<Province[]>([]);
     const [districts, setDistricts] = useState<District[]>([]);
     const [wards, setWards] = useState<Ward[]>([]);

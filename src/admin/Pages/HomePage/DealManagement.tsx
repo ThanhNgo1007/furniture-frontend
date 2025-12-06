@@ -143,14 +143,14 @@ export default function DealManagement() {
     // Find the selected category
     const selectedCategory = categories.find(cat => cat.id.toString() === formData.categoryId);
     if (!selectedCategory) {
-      alert('Please select a category');
+      alert('Vui lòng chọn danh mục');
       return;
     }
 
     // Validate discount
     const maxAllowed = calculateMaxDiscount(selectedCategory.categoryId);
     if (formData.discount > maxAllowed) {
-      alert(`Discount cannot exceed ${maxAllowed}% (maximum discount of products in this category)`);
+      alert(`Giảm giá không được vượt quá ${maxAllowed}% (mức giảm giá tối đa của các sản phẩm trong danh mục này)`);
       return;
     }
 
@@ -169,7 +169,7 @@ export default function DealManagement() {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this deal?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa ưu đãi này?')) {
       await dispatch(deleteDeal(id));
     }
   };
@@ -211,11 +211,11 @@ export default function DealManagement() {
 
   const handleDeleteSelected = async () => {
     if (selectedIds.length === 0) {
-      alert('Please select at least one deal to delete');
+      alert('Vui lòng chọn ít nhất một ưu đãi để xóa');
       return;
     }
 
-    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} deal(s)?`)) {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} ưu đãi đã chọn?`)) {
       await dispatch(bulkDeleteDeals(selectedIds));
       setSelectedIds([]);
       setIsDeleteMode(false);
@@ -228,19 +228,19 @@ export default function DealManagement() {
         {!isDeleteMode ? (
           <>
             <Button variant="contained" color="primary" startIcon={<Add />} onClick={handleCreate}>
-              Create New Deal
+              Tạo ưu đãi mới
             </Button>
             <Button variant="outlined" color="error" startIcon={<Delete />} onClick={handleToggleDeleteMode}>
-              Delete
+              Xóa
             </Button>
           </>
         ) : (
           <>
             <Button variant="contained" color="error" onClick={handleDeleteSelected}>
-              Delete Selected ({selectedIds.length})
+              Xóa đã chọn ({selectedIds.length})
             </Button>
             <Button variant="outlined" onClick={handleToggleDeleteMode}>
-              Cancel
+              Hủy
             </Button>
           </>
         )}
@@ -264,13 +264,13 @@ export default function DealManagement() {
                   />
                 </StyledTableCell>
               )}
-              <StyledTableCell>No</StyledTableCell>
+              <StyledTableCell>STT</StyledTableCell>
               <StyledTableCell>ID</StyledTableCell>
-              <StyledTableCell>Image</StyledTableCell>
-              <StyledTableCell>Category</StyledTableCell>
-              <StyledTableCell>Category ID</StyledTableCell>
-              <StyledTableCell>Discount %</StyledTableCell>
-              <StyledTableCell align="right">Actions</StyledTableCell>
+              <StyledTableCell>Ảnh</StyledTableCell>
+              <StyledTableCell>Danh mục</StyledTableCell>
+              <StyledTableCell>ID Danh mục</StyledTableCell>
+              <StyledTableCell>Giảm giá %</StyledTableCell>
+              <StyledTableCell align="right">Hành động</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -323,13 +323,13 @@ export default function DealManagement() {
       </TableContainer>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingDeal ? 'Edit Deal' : 'Create Deal'}</DialogTitle>
+        <DialogTitle>{editingDeal ? 'Cập nhật ưu đãi' : 'Tạo ưu đãi mới'}</DialogTitle>
         <DialogContent>
           <FormControl fullWidth margin="dense">
-            <InputLabel>Category (Level 3 Only)</InputLabel>
+            <InputLabel>Danh mục (Chỉ cấp 3)</InputLabel>
             <Select
               value={formData.categoryId}
-              label="Category (Level 3 Only)"
+              label="Danh mục (Chỉ cấp 3)"
               onChange={(e) => handleCategoryChange(e.target.value)}
             >
               {categories.map((cat) => (
@@ -341,7 +341,7 @@ export default function DealManagement() {
           </FormControl>
           <TextField
             margin="dense"
-            label={`Discount Percentage (Max: ${maxDiscount}%)`}
+            label={`Phần trăm giảm giá (Tối đa: ${maxDiscount}%)`}
             type="number"
             fullWidth
             value={formData.discount}
@@ -352,22 +352,22 @@ export default function DealManagement() {
               }
             }}
             inputProps={{ min: 0, max: maxDiscount }}
-            helperText={`Maximum discount allowed: ${maxDiscount}% (based on products in this category)`}
+            helperText={`Giảm giá tối đa cho phép: ${maxDiscount}% (dựa trên sản phẩm trong danh mục này)`}
           />
           <TextField
             margin="dense"
-            label="Image URL"
+            label="URL Ảnh"
             type="text"
             fullWidth
             value={formData.image || ''}
             onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-            helperText="Enter the URL of the deal image"
+            helperText="Nhập URL của ảnh ưu đãi"
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenDialog(false)}>Hủy</Button>
           <Button onClick={handleSave} variant="contained" color="primary">
-            Save
+            Lưu
           </Button>
         </DialogActions>
       </Dialog>

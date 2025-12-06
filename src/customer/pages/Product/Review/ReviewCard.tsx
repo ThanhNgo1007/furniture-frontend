@@ -1,12 +1,11 @@
 import { Avatar, Box, Grid, Rating } from '@mui/material';
-import React from 'react';
 import type { Review } from '../../../../State/customer/reviewSlice';
 
 interface ReviewCardProps {
   review: Review;
 }
 
-const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
+const ReviewCard = ({ review }: ReviewCardProps) => {
   // Get first letter of user name for avatar
   const avatarLetter = review.user.fullName?.charAt(0).toUpperCase() || 'U';
   

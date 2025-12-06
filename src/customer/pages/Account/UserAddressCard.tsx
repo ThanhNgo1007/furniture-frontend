@@ -1,5 +1,4 @@
 import { Button, Radio } from '@mui/material';
-import React from 'react';
 
 interface UserAddressCardProps {
     address: any;
@@ -8,7 +7,7 @@ interface UserAddressCardProps {
     onSetDefault: (addressId: number) => void;
 }
 
-const UserAddressCard: React.FC<UserAddressCardProps> = ({ address, onEdit, onDelete, onSetDefault }) => {
+const UserAddressCard = ({ address, onEdit, onDelete, onSetDefault }: UserAddressCardProps) => {
   return (
     <div className='p-3 border-b border-gray-200 flex items-start gap-3 bg-white'>
         {/* Radio Button for Default Selection */}

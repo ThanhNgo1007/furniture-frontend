@@ -1,8 +1,11 @@
 import {
   Chat as ChatIcon,
   Close as CloseIcon,
+  DoneAll as DoneAllIcon,
+  Done as DoneIcon,
   Search as SearchIcon,
-  Send as SendIcon
+  Send as SendIcon,
+  Visibility as VisibilityIcon
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -28,6 +31,7 @@ import {
   fetchChatHistory,
   fetchConversations,
   markMessagesAsRead,
+  markMessagesAsReadLocally,
   setConnected,
   setCurrentConversation,
   setIsOpen,
@@ -39,10 +43,38 @@ import type { Message } from "../../../types/chatTypes";
 const SHOPEE_RED = "#EE4D2D";
 const SHOPEE_RED_DARK = "#D73211";
 
-const FloatingChatWidget: React.FC = () => {
+// Helper function to format date for separators
+const formatDateSeparator = (dateString: string): string => {
+  const date = new Date(dateString);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (date.toDateString() === today.toDateString()) {
+    return "Hôm nay";
+  } else if (date.toDateString() === yesterday.toDateString()) {
+    return "Hôm qua";
+  } else {
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+  }
+};
+
+// Helper function to check if two dates are different days
+const isDifferentDay = (date1: string, date2: string): boolean => {
+  const d1 = new Date(date1).toDateString();
+  const d2 = new Date(date2).toDateString();
+  return d1 !== d2;
+};
+
+const FloatingChatWidget = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { auth } = useAppSelector((state) => state);
+  const { seller } = useAppSelector((state) => state.seller);
   const { conversations, currentConversation, messages, unreadCount, connected, loading, isOpen } =
     useAppSelector((state) => state.chat);
 
@@ -56,31 +88,51 @@ const FloatingChatWidget: React.FC = () => {
     }
   };
 
-  // Connect to WebSocket when component mounts
+  // Connect to WebSocket when component mounts or JWT changes
   useEffect(() => {
-    if (auth.jwt && !connected) {
-      webSocketService
-        .connect(auth.jwt)
-        .then(() => {
-          dispatch(setConnected(true));
-        })
-        .catch((err) => {
-          console.error("Failed to connect to WebSocket:", err);
-        });
-
-      // Listen for incoming messages
-      const handleMessage = (message: Message) => {
-        dispatch(addMessage(message));
-      };
-
-      webSocketService.addMessageListener(handleMessage);
-
-      return () => {
-        webSocketService.removeMessageListener(handleMessage);
-        webSocketService.disconnect();
-      };
+    if (!auth.jwt) {
+      // No JWT - disconnect and reset
+      webSocketService.disconnect();
+      dispatch(setConnected(false));
+      return;
     }
-  }, [auth.jwt, connected, dispatch]);
+    
+    console.log("[FloatingChatWidget] Connecting WebSocket with JWT...");
+    // Update token in service for reconnection
+    webSocketService.updateToken(auth.jwt);
+    
+    // Listen for incoming messages
+    const handleMessage = (message: Message) => {
+      console.log("[FloatingChatWidget] Received message:", message);
+      dispatch(addMessage(message));
+    };
+
+    // Listen for read receipts
+    const handleReadReceipt = (receipt: { conversationId: number; readAt: string; readBy: string }) => {
+      console.log("[FloatingChatWidget] Received read receipt:", receipt);
+      dispatch(markMessagesAsReadLocally({ conversationId: receipt.conversationId, readAt: receipt.readAt, readBy: receipt.readBy }));
+    };
+
+    webSocketService.addMessageListener(handleMessage);
+    webSocketService.addReadReceiptListener(handleReadReceipt);
+    
+    webSocketService
+      .connect(auth.jwt)
+      .then(() => {
+        console.log("[FloatingChatWidget] WebSocket connected successfully");
+        dispatch(setConnected(true));
+      })
+      .catch((err) => {
+        console.error("[FloatingChatWidget] Failed to connect to WebSocket:", err);
+        dispatch(setConnected(false));
+      });
+
+    return () => {
+      webSocketService.removeMessageListener(handleMessage);
+      webSocketService.removeReadReceiptListener(handleReadReceipt);
+      // Don't disconnect on cleanup - let the connection persist
+    };
+  }, [auth.jwt, dispatch]);
 
   // Load conversations when chat opens
   useEffect(() => {
@@ -97,16 +149,30 @@ const FloatingChatWidget: React.FC = () => {
 
   // Subscribe to current conversation updates
   useEffect(() => {
+    console.log("[FloatingChatWidget] Subscription effect - currentConversation:", currentConversation?.id, "connected:", connected);
     if (currentConversation?.id && connected) {
+      console.log("[FloatingChatWidget] Subscribing to conversation:", currentConversation.id);
       webSocketService.subscribeToConversation(currentConversation.id);
     }
 
     return () => {
       if (currentConversation?.id) {
+        console.log("[FloatingChatWidget] Unsubscribing from conversation:", currentConversation.id);
         webSocketService.unsubscribeFromConversation(currentConversation.id);
       }
     };
   }, [currentConversation?.id, connected]);
+
+  // Auto-mark new incoming messages as read when viewing the conversation
+  useEffect(() => {
+    if (currentConversation && auth.jwt && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      // If last message is from the other party and not read, mark as read
+      if (lastMessage.senderType !== "USER" && !lastMessage.isRead) {
+        dispatch(markMessagesAsRead({ conversationId: currentConversation.id, jwt: auth.jwt }));
+      }
+    }
+  }, [messages, currentConversation, auth.jwt, dispatch]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -134,22 +200,7 @@ const FloatingChatWidget: React.FC = () => {
     if (messageInput.trim() && currentConversation && connected && auth.user) {
       const messageContent = messageInput.trim();
       
-      // Optimistic UI update - add message immediately to the chat
-      const optimisticMessage: Message = {
-        id: Date.now(), // Temporary ID
-        conversationId: currentConversation.id,
-        senderId: auth.user.id || 0,
-        senderType: "USER",
-        senderName: auth.user.fullName || "User",
-        content: messageContent,
-        messageType: "TEXT",
-        isRead: false,
-        createdAt: new Date().toISOString(),
-      };
-      
-      dispatch(addMessage(optimisticMessage));
-      
-      // Send via WebSocket
+      // Send via WebSocket - server will broadcast back to us and others
       webSocketService.sendMessage({
         conversationId: currentConversation.id,
         content: messageContent,
@@ -189,7 +240,11 @@ const FloatingChatWidget: React.FC = () => {
     return matchesSearch && (hasHistory || isCurrent);
   });
 
-  // ... (previous logic remains the same up to return)
+  // Don't render for sellers and admins - they use dedicated pages
+  // Check both auth.user.role AND seller state (seller login may not set auth.user)
+  if (auth.user?.role === "ROLE_SELLER" || auth.user?.role === "ROLE_ADMIN" || seller) {
+    return null;
+  }
 
   return (
     <>
@@ -198,7 +253,7 @@ const FloatingChatWidget: React.FC = () => {
         <Box
           sx={{
             position: "fixed",
-            bottom: 24,
+            bottom: 100, // Above BackToTopButton
             right: 24,
             zIndex: 1000,
           }}
@@ -338,7 +393,12 @@ const FloatingChatWidget: React.FC = () => {
                           }
                           secondary={
                             <Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block" }}>
-                              {conv.productTitle ? `SP: ${conv.productTitle}` : (conv.lastMessagePreview || "Bắt đầu trò chuyện")}
+                              {conv.productTitle ? `SP: ${conv.productTitle}` : 
+                                conv.lastMessagePreview ? (
+                                  conv.lastMessageSenderType === "USER" 
+                                    ? `Bạn: ${conv.lastMessagePreview}`
+                                    : `${conv.sellerName}: ${conv.lastMessagePreview}`
+                                ) : "Bắt đầu trò chuyện"}
                             </Typography>
                           }
                         />
@@ -432,21 +492,57 @@ const FloatingChatWidget: React.FC = () => {
                     </Box>
                   ) : (
                     <>
-                      {/* Messages */}
-                      {messages.map((msg) => {
+                      {/* Messages with Date Separators */}
+                      {messages.map((msg, index) => {
+                        // For customers, own messages are USER type. For sellers, own messages are SELLER type
                         const isOwnMessage = 
                           (auth.user?.role === "ROLE_CUSTOMER" && msg.senderType === "USER") ||
                           (auth.user?.role === "ROLE_SELLER" && msg.senderType === "SELLER");
+                        
+                        // Check if we need a date separator
+                        const previousMsg = index > 0 ? messages[index - 1] : null;
+                        const showDateSeparator = !previousMsg || isDifferentDay(previousMsg.createdAt, msg.createdAt);
+                        
+                        // Determine the sender type for the current user to check last read
+                        const ownSenderType = auth.user?.role === "ROLE_CUSTOMER" ? "USER" : "SELLER";
+                        
+                        // Check if this is the last own message that was read (for eye icon)
+                        const isLastReadMessage = isOwnMessage && msg.isRead && 
+                          (index === messages.length - 1 || !messages.slice(index + 1).some(m => m.senderType === ownSenderType && m.isRead));
 
                         return (
-                          <Box
-                            key={msg.id}
-                            sx={{
-                              display: "flex",
-                              justifyContent: isOwnMessage ? "flex-end" : "flex-start",
-                              mb: 1.5,
-                            }}
-                          >
+                          <React.Fragment key={msg.id}>
+                            {/* Date Separator */}
+                            {showDateSeparator && (
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  my: 2,
+                                }}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  sx={{
+                                    px: 2,
+                                    py: 0.5,
+                                    bgcolor: "rgba(0,0,0,0.05)",
+                                    borderRadius: 2,
+                                    color: "text.secondary",
+                                    fontSize: 11,
+                                  }}
+                                >
+                                  {formatDateSeparator(msg.createdAt)}
+                                </Typography>
+                              </Box>
+                            )}
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: isOwnMessage ? "flex-end" : "flex-start",
+                                mb: 1.5,
+                              }}
+                            >
                             {!isOwnMessage && (
                               <Avatar sx={{ width: 32, height: 32, mr: 1, bgcolor: "#bdbdbd", fontSize: 14 }}>
                                 {msg.senderName?.charAt(0).toUpperCase()}
@@ -483,7 +579,7 @@ const FloatingChatWidget: React.FC = () => {
                                         </Box>
                                       </Paper>
                                     );
-                                  } catch (e) {
+                                  } catch {
                                     return <Typography variant="body2" color="error">Lỗi hiển thị sản phẩm</Typography>;
                                   }
                                 })()
@@ -492,7 +588,7 @@ const FloatingChatWidget: React.FC = () => {
                                   elevation={0}
                                   sx={{
                                     p: 1.5,
-                                    bgcolor: isOwnMessage ? "#dcf8c6" : "white", // WhatsApp/Shopee style light green for own, white for others
+                                    bgcolor: isOwnMessage ? "#dcf8c6" : "white",
                                     color: "text.primary",
                                     borderRadius: 2,
                                     border: "1px solid #e0e0e0",
@@ -502,11 +598,30 @@ const FloatingChatWidget: React.FC = () => {
                                   <Typography variant="body2">{msg.content}</Typography>
                                 </Paper>
                               )}
-                              <Typography variant="caption" sx={{ display: "block", mt: 0.5, textAlign: isOwnMessage ? "right" : "left", color: "text.secondary", fontSize: 10 }}>
-                                {new Date(msg.createdAt).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' })}
-                              </Typography>
+                              <Box sx={{ display: "flex", alignItems: "center", justifyContent: isOwnMessage ? "flex-end" : "flex-start", gap: 0.5, mt: 0.5 }}>
+                                <Typography variant="caption" sx={{ color: "text.secondary", fontSize: 10 }}>
+                                  {new Date(msg.createdAt).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' })}
+                                </Typography>
+                                {/* Read receipt for own messages */}
+                                {isOwnMessage && (
+                                  isLastReadMessage ? (
+                                    // Eye icon + "Đã xem" for the last read message
+                                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.3 }}>
+                                      <VisibilityIcon sx={{ fontSize: 12, color: "#4fc3f7" }} />
+                                      <Typography variant="caption" sx={{ fontSize: 10, color: "#4fc3f7" }}>Đã xem</Typography>
+                                    </Box>
+                                  ) : msg.isRead ? (
+                                    // Double tick for older read messages
+                                    <DoneAllIcon sx={{ fontSize: 14, color: "#4fc3f7" }} />
+                                  ) : (
+                                    // Single tick for unread messages
+                                    <DoneIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+                                  )
+                                )}
+                              </Box>
                             </Box>
-                          </Box>
+                            </Box>
+                          </React.Fragment>
                         );
                       })}
                       <div ref={messagesEndRef} />

@@ -1,11 +1,10 @@
-import React from 'react';
 import { TextField } from '@mui/material';
 
 interface BecomeSellerFormStep3Props {
   formik: any;
 }
 
-const BecomeSellerFormStep3: React.FC<BecomeSellerFormStep3Props> = ({ formik }) => {
+const BecomeSellerFormStep3 = ({ formik }: BecomeSellerFormStep3Props) => {
   return (
     <div className="space-y-5 flex flex-col gap-5 mb-4">
       <TextField

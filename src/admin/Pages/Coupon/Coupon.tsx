@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DeleteOutline } from '@mui/icons-material';
-import { Button, FormControl, InputLabel, MenuItem, Paper, Select, styled, 
-    Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow } from '@mui/material'
-import React, { useState } from 'react'
+import {
+    Paper,
+    styled,
+    Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow
+} from '@mui/material';
+import { useState } from 'react';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -60,16 +63,16 @@ const Coupon = () => {
     }
     return (
         <>
-         <TableContainer component={Paper}>
+        <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>Coupon</StyledTableCell>
-            <StyledTableCell>Start Date</StyledTableCell>
-            <StyledTableCell>End Date</StyledTableCell>
-            <StyledTableCell align="right">Minimum Order Value</StyledTableCell>
-            <StyledTableCell align="right">Discount</StyledTableCell>
-            <StyledTableCell align="right">Delete</StyledTableCell>
+            <StyledTableCell>Mã giảm giá</StyledTableCell>
+            <StyledTableCell>Ngày bắt đầu</StyledTableCell>
+            <StyledTableCell>Ngày kết thúc</StyledTableCell>
+            <StyledTableCell align="right">Giá trị đơn tối thiểu</StyledTableCell>
+            <StyledTableCell align="right">Giảm giá</StyledTableCell>
+            <StyledTableCell align="right">Xóa</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>

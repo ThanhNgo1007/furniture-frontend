@@ -1,6 +1,5 @@
-import React from 'react'
 
-export const ArrowRightIcon: React.FC = () => (
+export const ArrowRightIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className="h-5 w-5"
@@ -13,7 +12,7 @@ export const ArrowRightIcon: React.FC = () => (
   </svg>
 )
 
-export const CheckIcon: React.FC<{ className?: string }> = ({ className }) => (
+export const CheckIcon = ({ className }: { className?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className={`h-5 w-5 ${className}`}
@@ -182,7 +181,7 @@ export const ArticleLogo = () => (
   />
 )
 
-export const InstagramIcon: React.FC = () => (
+export const InstagramIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className="h-6 w-6"
@@ -204,7 +203,7 @@ export const InstagramIcon: React.FC = () => (
   </svg>
 )
 
-export const TwitterIcon: React.FC = () => (
+export const TwitterIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className="h-6 w-6"
@@ -215,7 +214,7 @@ export const TwitterIcon: React.FC = () => (
   </svg>
 )
 
-export const FacebookIcon: React.FC = () => (
+export const FacebookIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className="h-6 w-6"
@@ -226,7 +225,7 @@ export const FacebookIcon: React.FC = () => (
   </svg>
 )
 
-export const PinterestIcon: React.FC = () => (
+export const PinterestIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className="h-6 w-6"

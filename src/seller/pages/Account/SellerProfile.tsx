@@ -1,15 +1,15 @@
 import { AccountBalance, Business, LocationOn, Person } from '@mui/icons-material';
 import {
-  Avatar,
-  Box,
-  Button,
-  Card, CardContent,
-  CircularProgress,
-  Grid,
-  Tab,
-  Tabs,
-  TextField,
-  Typography
+    Avatar,
+    Box,
+    Button,
+    Card, CardContent,
+    CircularProgress,
+    Grid,
+    Tab,
+    Tabs,
+    TextField,
+    Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { api } from '../../../config/Api';
@@ -245,7 +245,7 @@ const SellerProfile = () => {
           sx={{ width: 120, height: 120, margin: '0 auto 16px', bgcolor: 'primary.main' }}
           src="https://avatar.iran.liara.run/public/boy"
         />
-        <Typography variant="h4" fontWeight="bold">{sellerData?.sellerName || "Seller Profile"}</Typography>
+        <Typography variant="h4" fontWeight="bold">{sellerData?.sellerName || "Hồ sơ người bán"}</Typography>
         <Typography color="textSecondary">{sellerData?.email}</Typography>
       </Box>
 

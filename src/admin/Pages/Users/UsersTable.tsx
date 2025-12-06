@@ -37,8 +37,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }))
 
 const roles = [
-  { value: 'ROLE_CUSTOMER', label: 'Customer' },
-  { value: 'ROLE_ADMIN', label: 'Admin' },
+  { value: 'ROLE_CUSTOMER', label: 'Khách hàng' },
+  { value: 'ROLE_ADMIN', label: 'Quản trị viên' },
 ]
 
 const UsersTable = () => {
@@ -58,19 +58,19 @@ const UsersTable = () => {
       <Table sx={{ minWidth: 700 }} aria-label="users table">
         <TableHead>
           <TableRow>
-            <StyledTableCell>User ID</StyledTableCell>
-            <StyledTableCell>Full Name</StyledTableCell>
+            <StyledTableCell>ID người dùng</StyledTableCell>
+            <StyledTableCell>Họ và tên</StyledTableCell>
             <StyledTableCell>Email</StyledTableCell>
-            <StyledTableCell>Mobile</StyledTableCell>
-            <StyledTableCell>Current Role</StyledTableCell>
-            <StyledTableCell align="right">Role Action</StyledTableCell>
+            <StyledTableCell>Số điện thoại</StyledTableCell>
+            <StyledTableCell>Vai trò hiện tại</StyledTableCell>
+            <StyledTableCell align="right">Thay đổi vai trò</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {loading ? (
             <TableRow>
               <TableCell colSpan={6} align="center">
-                Loading...
+                Đang tải...
               </TableCell>
             </TableRow>
           ) : users && users.length > 0 ? (
@@ -90,7 +90,7 @@ const UsersTable = () => {
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    {row.role === 'ROLE_ADMIN' ? 'Admin' : 'Customer'}
+                    {row.role === 'ROLE_ADMIN' ? 'Quản trị viên' : 'Khách hàng'}
                   </span>
                 </StyledTableCell>
                 <StyledTableCell align="right">
@@ -114,7 +114,7 @@ const UsersTable = () => {
           ) : (
             <TableRow>
               <TableCell colSpan={6} align="center">
-                No users found.
+                Không tìm thấy người dùng nào.
               </TableCell>
             </TableRow>
           )}

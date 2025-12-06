@@ -33,7 +33,12 @@ export const signing = createAsyncThunk<any, any>(
       return response.data.jwt
     } catch (error: any) {
       console.log('error', error)
-      return rejectWithValue(error.response?.data || "Failed to login")
+      const errorData = error.response?.data;
+      // Extract message string from error object if it exists
+      const errorMessage = typeof errorData === 'object' && errorData?.message
+        ? errorData.message
+        : (typeof errorData === 'string' ? errorData : "Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
+      return rejectWithValue(errorMessage)
     }
   }
 )

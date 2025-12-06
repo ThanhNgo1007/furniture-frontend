@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import Account from '../seller/pages/Account/Account'
+import SellerMessages from '../seller/pages/Messages/SellerMessages'
 import Orders from '../seller/pages/Orders/Orders'
 import Payment from '../seller/pages/Payment/Payment'
 import Transaction from '../seller/pages/Payment/Transaction'
@@ -15,6 +16,7 @@ const SellerRoutes = () => {
                 <Route path="/products" element={<Products />} />
                 <Route path="/add-product" element={<AddProduct />} />
                 <Route path="/orders" element={<Orders />} />
+                <Route path="/messages" element={<SellerMessages />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/payment" element={<Payment />} />
                 <Route path="/transaction" element={<Transaction />} />

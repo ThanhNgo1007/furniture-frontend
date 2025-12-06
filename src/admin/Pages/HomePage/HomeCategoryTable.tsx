@@ -106,13 +106,13 @@ export default function HomeCategoryTable() {
         
         // Check max 5 items
         if (!editingCategory && gridCategories.length >= 5) {
-          alert('Maximum 5 items allowed in GRID section');
+          alert('Tối đa 5 mục được phép trong phần GRID');
           return;
         }
 
         // Check display order range
         if (formData.displayOrder < 1 || formData.displayOrder > 5) {
-          alert('Display order must be between 1 and 5');
+          alert('Thứ tự hiển thị phải từ 1 đến 5');
           return;
         }
 
@@ -123,7 +123,7 @@ export default function HomeCategoryTable() {
         );
 
         if (isDuplicateOrder) {
-          alert(`Display order ${formData.displayOrder} is already taken in GRID section`);
+          alert(`Thứ tự hiển thị ${formData.displayOrder} đã được sử dụng trong phần GRID`);
           return;
         }
       }
@@ -178,11 +178,11 @@ export default function HomeCategoryTable() {
 
   const handleDeleteSelected = async () => {
     if (selectedIds.length === 0) {
-      alert("No items selected for deletion.");
+      alert("Chưa chọn mục nào để xóa.");
       return;
     }
 
-    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} items?`)) {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa ${selectedIds.length} mục?`)) {
       try {
         // Delete each selected item
         await Promise.all(selectedIds.map(id => api.delete(`/admin/home-category/${id}`)));
@@ -193,7 +193,7 @@ export default function HomeCategoryTable() {
         setIsDeleteMode(false);
       } catch (error) {
         console.error("Failed to delete selected categories:", error);
-        alert("Failed to delete some categories. Please try again.");
+        alert("Xóa thất bại một số danh mục. Vui lòng thử lại.");
       }
     }
   };
@@ -204,19 +204,19 @@ export default function HomeCategoryTable() {
         {!isDeleteMode ? (
           <>
             <Button variant="contained" color="primary" onClick={handleCreate}>
-              Create New Category
+              Tạo danh mục mới
             </Button>
             <Button variant="outlined" color="error" startIcon={<Delete />} onClick={handleToggleDeleteMode}>
-              Delete
+              Xóa
             </Button>
           </>
         ) : (
           <>
             <Button variant="contained" color="error" onClick={handleDeleteSelected}>
-              Delete Selected ({selectedIds.length})
+              Xóa đã chọn ({selectedIds.length})
             </Button>
             <Button variant="outlined" onClick={handleToggleDeleteMode}>
-              Cancel
+              Hủy
             </Button>
           </>
         )}
@@ -240,13 +240,13 @@ export default function HomeCategoryTable() {
                   />
                 </StyledTableCell>
               )}
-              <StyledTableCell>No</StyledTableCell>
-              <StyledTableCell>Image</StyledTableCell>
-              <StyledTableCell>Name</StyledTableCell>
-              <StyledTableCell>Category ID</StyledTableCell>
-              <StyledTableCell>Order</StyledTableCell>
-              <StyledTableCell>Status</StyledTableCell>
-              <StyledTableCell align="right">Actions</StyledTableCell>
+              <StyledTableCell>STT</StyledTableCell>
+              <StyledTableCell>Ảnh</StyledTableCell>
+              <StyledTableCell>Tên</StyledTableCell>
+              <StyledTableCell>ID Danh mục</StyledTableCell>
+              <StyledTableCell>Thứ tự</StyledTableCell>
+              <StyledTableCell>Trạng thái</StyledTableCell>
+              <StyledTableCell align="right">Hành động</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -284,7 +284,7 @@ export default function HomeCategoryTable() {
                   <StyledTableCell>{category.displayOrder}</StyledTableCell>
                   <StyledTableCell>
                     <Chip 
-                      label={category.isActive ? 'Active' : 'Inactive'} 
+                      label={category.isActive ? 'Hoạt động' : 'Không hoạt động'} 
                       color={category.isActive ? 'success' : 'default'} 
                       size="small" 
                     />
@@ -302,27 +302,27 @@ export default function HomeCategoryTable() {
       </TableContainer>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingCategory ? 'Edit Category' : 'Create Category'}</DialogTitle>
+        <DialogTitle>{editingCategory ? 'Cập nhật danh mục' : 'Tạo danh mục mới'}</DialogTitle>
         <DialogContent>
           <TextField
             margin="dense"
-            label="Name"
+            label="Tên"
             fullWidth
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <TextField
             margin="dense"
-            label="Image URL"
+            label="URL Ảnh"
             fullWidth
             value={formData.image}
             onChange={(e) => setFormData({ ...formData, image: e.target.value })}
           />
           <FormControl fullWidth margin="dense">
-            <InputLabel>Category</InputLabel>
+            <InputLabel>Danh mục</InputLabel>
             <Select
               value={formData.categoryId}
-              label="Category"
+              label="Danh mục"
               onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
             >
               {allLevelThreeCategories.map((cat) => (
@@ -333,10 +333,10 @@ export default function HomeCategoryTable() {
             </Select>
           </FormControl>
           <FormControl fullWidth margin="dense">
-            <InputLabel>Section</InputLabel>
+            <InputLabel>Khu vực</InputLabel>
             <Select
               value={formData.section}
-              label="Section"
+              label="Khu vực"
               onChange={(e) => setFormData({ ...formData, section: e.target.value })}
             >
               <MenuItem value="GRID">GRID</MenuItem>
@@ -344,30 +344,30 @@ export default function HomeCategoryTable() {
           </FormControl>
           <TextField
             margin="dense"
-            label="Display Order"
+            label="Thứ tự hiển thị"
             type="number"
             fullWidth
             value={formData.displayOrder}
             onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) })}
             inputProps={formData.section === 'GRID' ? { min: 1, max: 5 } : {}}
-            helperText={formData.section === 'GRID' ? "Enter a number between 1 and 5" : ""}
+            helperText={formData.section === 'GRID' ? "Nhập số từ 1 đến 5" : ""}
           />
           <FormControl fullWidth margin="dense">
-            <InputLabel>Status</InputLabel>
+            <InputLabel>Trạng thái</InputLabel>
             <Select
               value={formData.isActive}
-              label="Status"
+              label="Trạng thái"
               onChange={(e) => setFormData({ ...formData, isActive: e.target.value as boolean })}
             >
-              <MenuItem value={true as any}>Active</MenuItem>
-              <MenuItem value={false as any}>Inactive</MenuItem>
+              <MenuItem value={true as any}>Hoạt động</MenuItem>
+              <MenuItem value={false as any}>Không hoạt động</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+          <Button onClick={() => setOpenDialog(false)}>Hủy</Button>
           <Button onClick={handleSave} variant="contained" color="primary">
-            Save
+            Lưu
           </Button>
         </DialogActions>
       </Dialog>

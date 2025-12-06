@@ -47,7 +47,11 @@ const LoginForm = () => {
   // 4. Listen for auth errors
   useEffect(() => {
     if (auth.error) {
-        setSnackbarMessage(auth.error); // Use the error message from Redux
+        // Defensive: ensure error is always a string
+        const errorMsg = typeof auth.error === 'object' 
+          ? (auth.error as any).message || 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.'
+          : String(auth.error);
+        setSnackbarMessage(errorMsg);
         setSnackbarSeverity("error");
         setSnackbarOpen(true);
     }

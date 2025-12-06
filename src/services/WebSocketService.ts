@@ -1,43 +1,60 @@
 import { Client, type StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import type { Message } from "../types/chatTypes";
+import type { Message, ReadReceipt } from "../types/chatTypes";
 
 class WebSocketService {
   private client: Client | null = null;
   private subscriptions: Map<string, StompSubscription> = new Map();
   private messageCallbacks: Array<(message: Message) => void> = [];
+  private readReceiptCallbacks: Array<(receipt: ReadReceipt) => void> = [];
   private connectionCallbacks: Array<(connected: boolean) => void> = [];
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
+  private currentJwt: string | null = null;
+  private isReconnecting = false;
+  private lastErrorLogged = 0; // Throttle error logging
+
+  /**
+   * Update the JWT token - call this when token is refreshed
+   */
+  updateToken(jwt: string): void {
+    // console.log("[WebSocket] Token updated");
+    this.currentJwt = jwt;
+  }
 
   /**
    * Connect to WebSocket server with JWT authentication
    */
   connect(jwt: string): Promise<void> {
+    // Don't connect if no JWT
+    if (!jwt) {
+      // console.warn("[WebSocket] No JWT provided, skipping connection");
+      return Promise.resolve();
+    }
+
+    this.currentJwt = jwt;
+
     return new Promise((resolve, reject) => {
       // Clean up existing connection
       if (this.client?.connected) {
         this.disconnect();
       }
 
-      const socket = new SockJS("http://localhost:5454/ws");
-
       this.client = new Client({
-        webSocketFactory: () => socket as any,
+        webSocketFactory: () => new SockJS(`http://localhost:5454/ws`),
         connectHeaders: {
           Authorization: `Bearer ${jwt}`,
         },
-        debug: (str) => {
-          console.log("[WebSocket Debug]", str);
-        },
-        reconnectDelay: 5000,
-        heartbeatIncoming: 10000,
-        heartbeatOutgoing: 10000,
+        debug: () => { }, // Disable debug logging to reduce console spam
+        reconnectDelay: 0, // We handle reconnection manually
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
       });
 
       this.client.onConnect = (frame) => {
-        console.log("[WebSocket] Connected:", frame);
+        // console.log("[WebSocket] Connected successfully");
         this.reconnectAttempts = 0;
+        this.isReconnecting = false;
         this.notifyConnectionCallbacks(true);
 
         // Subscribe to user's message queue
@@ -47,31 +64,66 @@ class WebSocketService {
       };
 
       this.client.onStompError = (frame) => {
-        console.error("[WebSocket] STOMP Error:", frame.headers["message"]);
-        console.error("[WebSocket] Additional details:", frame.body);
+        this.throttledError(`STOMP Error: ${frame.headers["message"]}`);
         this.notifyConnectionCallbacks(false);
         reject(new Error(frame.headers["message"]));
       };
 
-      this.client.onWebSocketError = (event) => {
-        console.error("[WebSocket] WebSocket Error:", event);
+      this.client.onWebSocketError = () => {
+        // Only log every 30 seconds to avoid console spam
+        this.throttledError("WebSocket connection error");
         this.notifyConnectionCallbacks(false);
       };
 
-      this.client.onWebSocketClose = (event) => {
-        console.log("[WebSocket] Connection closed:", event);
+      this.client.onWebSocketClose = () => {
         this.notifyConnectionCallbacks(false);
-
-        // Attempt reconnection
-        if (this.reconnectAttempts < this.maxReconnectAttempts) {
-          this.reconnectAttempts++;
-          console.log(`[WebSocket] Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
-          setTimeout(() => this.connect(jwt), 5000);
-        }
+        this.attemptReconnect();
       };
 
       this.client.activate();
     });
+  }
+
+  /**
+   * Throttle error logging to prevent console spam
+   */
+  private throttledError(message: string): void {
+    const now = Date.now();
+    if (now - this.lastErrorLogged > 30000) {
+      // console.warn(`[WebSocket] ${message}`);
+      this.lastErrorLogged = now;
+    }
+  }
+
+  /**
+   * Attempt to reconnect with exponential backoff
+   */
+  private attemptReconnect(): void {
+    if (this.isReconnecting || !this.currentJwt) {
+      return;
+    }
+
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      // console.warn(`[WebSocket] Max reconnect attempts (${this.maxReconnectAttempts}) reached. Stopping.`);
+      return;
+    }
+
+    this.isReconnecting = true;
+    this.reconnectAttempts++;
+
+    // Exponential backoff: 2s, 4s, 8s, 16s, 32s
+    const delay = Math.min(2000 * Math.pow(2, this.reconnectAttempts - 1), 32000);
+
+    // console.log(`[WebSocket] Reconnecting in ${delay / 1000}s (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+
+    setTimeout(() => {
+      this.isReconnecting = false;
+      if (this.currentJwt) {
+        this.connect(this.currentJwt).catch(() => {
+          // Error handled in connect()
+        });
+      }
+    }, delay);
   }
 
   /**
@@ -85,8 +137,9 @@ class WebSocketService {
 
       this.client.deactivate();
       this.client = null;
+      this.reconnectAttempts = this.maxReconnectAttempts;
       this.notifyConnectionCallbacks(false);
-      console.log("[WebSocket] Disconnected");
+      // console.log("[WebSocket] Disconnected");
     }
   }
 
@@ -95,17 +148,17 @@ class WebSocketService {
    */
   private subscribeToMessages(): void {
     if (!this.client?.connected) {
-      console.error("[WebSocket] Cannot subscribe: not connected");
+      // console.error("[WebSocket] Cannot subscribe: not connected");
       return;
     }
 
     const subscription = this.client.subscribe("/user/queue/messages", (message) => {
       try {
         const messageData: Message = JSON.parse(message.body);
-        console.log("[WebSocket] Received message:", messageData);
+        // console.log("[WebSocket] Received message:", messageData);
         this.notifyMessageCallbacks(messageData);
       } catch (error) {
-        console.error("[WebSocket] Error parsing message:", error);
+        // console.error("[WebSocket] Error parsing message:", error);
       }
     });
 
@@ -117,7 +170,7 @@ class WebSocketService {
    */
   subscribeToConversation(conversationId: number): void {
     if (!this.client?.connected) {
-      console.error("[WebSocket] Cannot subscribe to conversation: not connected");
+      // console.error("[WebSocket] Cannot subscribe to conversation: not connected");
       return;
     }
 
@@ -126,16 +179,24 @@ class WebSocketService {
 
     const subscription = this.client.subscribe(`/topic/conversation/${conversationId}`, (message) => {
       try {
-        const messageData: Message = JSON.parse(message.body);
-        console.log(`[WebSocket] Received message for conversation ${conversationId}:`, messageData);
-        this.notifyMessageCallbacks(messageData);
+        const data = JSON.parse(message.body);
+
+        // Check if this is a read receipt or a message
+        if (data.type === "READ_RECEIPT") {
+          // console.log(`[WebSocket] Received read receipt for conversation ${conversationId}:`, data);
+          this.notifyReadReceiptCallbacks(data);
+        } else {
+          const messageData: Message = data;
+          // console.log(`[WebSocket] Received message for conversation ${conversationId}:`, messageData);
+          this.notifyMessageCallbacks(messageData);
+        }
       } catch (error) {
-        console.error("[WebSocket] Error parsing message:", error);
+        // console.error("[WebSocket] Error parsing message:", error);
       }
     });
 
     this.subscriptions.set(`conversation-${conversationId}`, subscription);
-    console.log(`[WebSocket] Subscribed to conversation ${conversationId}`);
+    // console.log(`[WebSocket] Subscribed to conversation ${conversationId}`);
   }
 
   /**
@@ -146,7 +207,7 @@ class WebSocketService {
     if (this.subscriptions.has(key)) {
       this.subscriptions.get(key)?.unsubscribe();
       this.subscriptions.delete(key);
-      console.log(`[WebSocket] Unsubscribed from conversation ${conversationId}`);
+      // console.log(`[WebSocket] Unsubscribed from conversation ${conversationId}`);
     }
   }
 
@@ -161,7 +222,7 @@ class WebSocketService {
     messageType?: string;
   }): void {
     if (!this.client?.connected) {
-      console.error("[WebSocket] Cannot send message: not connected");
+      // console.error("[WebSocket] Cannot send message: not connected");
       throw new Error("WebSocket not connected");
     }
 
@@ -170,7 +231,7 @@ class WebSocketService {
       body: JSON.stringify(message),
     });
 
-    console.log("[WebSocket] Sent message:", message);
+    // console.log("[WebSocket] Sent message:", message);
   }
 
   /**
@@ -192,7 +253,7 @@ class WebSocketService {
    */
   subscribeToTyping(callback: (conversationId: number) => void): void {
     if (!this.client?.connected) {
-      console.error("[WebSocket] Cannot subscribe to typing: not connected");
+      // console.error("[WebSocket] Cannot subscribe to typing: not connected");
       return;
     }
 
@@ -201,7 +262,7 @@ class WebSocketService {
         const conversationId = parseInt(message.body, 10);
         callback(conversationId);
       } catch (error) {
-        console.error("[WebSocket] Error parsing typing indicator:", error);
+        // console.error("[WebSocket] Error parsing typing indicator:", error);
       }
     });
 
@@ -251,7 +312,7 @@ class WebSocketService {
       try {
         callback(message);
       } catch (error) {
-        console.error("[WebSocket] Error in message callback:", error);
+        // console.error("[WebSocket] Error in message callback:", error);
       }
     });
   }
@@ -264,9 +325,36 @@ class WebSocketService {
       try {
         callback(connected);
       } catch (error) {
-        console.error("[WebSocket] Error in connection callback:", error);
+        // console.error("[WebSocket] Error in connection callback:", error);
       }
     });
+  }
+
+  /**
+   * Notify all read receipt callbacks
+   */
+  private notifyReadReceiptCallbacks(receipt: ReadReceipt): void {
+    this.readReceiptCallbacks.forEach((callback) => {
+      try {
+        callback(receipt);
+      } catch (error) {
+        // console.error("[WebSocket] Error in read receipt callback:", error);
+      }
+    });
+  }
+
+  /**
+   * Add callback for read receipts
+   */
+  addReadReceiptListener(callback: (receipt: ReadReceipt) => void): void {
+    this.readReceiptCallbacks.push(callback);
+  }
+
+  /**
+   * Remove read receipt listener
+   */
+  removeReadReceiptListener(callback: (receipt: ReadReceipt) => void): void {
+    this.readReceiptCallbacks = this.readReceiptCallbacks.filter((cb) => cb !== callback);
   }
 }
 

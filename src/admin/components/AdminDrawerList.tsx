@@ -4,37 +4,37 @@ import DrawerList from '../../component/DrawerList';
 
 const menu = [
     {
-        name: "Dashboard",
+        name: "Tổng quan",
         path: "/admin",
         icon: <Dashboard className='text-teal-600'/>,
         activeIcon: <Dashboard className='text-white'/>
     },
     {
-        name: "Coupons",
+        name: "Mã giảm giá",
         path: "/admin/coupon",
         icon: <IntegrationInstructions className='text-teal-600'/>,
         activeIcon: <IntegrationInstructions className='text-white'/>
     },
     {
-        name: "Add New Coupon",
+        name: "Thêm mã giảm giá",
         path: "/admin/add-coupon",
         icon: <Add className='text-teal-600'/>,
         activeIcon: <Add className='text-white'/>
     },
     {
-        name: "Home Page Grid",
+        name: "Bố cục Trang chủ",
         path: "/admin/home-grid",
         icon: <Home className='text-teal-600'/>,
         activeIcon: <Home className='text-white'/>
     },
     {
-        name: "Deal Management",
+        name: "Quản lý Ưu đãi",
         path: "/admin/deal-management",
         icon: <LocalOffer className='text-teal-600'/>,
         activeIcon: <LocalOffer className='text-white'/>
     },
     {
-        name: "Users Management",
+        name: "Quản lý Người dùng",
         path: "/admin/users",
         icon: <Group className="text-teal-600" />,
         activeIcon: <Group className="text-white" />
@@ -43,13 +43,13 @@ const menu = [
 
 const menu2 = [
     {
-        name: "Account",
+        name: "Tài khoản",
         path: "/seller/account",
         icon: <AccountBox className='text-teal-600'/>,
         activeIcon: <AccountBox className='text-white' />
     },
     {
-        name: "Logout",
+        name: "Đăng xuất",
         path: "/",
         icon: <Logout className='text-teal-600'/>,
         activeIcon: <Logout className='text-white' />

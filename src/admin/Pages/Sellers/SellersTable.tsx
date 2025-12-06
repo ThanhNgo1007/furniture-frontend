@@ -1,6 +1,6 @@
 import {
-  FormControl, InputLabel, MenuItem, Paper, Select, styled,
-  Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow
+    FormControl, InputLabel, MenuItem, Paper, Select, styled,
+    Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { fetchSellers, updateSellerStatus } from '../../../State/admin/adminSellerSlice';
@@ -27,12 +27,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 const accountStatu = [
-  { status: "PENDING_VERIFICATION", title: "Pending Verification" },
-  { status: "ACTIVE", title: "Active" },
-  { status: "SUSPENDED", title: "Suspended" },
-  { status: "DEACTIVATED", title: "Deactivated" },
-  { status: "BANNED", title: "Banned" },
-  { status: "CLOSED", title: "Closed" }
+  { status: "PENDING_VERIFICATION", title: "Chờ xác thực" },
+  { status: "ACTIVE", title: "Hoạt động" },
+  { status: "SUSPENDED", title: "Tạm ngưng" },
+  { status: "DEACTIVATED", title: "Vô hiệu hóa" },
+  { status: "BANNED", title: "Bị cấm" },
+  { status: "CLOSED", title: "Đã đóng" }
 ]
 
 const SellersTable = () => {
@@ -54,15 +54,15 @@ const SellersTable = () => {
     <>
       <div className='pb-5 w-60'>
         <FormControl fullWidth>
-          <InputLabel id="account-status-label">Account Status</InputLabel>
+          <InputLabel id="account-status-label">Trạng thái tài khoản</InputLabel>
           <Select
             labelId="account-status-label"
             id="account-status-select"
             value={accountStatus}
-            label="Account Status"
+            label="Trạng thái tài khoản"
             onChange={(e) => setAccountStatus(e.target.value)}
           >
-            <MenuItem value="ALL">All Status</MenuItem>
+            <MenuItem value="ALL">Tất cả</MenuItem>
             {accountStatu.map((item) => (
               <MenuItem key={item.status} value={item.status}>
                 {item.title}
@@ -76,20 +76,20 @@ const SellersTable = () => {
         <Table sx={{ minWidth: 700 }} aria-label="sellers table">
           <TableHead>
             <TableRow>
-              <StyledTableCell>Seller Name</StyledTableCell>
+              <StyledTableCell>Tên người bán</StyledTableCell>
               <StyledTableCell>Email</StyledTableCell>
-              <StyledTableCell align="right">Mobile</StyledTableCell>
+              <StyledTableCell align="right">SĐT</StyledTableCell>
               <StyledTableCell align="right">MST</StyledTableCell>
-              <StyledTableCell align="right">Business Name</StyledTableCell>
-              <StyledTableCell align="right">Account Status</StyledTableCell>
-              <StyledTableCell align="right">Status Action</StyledTableCell>
+              <StyledTableCell align="right">Tên doanh nghiệp</StyledTableCell>
+              <StyledTableCell align="right">Trạng thái</StyledTableCell>
+              <StyledTableCell align="right">Hành động</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  Loading...
+                  Đang tải...
                 </TableCell>
               </TableRow>
             ) : sellers && sellers.length > 0 ? (
@@ -114,7 +114,7 @@ const SellersTable = () => {
                           : 'bg-red-100 text-red-800'
                       }`}
                     >
-                      {row.accountStatus}
+                      {accountStatu.find(s => s.status === row.accountStatus)?.title || row.accountStatus}
                     </span>
                   </StyledTableCell>
                   <StyledTableCell align="right">
@@ -138,7 +138,7 @@ const SellersTable = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  No sellers found.
+                  Không tìm thấy người bán nào.
                 </TableCell>
               </TableRow>
             )}

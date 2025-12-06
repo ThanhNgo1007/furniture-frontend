@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Định nghĩa kiểu dữ liệu cho props
@@ -12,7 +11,7 @@ interface DecorCategoryCardProps {
   }
 }
 
-const DecorCategoryCard: React.FC<DecorCategoryCardProps> = ({ item }) => {
+const DecorCategoryCard = ({ item }: DecorCategoryCardProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -33,7 +32,7 @@ const DecorCategoryCard: React.FC<DecorCategoryCardProps> = ({ item }) => {
     > 
         {/* Sử dụng item.imageUrl và item.name từ props */}
         <img 
-          className="object-contain h-10 mb-4 h-32 w-32 mx-auto" 
+          className="object-contain mb-4 h-32 w-32 mx-auto" 
           src={item.imageUrl} 
           alt={item.name} 
         />

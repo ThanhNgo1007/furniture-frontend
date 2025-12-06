@@ -174,6 +174,30 @@ const chatSlice = createSlice({
     setIsOpen: (state, action: PayloadAction<boolean>) => {
       state.isOpen = action.payload;
     },
+
+    // Mark all messages in current conversation as read (for read receipt handling)
+    // When SELLER reads the conversation, USER's messages are now read -> senderType "USER" should be marked
+    // When USER reads the conversation, SELLER's messages are now read -> senderType "SELLER" should be marked
+    markMessagesAsReadLocally: (state, action: PayloadAction<{ conversationId: number; readAt: string; readBy?: string }>) => {
+      const { conversationId, readAt, readBy } = action.payload;
+      if (state.currentConversation?.id === conversationId) {
+        // readBy tells us who read the messages
+        // If SELLER read, then USER's sent messages are read (senderType = "USER")
+        // If USER read, then SELLER's sent messages are read (senderType = "SELLER")
+        const senderTypeToMark = readBy === "SELLER" ? "USER" : "SELLER";
+
+        state.messages = state.messages.map((msg) => {
+          if (msg.senderType === senderTypeToMark && !msg.isRead) {
+            return {
+              ...msg,
+              isRead: true,
+              readAt: readAt,
+            };
+          }
+          return msg;
+        });
+      }
+    },
   },
   extraReducers: (builder) => {
     // Fetch conversations
@@ -254,6 +278,7 @@ export const {
   setTyping,
   clearError,
   setIsOpen,
+  markMessagesAsReadLocally,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

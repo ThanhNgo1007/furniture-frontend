@@ -87,17 +87,17 @@ const Dashboard = () => {
 
   const orderStatusOptions: ApexCharts.ApexOptions = {
     chart: { type: 'donut' },
-    labels: ['Pending', 'Shipping', 'Delivered', 'Cancelled'],
+    labels: ['Chờ xử lý', 'Đang giao', 'Đã giao', 'Đã hủy'],
     colors: ['#FEB019', '#008FFB', '#00E396', '#FF4560'],
     legend: { position: 'bottom' },
-    plotOptions: { pie: { donut: { labels: { show: true, total: { show: true, label: 'Total Orders', formatter: () => summary.totalOrders.toString() } } } } }
+    plotOptions: { pie: { donut: { labels: { show: true, total: { show: true, label: 'Tổng đơn hàng', formatter: () => summary.totalOrders.toString() } } } } }
   };
 
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1a1a1a' }}>
-          Seller Dashboard
+          Tổng quan Người bán
         </Typography>
         {summary.lastUpdated && (
           <Chip 
@@ -115,31 +115,31 @@ const Dashboard = () => {
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={tabValue} onChange={handleTabChange} aria-label="dashboard tabs">
-          <Tab label="Overview" />
-          <Tab label="Revenue & Finance" />
-          <Tab label="Orders" />
-          <Tab label="Products & Customers" />
+          <Tab label="Tổng quan" />
+          <Tab label="Doanh thu & Tài chính" />
+          <Tab label="Đơn hàng" />
+          <Tab label="Sản phẩm & Khách hàng" />
         </Tabs>
       </Box>
 
       {/* Tab 0: Overview */}
       <TabPanel value={tabValue} index={0}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
-          <StatsCard title="Total Revenue" value={formatVND(summary.totalRevenue)} icon={<AttachMoneyIcon sx={{ fontSize: 40, color: '#00E396' }} />} color="#e6fffa" />
-          <StatsCard title="Total Orders" value={summary.totalOrders} icon={<ShoppingBagIcon sx={{ fontSize: 40, color: '#008FFB' }} />} color="#e3f2fd" />
-          <StatsCard title="Net Profit (Est.)" value={formatVND(finance?.netProfit || 0)} icon={<AccountBalanceWalletIcon sx={{ fontSize: 40, color: '#775DD0' }} />} color="#f3e5f5" />
-          <StatsCard title="Customers" value={customers?.totalCustomers || 0} icon={<PeopleIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
+          <StatsCard title="Tổng doanh thu" value={formatVND(summary.totalRevenue)} icon={<AttachMoneyIcon sx={{ fontSize: 40, color: '#00E396' }} />} color="#e6fffa" />
+          <StatsCard title="Tổng đơn hàng" value={summary.totalOrders} icon={<ShoppingBagIcon sx={{ fontSize: 40, color: '#008FFB' }} />} color="#e3f2fd" />
+          <StatsCard title="Lợi nhuận ròng (Ước tính)" value={formatVND(finance?.netProfit || 0)} icon={<AccountBalanceWalletIcon sx={{ fontSize: 40, color: '#775DD0' }} />} color="#f3e5f5" />
+          <StatsCard title="Khách hàng" value={customers?.totalCustomers || 0} icon={<PeopleIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
         </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' }, gap: 3 }}>
           <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Revenue Analytics (Last 30 Days)</Typography>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Phân tích doanh thu (30 ngày qua)</Typography>
               <ReactApexChart options={revenueChartOptions} series={revenueSeries} type="area" height={350} />
             </CardContent>
           </Card>
           <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', height: '100%' }}>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Order Status</Typography>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Trạng thái đơn hàng</Typography>
               <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 320 }}>
                 <ReactApexChart options={orderStatusOptions} series={orderStatusSeries} type="donut" width={380} />
               </Box>
@@ -151,9 +151,9 @@ const Dashboard = () => {
       {/* Tab 1: Revenue & Finance */}
       <TabPanel value={tabValue} index={1}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
-          <StatsCard title="Total Revenue" value={formatVND(summary.totalRevenue)} icon={<AttachMoneyIcon sx={{ fontSize: 40, color: '#00E396' }} />} color="#e6fffa" />
-          <StatsCard title="Platform Fees (5%)" value={formatVND(finance?.platformFee || 0)} icon={<AttachMoneyIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
-          <StatsCard title="Net Profit" value={formatVND(finance?.netProfit || 0)} icon={<AccountBalanceWalletIcon sx={{ fontSize: 40, color: '#775DD0' }} />} color="#f3e5f5" />
+          <StatsCard title="Tổng doanh thu" value={formatVND(summary.totalRevenue)} icon={<AttachMoneyIcon sx={{ fontSize: 40, color: '#00E396' }} />} color="#e6fffa" />
+          <StatsCard title="Phí nền tảng (5%)" value={formatVND(finance?.platformFee || 0)} icon={<AttachMoneyIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
+          <StatsCard title="Lợi nhuận ròng" value={formatVND(finance?.netProfit || 0)} icon={<AccountBalanceWalletIcon sx={{ fontSize: 40, color: '#775DD0' }} />} color="#f3e5f5" />
         </Box>
         {finance?.lastUpdated && (
           <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -165,7 +165,7 @@ const Dashboard = () => {
         )}
         <Card sx={{ borderRadius: 4, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
           <CardContent>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Detailed Revenue Chart</Typography>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Biểu đồ doanh thu chi tiết</Typography>
             <ReactApexChart options={revenueChartOptions} series={revenueSeries} type="bar" height={350} />
           </CardContent>
         </Card>
@@ -174,19 +174,19 @@ const Dashboard = () => {
       {/* Tab 2: Orders */}
       <TabPanel value={tabValue} index={2}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
-          <StatsCard title="Pending" value={summary.pendingOrders} icon={<ShoppingBagIcon sx={{ fontSize: 40, color: '#FEB019' }} />} color="#fff8e1" />
-          <StatsCard title="Shipping" value={summary.shippingOrders} icon={<LocalShippingIcon sx={{ fontSize: 40, color: '#008FFB' }} />} color="#e3f2fd" />
-          <StatsCard title="Delivered" value={summary.deliveredOrders} icon={<InventoryIcon sx={{ fontSize: 40, color: '#00E396' }} />} color="#e6fffa" />
-          <StatsCard title="Cancelled" value={summary.cancelledOrders} icon={<CancelIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
+          <StatsCard title="Chờ xử lý" value={summary.pendingOrders} icon={<ShoppingBagIcon sx={{ fontSize: 40, color: '#FEB019' }} />} color="#fff8e1" />
+          <StatsCard title="Đang giao" value={summary.shippingOrders} icon={<LocalShippingIcon sx={{ fontSize: 40, color: '#008FFB' }} />} color="#e3f2fd" />
+          <StatsCard title="Đã giao" value={summary.deliveredOrders} icon={<InventoryIcon sx={{ fontSize: 40, color: '#00E396' }} />} color="#e6fffa" />
+          <StatsCard title="Đã hủy" value={summary.cancelledOrders} icon={<CancelIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
         </Box>
       </TabPanel>
 
       {/* Tab 3: Products & Customers */}
       <TabPanel value={tabValue} index={3}>
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3, mb: 4 }}>
-          <StatsCard title="Total Products" value={products?.totalProducts || 0} icon={<InventoryIcon sx={{ fontSize: 40, color: '#008FFB' }} />} color="#e3f2fd" />
-          <StatsCard title="Low Stock Alert (<10)" value={products?.lowStockProducts || 0} icon={<InventoryIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
-          <StatsCard title="Total Customers" value={customers?.totalCustomers || 0} icon={<PeopleIcon sx={{ fontSize: 40, color: '#775DD0' }} />} color="#f3e5f5" />
+          <StatsCard title="Tổng sản phẩm" value={products?.totalProducts || 0} icon={<InventoryIcon sx={{ fontSize: 40, color: '#008FFB' }} />} color="#e3f2fd" />
+          <StatsCard title="Sắp hết hàng (<10)" value={products?.lowStockProducts || 0} icon={<InventoryIcon sx={{ fontSize: 40, color: '#FF4560' }} />} color="#ffebee" />
+          <StatsCard title="Tổng khách hàng" value={customers?.totalCustomers || 0} icon={<PeopleIcon sx={{ fontSize: 40, color: '#775DD0' }} />} color="#f3e5f5" />
         </Box>
       </TabPanel>
     </Box>

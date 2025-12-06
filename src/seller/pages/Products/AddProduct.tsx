@@ -4,16 +4,16 @@
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import CloseIcon from '@mui/icons-material/Close'
 import {
-  Button,
-  CircularProgress,
-  FormControl,
-  FormHelperText,
-  Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField
+    Button,
+    CircularProgress,
+    FormControl,
+    FormHelperText,
+    Grid,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField
 } from '@mui/material'
 import { useFormik } from 'formik'
 import 'quill/dist/quill.snow.css'
@@ -89,16 +89,16 @@ const AddProduct = () => {
 
       // MSRP Price must be a whole number
       if (!values.msrpPrice) {
-        errors.msrpPrice = 'MSRP price is required'
+        errors.msrpPrice = 'Vui lòng nhập giá gốc'
       } else if (!isInteger(values.msrpPrice)) {
-        errors.msrpPrice = 'Price must be a whole number (no decimals)'
+        errors.msrpPrice = 'Giá phải là số nguyên (không có thập phân)'
       }
 
       // Selling Price must be a whole number
       if (!values.sellingPrice) {
-        errors.sellingPrice = 'Selling price is required'
+        errors.sellingPrice = 'Vui lòng nhập giá bán'
       } else if (!isInteger(values.sellingPrice)) {
-        errors.sellingPrice = 'Price must be a whole number (no decimals)'
+        errors.sellingPrice = 'Giá phải là số nguyên (không có thập phân)'
       }
 
       return errors
@@ -201,7 +201,7 @@ const AddProduct = () => {
               fullWidth
               id="title"
               name="title"
-              label="Title"
+              label="Tên sản phẩm"
               value={formik.values.title}
               onChange={formik.handleChange}
               error={formik.touched.title && Boolean(formik.errors.title)}
@@ -210,7 +210,7 @@ const AddProduct = () => {
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <InputLabel htmlFor="description" sx={{ mb: 1 }}>Description *</InputLabel>
+            <InputLabel htmlFor="description" sx={{ mb: 1 }}>Mô tả sản phẩm *</InputLabel>
             <div ref={quillRef} style={{ height: '200px', marginBottom: '50px' }} />
             {formik.touched.description && formik.errors.description && (
               <FormHelperText error>{formik.errors.description}</FormHelperText>
@@ -221,7 +221,7 @@ const AddProduct = () => {
               fullWidth
               id="quantity"
               name="quantity"
-              label="Quantity"
+              label="Số lượng"
               value={formik.values.quantity}
               onChange={formik.handleChange}
               error={formik.touched.quantity && Boolean(formik.errors.quantity)}
@@ -234,7 +234,7 @@ const AddProduct = () => {
               fullWidth
               id="msrp_price"
               name="msrpPrice"
-              label="MSRP Price"
+              label="Giá gốc"
               value={formik.values.msrpPrice}
               onChange={formik.handleChange}
               error={formik.touched.msrpPrice && Boolean(formik.errors.msrpPrice)}
@@ -247,7 +247,7 @@ const AddProduct = () => {
               fullWidth
               id="sellingPrice"
               name="sellingPrice"
-              label="Selling Price"
+              label="Giá bán"
               value={formik.values.sellingPrice}
               onChange={formik.handleChange}
               error={formik.touched.sellingPrice && Boolean(formik.errors.sellingPrice)}
@@ -261,17 +261,17 @@ const AddProduct = () => {
               error={formik.touched.color && Boolean(formik.errors.color)}
               required
             >
-              <InputLabel id="color-label">Color</InputLabel>
+              <InputLabel id="color-label">Màu sắc</InputLabel>
               <Select
                 labelId="color-label"
                 id="color"
                 name="color"
                 value={formik.values.color}
                 onChange={formik.handleChange}
-                label="color"
+                label="Màu sắc"
               >
                 <MenuItem value="">
-                  <em>None</em>
+                  <em>Không chọn</em>
                 </MenuItem>
 
                 {colors.map((color) => (
@@ -300,14 +300,14 @@ const AddProduct = () => {
               error={formik.touched.category && Boolean(formik.errors.category)}
               required
             >
-              <InputLabel id="category-label">Category</InputLabel>
+              <InputLabel id="category-label">Danh mục cấp 1</InputLabel>
               <Select
                 labelId="category-label"
                 id="category"
                 name="category"
                 value={formik.values.category}
                 onChange={formik.handleChange}
-                label="Category"
+                label="Danh mục cấp 1"
               >
                 {mainCategory.map(item => (
                   <MenuItem value={item.categoryId}>{item.name}</MenuItem>
@@ -324,16 +324,16 @@ const AddProduct = () => {
               error={formik.touched.category && Boolean(formik.errors.category)}
               required
             >
-              <InputLabel id="category2-label">Second Category</InputLabel>
+              <InputLabel id="category2-label">Danh mục cấp 2</InputLabel>
               <Select
                 labelId="category2-label"
                 id="category2"
                 name="category2"
                 value={formik.values.category2}
                 onChange={formik.handleChange}
-                label="Second Category"
+                label="Danh mục cấp 2"
               >
-                <MenuItem value="none">none</MenuItem>
+                <MenuItem value="none">Không có</MenuItem>
                 {formik.values.category &&
                   categoryTwo[formik.values.category]?.map((item, index) => (
                     <MenuItem key={index} value={item.categoryId}>
@@ -351,17 +351,17 @@ const AddProduct = () => {
               fullWidth
               error={formik.touched.category && Boolean(formik.errors.category)}
             >
-              <InputLabel id="category-label">Third Category</InputLabel>
+              <InputLabel id="category-label">Danh mục cấp 3</InputLabel>
               <Select
                 labelId="category-label"
                 id="category"
                 name="category3"
                 value={formik.values.category3}
                 onChange={formik.handleChange}
-                label="Third Category"
+                label="Danh mục cấp 3"
               >
                 <MenuItem value="none">
-                  <em>None</em>
+                  <em>Không có</em>
                 </MenuItem>
                 {formik.values.category2 &&
                   childCategory(
@@ -389,7 +389,7 @@ const AddProduct = () => {
               {false ? (
                 <CircularProgress size="small" sx={{ width: '27px', height: '27px' }} />
               ) : (
-                'Add Product'
+                'Thêm sản phẩm'
               )}
             </Button>
           </Grid>
