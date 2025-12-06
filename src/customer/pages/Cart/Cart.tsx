@@ -20,8 +20,13 @@ const Cart = () => {
     const { cart, loading } = useAppSelector(store => store.cart);
 
     useEffect(() => {
-        dispatch(fetchUserCart(localStorage.getItem("jwt") || ""));
-    }, [dispatch]);
+        const jwt = localStorage.getItem("jwt");
+        if (jwt) {
+            dispatch(fetchUserCart(jwt));
+        } else {
+            navigate("/login");
+        }
+    }, [dispatch, navigate]);
 
     const handleChange = (e: any) => {
         setCouponCode(e.target.value)

@@ -16,7 +16,9 @@ import {
   TextField
 } from '@mui/material'
 import { useFormik } from 'formik'
-import { useState } from 'react'
+import 'quill/dist/quill.snow.css'
+import { useEffect, useState } from 'react'
+import { useQuill } from 'react-quilljs'
 import { furnituresLevelThree } from '../../../data/category/levelthree/furnituresLevelThree'
 import { lightingLevelThree } from '../../../data/category/levelthree/lightingLevelThree'
 import { outdoorLevelThree } from '../../../data/category/levelthree/outdoorLevelThree'
@@ -50,6 +52,19 @@ const categoryThree: { [key: string]: any[] } = {
 
 const AddProduct = () => {
   const [uploadImage, setUploadingImage] = useState(false)
+  
+  // Configure Quill to only allow text formatting, no images/videos
+  const { quill, quillRef } = useQuill({
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['clean']
+      ]
+    }
+  });
 
   const dispatch = useAppDispatch()
 
@@ -114,6 +129,15 @@ const AddProduct = () => {
       return child.parentCategoryId == parentCategoryId
     })
   }
+
+  // Sync Quill editor with formik
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', () => {
+        formik.setFieldValue('description', quill.root.innerHTML);
+      });
+    }
+  }, [quill]);
 
   return (
     <div>
@@ -186,26 +210,11 @@ const AddProduct = () => {
             />
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <TextField
-              multiline
-              rows={4}
-              fullWidth
-              id="description"
-              name="description"
-              label="Description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              error={formik.touched.description && Boolean(formik.errors.description)}
-              helperText={
-                formik.touched.description && formik.errors.description
-                  ? formik.errors.description
-                  : `${formik.values.description.length}/2000 characters`
-              }
-              inputProps={{
-                maxLength: 2000
-              }}
-              required
-            />
+            <InputLabel htmlFor="description" sx={{ mb: 1 }}>Description *</InputLabel>
+            <div ref={quillRef} style={{ height: '200px', marginBottom: '50px' }} />
+            {formik.touched.description && formik.errors.description && (
+              <FormHelperText error>{formik.errors.description}</FormHelperText>
+            )}
           </Grid>
           <Grid size={{ xs: 12, md: 4, lg: 3 }}>
             <TextField

@@ -3,25 +3,54 @@
 import PaymentsIcon from '@mui/icons-material/Payments';
 import { Box, Button, Divider } from '@mui/material';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 // Import thêm action cancelOrder
 import { useTranslation } from 'react-i18next';
 import { cancelOrder, fetchOrderById, fetchOrderItemById } from '../../../State/customer/orderSlice';
+import { fetchProductReviews } from '../../../State/customer/reviewSlice';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
 import { formatVND } from '../../../Util/formatCurrency';
 import OrderStepper from './OrderStepper';
 
 const OrderDetails = () => {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const location = useLocation();
     const { orderId, orderItemId } = useParams();
     const { currentOrder, orderItem: currentItem } = useAppSelector(store => store.order)
+    const { productReviews } = useAppSelector(store => store.review)
+    const { user } = useAppSelector(store => store.auth)
     const { t } = useTranslation();
 
     useEffect(() => {
         dispatch(fetchOrderById({ orderId: Number(orderId), jwt: localStorage.getItem('jwt') || '' }))
         dispatch(fetchOrderItemById({ orderItemId: Number(orderItemId), jwt: localStorage.getItem('jwt') || '' }))
-
     }, [dispatch, orderId, orderItemId])
+
+    // Fetch reviews for all products in the order
+    // Re-fetch when location changes (e.g., navigating back from WriteReview)
+    useEffect(() => {
+        if (currentOrder?.orderItems) {
+            currentOrder.orderItems.forEach(item => {
+                if (item?.product?.id) {
+                    dispatch(fetchProductReviews(item.product.id));
+                }
+            });
+        }
+    }, [dispatch, currentOrder?.orderItems, location.pathname]);
+
+    // Check if user has already reviewed a product
+    const hasUserReviewed = (productId: number) => {
+        const reviews = productReviews[productId];
+        if (!user?.id || !reviews || reviews.length === 0) {
+            return false;
+        }
+        
+        // Check if any review matches the current order ID
+        return reviews.some(review => 
+            review.user?.id === user.id && review.orderId === Number(orderId)
+        );
+    }
 
     // --- THÊM HÀM XỬ LÝ HỦY ĐƠN ---
     const handleCancelOrder = () => {
@@ -77,6 +106,46 @@ const OrderDetails = () => {
                                     <p className='text-xs text-gray-600'>{t('product.quantity')}: {item.quantity}</p>
                                     <p className='font-medium text-sm'>{formatVND(item.sellingPrice)}</p>
                                 </div>
+                                
+                                {/* Write Review Button - Only show for DELIVERED orders */}
+                                {currentOrder?.orderStatus === 'DELIVERED' && item.product?.id && (
+                                    hasUserReviewed(item.product.id) ? (
+                                        <div className="flex flex-col items-start gap-1 mt-1">
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                disabled
+                                                sx={{ color: 'success.main', borderColor: 'success.main' }}
+                                            >
+                                                ✓ {t('review.reviewed')}
+                                            </Button>
+                                            <span 
+                                                className="text-blue-600 text-xs cursor-pointer hover:underline"
+                                                onClick={() => {
+                                                    if (item.product?.id) {
+                                                        const review = productReviews[item.product.id]?.find(r => 
+                                                            r.user?.id === user?.id && r.orderId === Number(orderId)
+                                                        );
+                                                        if (review) {
+                                                            navigate(`/reviews/${item.product.id}#review-${review.id}`);
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                {t('review.seeReviewDetails')}
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            onClick={() => navigate(`/write-review/${orderId}/${item.id}/${item.product.id}`)}
+                                            sx={{ mt: 1 }}
+                                        >
+                                            {t('review.writeReview')}
+                                        </Button>
+                                    )
+                                )}
                             </div>
                         </div>
                     ))}

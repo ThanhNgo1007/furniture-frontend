@@ -8,5 +8,6 @@ export interface Transaction {
   order: Order
   seller: Seller
   date: string,
-  paid: boolean
+  paid: boolean,
+  payoutDate?: string;
 }

@@ -30,7 +30,7 @@ const RightMenuDrawer = () => {
     <>
       {/* Menu Icon Button */}
       <IconButton onClick={() => setOpen(true)}>
-        <MenuIcon className="text-gray-700" sx={{ fontSize: 29 }} />
+        <MenuIcon className="text-gray-600" sx={{ fontSize: 29 }} />
       </IconButton>
 
       {/* Drawer */}
@@ -40,7 +40,7 @@ const RightMenuDrawer = () => {
         onClose={handleClose}
         sx={{
           '& .MuiDrawer-paper': {
-            width: 300,
+            width: 350,
             padding: 2,
           }
         }}
@@ -63,7 +63,7 @@ const RightMenuDrawer = () => {
           >
             <Avatar 
               src="https://avatar.iran.liara.run/public/boy" 
-              sx={{ width: 40, height: 40 }}
+              sx={{ width: 50, height: 50 }}
             />
             <div className="flex-1">
               <p className="font-semibold text-sm">{auth.user?.fullName}</p>
@@ -77,7 +77,10 @@ const RightMenuDrawer = () => {
             variant="outlined"
             startIcon={<AccountCircleIcon />}
             sx={{
-              mb: 2,
+              fontSize: 16,
+              mt: 3,
+              mb: 3,
+              p: 2,
               textTransform: 'none',
               borderColor: '#E27E6A',
               color: '#E27E6A',
@@ -98,19 +101,19 @@ const RightMenuDrawer = () => {
           {/* Wishlist */}
           <div
             onClick={() => handleNavigate('/wishlist')}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+            className="flex items-center gap-3 p-4 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
           >
-            <FavoriteBorder className="text-gray-700" />
-            <span className="font-medium text-sm">{t("navbar.wishlist")}</span>
+            <FavoriteBorder className="text-gray-700 font-lg" />
+            <span className="font-lg text-md">{t("navbar.wishlist")}</span>
           </div>
 
           {/* Cart */}
           <div
             onClick={() => handleNavigate('/cart')}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+            className="flex items-center gap-3 p-4 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
           >
-            <ShoppingBasketOutlinedIcon className="text-gray-700" />
-            <span className="font-medium text-sm">{t("navbar.cart")}</span>
+            <ShoppingBasketOutlinedIcon className="text-gray-700 font-lg" />
+            <span className="font-lg text-md">{t("navbar.cart")}</span>
           </div>
 
           <Divider sx={{ my: 2 }} />
@@ -118,12 +121,12 @@ const RightMenuDrawer = () => {
           {/* Become Seller */}
           <div
             onClick={() => handleNavigate('/become-seller')}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-teal-50 cursor-pointer transition-colors border border-teal-200"
+            className="flex items-center gap-3 p-4 rounded-lg hover:bg-teal-50 cursor-pointer transition-colors border border-teal-200"
           >
-            <Storefront className="text-teal-600" />
+            <Storefront className="text-teal-600 font-lg" />
             <div className="flex-1">
-              <p className="font-semibold text-sm text-teal-600">{t("navbar.becomeSeller")}</p>
-              <p className="text-xs text-gray-500">{t("navbar.start")}</p>
+              <p className="font-semibold text-md text-teal-600">{t("navbar.becomeSeller")}</p>
+              <p className="text-md text-gray-500">{t("navbar.start")}</p>
             </div>
           </div>
         </div>

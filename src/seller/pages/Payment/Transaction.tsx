@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Chip, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, Grid, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 import { useMemo, useState } from 'react';
@@ -39,47 +39,65 @@ const orderStatusColor: { [key: string]: { color: string; label: string } } = {
 // Thêm props
 interface TransactionTableProps {
     data?: any[]; // Hoặc Type Transaction[]
+    mode?: 'PENDING' | 'HISTORY';
 }
 
-export default function TransactionTable({data}: TransactionTableProps) {
+export default function TransactionTable({data, mode = 'HISTORY'}: TransactionTableProps) {
   const { transactions: storeTransactions } = useAppSelector(store => store.transactions);
   const transactions = data || storeTransactions;
 
   // State cho bộ lọc
-  const [filterType, setFilterType] = useState<'all' | 'day' | 'month' | 'year'>('all');
-  const [selectedDay, setSelectedDay] = useState<string>('');
+  const [filterType, setFilterType] = useState<'all' | 'day' | 'month' | 'year'>('day');
+  const [selectedDay, setSelectedDay] = useState<string>(new Date().toISOString().split('T')[0]);
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
 
   // Lọc transactions dựa trên filter
   const filteredTransactions = useMemo(() => {
-    if (filterType === 'all') {
-      return transactions;
+    // Nếu là PENDING, chỉ hiển thị data được truyền vào (đã lọc sẵn ở parent), không áp dụng bộ lọc của History
+    if (mode === 'PENDING') {
+        return transactions;
     }
 
-    return transactions.filter((transaction) => {
-      const transactionDate = new Date(transaction.date || Date.now());
-      const transactionDay = transactionDate.getDate();
-      const transactionMonth = transactionDate.getMonth() + 1; // 0-indexed
-      const transactionYear = transactionDate.getFullYear();
+    // MODE HISTORY:
+    // 1. Chỉ lấy các đơn ĐÃ QUYẾT TOÁN (PAID)
+    let data = transactions.filter(t => t.paid);
 
-      if (filterType === 'day' && selectedDay) {
-        const [year, month, day] = selectedDay.split('-').map(Number);
-        return transactionDay === day && transactionMonth === month && transactionYear === year;
-      }
+    // 2. Lọc theo thời gian
+    if (filterType !== 'all') {
+        data = data.filter((transaction) => {
+            // Sử dụng payoutDate nếu có, nếu không dùng date
+            const dateToUse = transaction.payoutDate || transaction.date || Date.now();
+            const transactionDate = new Date(dateToUse);
+            const transactionDay = transactionDate.getDate();
+            const transactionMonth = transactionDate.getMonth() + 1; // 0-indexed
+            const transactionYear = transactionDate.getFullYear();
 
-      if (filterType === 'month' && selectedMonth) {
-        const [year, month] = selectedMonth.split('-').map(Number);
-        return transactionMonth === month && transactionYear === year;
-      }
+            if (filterType === 'day' && selectedDay) {
+                const [year, month, day] = selectedDay.split('-').map(Number);
+                return transactionDay === day && transactionMonth === month && transactionYear === year;
+            }
 
-      if (filterType === 'year' && selectedYear) {
-        return transactionYear === Number(selectedYear);
-      }
+            if (filterType === 'month' && selectedMonth) {
+                const [year, month] = selectedMonth.split('-').map(Number);
+                return transactionMonth === month && transactionYear === year;
+            }
 
-      return true;
-    });
-  }, [transactions, filterType, selectedDay, selectedMonth, selectedYear]);
+            if (filterType === 'year' && selectedYear) {
+                return transactionYear === Number(selectedYear);
+            }
+            return true;
+        });
+    }
+    return data;
+  }, [transactions, filterType, selectedDay, selectedMonth, selectedYear, mode]);
+
+  // Tính tổng lợi nhuận của danh sách đã lọc
+  const summaryStats = useMemo(() => {
+      const totalRevenue = filteredTransactions.reduce((acc, curr) => acc + (curr.order.totalSellingPrice || 0), 0);
+      const totalProfit = totalRevenue * 0.95; // Trừ 5% phí sàn
+      return { totalRevenue, totalProfit, count: filteredTransactions.length };
+  }, [filteredTransactions]);
 
   // Reset filters
   const handleResetFilters = () => {
@@ -91,10 +109,37 @@ export default function TransactionTable({data}: TransactionTableProps) {
 
   return (
     <Box>
-      {/* Filter Controls */}
+      {/* Summary Stats Panel - Chỉ hiện khi mode HISTORY */}
+      {mode === 'HISTORY' && (
+      <Paper className="p-4 mb-6 shadow-md bg-blue-50 border border-blue-100">
+          <Grid container spacing={2} alignItems="center">
+              <Grid size={{ xs: 12, md: 4 }}>
+                  <Typography variant="subtitle2" color="text.secondary">Tổng số đơn đã quyết toán</Typography>
+                  <Typography variant="h4" fontWeight="bold" color="primary">
+                      {summaryStats.count} <span className="text-base font-normal text-gray-500">đơn</span>
+                  </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                  <Typography variant="subtitle2" color="text.secondary">Tổng doanh thu</Typography>
+                  <Typography variant="h4" fontWeight="bold" className="text-gray-800">
+                      {formatVND(summaryStats.totalRevenue)}
+                  </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                  <Typography variant="subtitle2" color="text.secondary">Tổng thực nhận (95%)</Typography>
+                  <Typography variant="h4" fontWeight="bold" color="success.main">
+                      {formatVND(summaryStats.totalProfit)}
+                  </Typography>
+              </Grid>
+          </Grid>
+      </Paper>
+      )}
+
+      {/* Filter Controls - Chỉ hiện khi mode HISTORY */}
+      {mode === 'HISTORY' && (
       <Paper className="p-4 mb-4 shadow-md">
         <Typography variant="h6" className="mb-3 font-bold">
-          Bộ lọc giao dịch
+          Bộ lọc lịch sử quyết toán
         </Typography>
         <Box className="flex flex-wrap gap-4 items-end">
           {/* Filter Type Selector */}
@@ -168,13 +213,9 @@ export default function TransactionTable({data}: TransactionTableProps) {
               Đặt lại
             </Button>
           )}
-
-          {/* Results Count */}
-          <Typography variant="body2" color="text.secondary" className="ml-auto">
-            Hiển thị {filteredTransactions.length} / {transactions.length} giao dịch
-          </Typography>
         </Box>
       </Paper>
+      )}
 
       {/* Transaction Table */}
       <TableContainer component={Paper} className="shadow-lg rounded-lg overflow-hidden">

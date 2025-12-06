@@ -2,18 +2,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Close, FilterAlt } from '@mui/icons-material'; // Thêm Close icon
 import {
-  Box,
-  Button,
-  Divider,
-  Drawer, // Thêm Drawer
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Pagination,
-  Select,
-  useMediaQuery,
-  useTheme
+    Box,
+    Button,
+    Divider,
+    Drawer, // Thêm Drawer
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Pagination,
+    Select,
+    useMediaQuery,
+    useTheme
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -143,10 +143,24 @@ const Product = () => {
           </div>
           <Divider />
           
-          <section className="products_section grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-5 px-4 justify-center max-w-[1500px] mx-auto">
-            {product.products?.map((item: any) => (
-              <ProductCard item={item} key={item.id} />
-            ))}
+          <section className="products_section">
+            {product.products && product.products.length > 0 ? (
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-5 px-4 justify-center max-w-[1500px] mx-auto">
+                {product.products.map((item: any) => (
+                  <ProductCard item={item} key={item.id} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-[60vh] opacity-60 w-full">
+                <FilterAlt sx={{ fontSize: 80, color: 'gray', mb: 2 }} />
+                <p className="text-xl font-medium text-gray-500">
+                  {t('product_listing.no_products_found') || "Không tìm thấy sản phẩm nào"}
+                </p>
+                <p className="text-sm text-gray-400 mt-1">
+                  Vui lòng thử lại với bộ lọc khác
+                </p>
+              </div>
+            )}
           </section>
 
           <div className="flex justify-center py-10">

@@ -18,8 +18,8 @@ const Orders = () => {
   const filterOptions = [
     { label: t('orders.allOrders'), value: "ALL" },
     { label: t('orders.pending'), value: "PENDING" },
-    { label: t('orders.placed'), value: "PLACED" },
     { label: t('orders.confirmed'), value: "CONFIRMED" },
+    { label: t('orders.placed'), value: "PLACED" },
     { label: t('orders.shipped'), value: "SHIPPED" },
     { label: t('orders.delivered'), value: "DELIVERED" },
     { label: t('orders.cancelled'), value: "CANCELLED" },
@@ -65,7 +65,7 @@ const Orders = () => {
       </div>
 
       {/* Filter Buttons */}
-      <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex gap-2 flex-wrap pb-4">
         {filterOptions.map((option) => (
           <button
             key={option.value}

@@ -25,6 +25,7 @@ const OrderCard = ({ order }: { order: Order }) => {
       case 'DELIVERED': return { bg: '#10b981', text: 'text-green-500' };
       case 'SHIPPED': return { bg: '#3b82f6', text: 'text-blue-500' };
       case 'CONFIRMED': return { bg: '#f59e0b', text: 'text-amber-500' };
+      case 'PENDING': return { bg: '#f0f13f', text: 'text-yellow-300' };
       default: return { bg: '#2dd4bf', text: 'text-teal-400' };
     }
   };

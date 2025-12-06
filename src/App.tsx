@@ -5,7 +5,9 @@ import CustomerLayout from './admin/components/Layout'
 import ManagementLayout from './admin/components/ManagementLayout'
 import AdminDashboard from './admin/Pages/Dashboard/AdminDashboard'
 import BackToTopButton from './customer/components/BackToTopButton'
+import FloatingChatWidget from './customer/components/FloatingChatWidget/FloatingChatWidget'
 import Account from './customer/pages/Account/Account'
+import WriteReview from './customer/pages/Account/WriteReview'
 import Auth from './customer/pages/Auth/Auth'
 import BecomeSeller from './customer/pages/Become Seller/BecomeSeller'
 import SellerVerificationWaiting from './customer/pages/Become Seller/SellerVerifycationWaiting'
@@ -27,6 +29,7 @@ import { loadBestSellers } from './State/customer/ProductSlice'
 import { fetchSellerProfile } from './State/seller/sellerSlice'
 import { useAppDispatch, useAppSelector } from './State/Store'
 import customTheme from './theme/customTheme'
+import ScrollToTop from './Util/ScrollToTop'
 // import { useAuthChecker } from './hooks/useAuthChecker' // Uncomment nếu muốn dùng
 
 // Debug component - Uncomment để debug
@@ -267,6 +270,7 @@ function App() {
           </Box>
         ) : (
           <>
+            <ScrollToTop />
             <Routes>
               <Route element={<CustomerLayout />}>
                  <Route path="/" element={<Home />} />
@@ -285,6 +289,7 @@ function App() {
                  <Route path="/order-success" element={<OrderSuccess />} />
                  <Route path="/verify-seller/:otp" element={<VerifySeller />} />
                  <Route path="/reviews/:productId" element={<Review />} />
+                 <Route path="/write-review/:orderId/:orderItemId/:productId" element={<WriteReview />} />
               </Route>
 
               <Route element={<ManagementLayout />}>
@@ -295,6 +300,8 @@ function App() {
               <Route path="/seller-verification-waiting" element={<SellerVerificationWaiting />} />
             </Routes>
             <BackToTopButton />
+            {auth.jwt && <FloatingChatWidget />}
+    
           </>
         )}
       </div>

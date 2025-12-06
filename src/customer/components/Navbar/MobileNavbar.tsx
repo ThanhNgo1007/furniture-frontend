@@ -163,7 +163,7 @@ const MobileNavbar = ({ handleClose }: MobileNavbarProps) => {
                                                                     }
                                                                 }}
                                                             >
-                                                                <ListItemText primary={sub.name} primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 'medium', color: '#444' }} />
+                                                                <ListItemText primary={t(`category.level2.${sub.categoryId}`)} primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 'medium', color: '#444' }} />
                                                                 {hasLevel3 ? (isLevel2Expanded ? <ExpandLess fontSize='small'/> : <ExpandMore fontSize='small' />) : null}
                                                             </ListItemButton>
 
@@ -177,7 +177,7 @@ const MobileNavbar = ({ handleClose }: MobileNavbarProps) => {
                                                                                 sx={{ pl: 8, bgcolor: '#fff' }} 
                                                                                 onClick={() => handleLinkClick(`/products/${l3.parentCategoryId}/${l3.categoryId}`)}
                                                                             >
-                                                                                <ListItemText primary={l3.name} primaryTypographyProps={{ fontSize: '0.85rem', color: '#666' }} />
+                                                                                <ListItemText primary={t(`category.level3.${l3.categoryId}`)} primaryTypographyProps={{ fontSize: '0.85rem', color: '#666' }} />
                                                                             </ListItemButton>
                                                                         ))}
                                                                     </List>

@@ -81,7 +81,28 @@
     "stabilityStandard": "Designed to meet the US Federal Stability Standard",
     "quantityError": "Only {{quantity}} items left",
     "reviews": "Reviews",
+    "noReviews": "No reviews yet",
     "seeMore": "See More"
+  },
+  "review": {
+    "writeReview": "Write a Review",
+    "reviewed": "Reviewed",
+    "seeReviewDetails": "See Review Details",
+    "yourReview": "Your Review",
+    "rating": "Rating",
+    "reviewPlaceholder": "Share your experience with this product...",
+    "addImages": "Add Images",
+    "uploadImage": "Upload Image",
+    "submitReview": "Submit Review",
+    "successMessage": "Thank you for your review! Redirecting...",
+    "minCharsError": "Review must be at least 10 characters",
+    "maxImagesError": "Maximum {{max}} images allowed",
+    "uploadError": "Error uploading images. Please try again!",
+    "orderNumber": "Order Number",
+    "basedOn": "Based on {{count}} reviews",
+    "allReviews": "All Reviews ({{count}})",
+    "noReviewsYet": "No reviews yet. Be the first to review this product!",
+    "loadMore": "Load More"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -140,13 +161,15 @@
     "on": "on",
     "by": "by",
     "stepper": {
-      "waitPending": "Wait for pending",
-      "confirmed": "Order confirmed",
-      "packing": "Seller packing",
-      "shipping": "On the way",
+      "waitPending": "Wait Pending",
+      "confirmed": "Confirmed",
+      "packing": "Packing",
+      "shipping": "Shipping",
       "delivered": "Delivered",
       "cancelled": "Cancelled"
-    }
+    },
+    "deliveredOn": "Delivered on",
+    "expectedBy": "Expected by"
   },
   "wishlist": {
     "title": "My Wishlist",

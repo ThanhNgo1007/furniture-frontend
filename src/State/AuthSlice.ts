@@ -139,6 +139,51 @@ export const addUserAddress = createAsyncThunk<User, { jwt: string, address: any
   }
 );
 
+export const updateUserAddress = createAsyncThunk<User, { jwt: string, addressId: number, address: any }>(
+  "auth/updateUserAddress",
+  async ({ jwt, addressId, address }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/api/users/address/${addressId}`, address, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      console.log("Address updated:", response.data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to update address");
+    }
+  }
+);
+
+export const deleteUserAddress = createAsyncThunk<User, { jwt: string, addressId: number }>(
+  "auth/deleteUserAddress",
+  async ({ jwt, addressId }, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/api/users/address/${addressId}`, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      console.log("Address deleted:", response.data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to delete address");
+    }
+  }
+);
+
+export const setDefaultAddress = createAsyncThunk<User, { jwt: string, addressId: number }>(
+  "auth/setDefaultAddress",
+  async ({ jwt, addressId }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/api/users/address/${addressId}/default`, {}, {
+        headers: { Authorization: `Bearer ${jwt}` }
+      });
+      console.log("Default address set:", response.data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Failed to set default address");
+    }
+  }
+);
+
 interface AuthState {
   jwt: string | null
   otpSent: boolean
@@ -278,6 +323,39 @@ const authSlice = createSlice({
       state.user = action.payload;
     });
     builder.addCase(addUserAddress.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+
+    // Update Address
+    builder.addCase(updateUserAddress.pending, (state) => { state.loading = true; });
+    builder.addCase(updateUserAddress.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    });
+    builder.addCase(updateUserAddress.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+
+    // Delete Address
+    builder.addCase(deleteUserAddress.pending, (state) => { state.loading = true; });
+    builder.addCase(deleteUserAddress.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    });
+    builder.addCase(deleteUserAddress.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload as string;
+    });
+
+    // Set Default Address
+    builder.addCase(setDefaultAddress.pending, (state) => { state.loading = true; });
+    builder.addCase(setDefaultAddress.fulfilled, (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    });
+    builder.addCase(setDefaultAddress.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
     });

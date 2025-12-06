@@ -85,7 +85,7 @@ const Footer = () => {
         <Box component="footer" sx={{ color: 'text.primary', position: 'relative' }}>
 
             {/* Main footer content */}
-            <Box sx={{ backgroundColor: 'background.paper', py: 8, mt: 8, position: 'relative' }}>
+            <Box sx={{ backgroundColor: 'background.paper', py: 8, position: 'relative' }}>
                 <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
                     <Typography
                         variant="h3"

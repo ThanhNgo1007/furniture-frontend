@@ -23,7 +23,13 @@ const OrderStepper = ({ orderStatus, orderDate, deliveryDate }: any) => {
         { name: t('orders.stepper.confirmed'), description: t('orders.stepper.confirmed'), value: "CONFIRMED" },
         { name: t('orders.stepper.packing'), description: t('orders.stepper.packing'), value: "PLACED" },
         { name: t('orders.stepper.shipping'), description: t('orders.stepper.shipping'), value: "SHIPPED" },
-        { name: t('orders.stepper.delivered'), description: `${t('orders.by')} ${formatDate(deliveryDate)}`, value: "DELIVERED" },
+        { 
+            name: t('orders.stepper.delivered'), 
+            description: orderStatus === 'DELIVERED' 
+                ? `${t('orders.deliveredOn')} ${formatDate(deliveryDate)}` 
+                : `${t('orders.expectedBy')} ${formatDate(deliveryDate)}`, 
+            value: "DELIVERED" 
+        },
     ];
 
     const canceledStep = [

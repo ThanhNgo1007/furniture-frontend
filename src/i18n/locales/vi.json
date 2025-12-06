@@ -50,7 +50,28 @@
     "loading": "Đang tải...",
     "error": "Lỗi",
     "success": "Thành công",
-    "remove": "Xóa"
+    "remove": "Xóa",
+    "cancel": "Hủy"
+  },
+  "review": {
+    "writeReview": "Viết đánh giá",
+    "reviewed": "Đã đánh giá",
+    "seeReviewDetails": "Xem chi tiết đánh giá",
+    "yourReview": "Đánh giá của bạn",
+    "rating": "Đánh giá sao",
+    "reviewPlaceholder": "Chia sẻ trải nghiệm của bạn về sản phẩm này...",
+    "addImages": "Thêm ảnh",
+    "uploadImage": "Tải ảnh lên",
+    "submitReview": "Gửi đánh giá",
+    "successMessage": "Cảm ơn bạn đã đánh giá! Chuyển hướng...",
+    "minCharsError": "Đánh giá phải có ít nhất 10 ký tự",
+    "maxImagesError": "Chỉ được tải tối đa {{max}} ảnh",
+    "uploadError": "Lỗi khi tải ảnh lên. Vui lòng thử lại!",
+    "orderNumber": "Mã đơn hàng",
+    "basedOn": "Dựa trên {{count}} đánh giá",
+    "allReviews": "Tất cả đánh giá ({{count}})",
+    "noReviewsYet": "Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá sản phẩm này!",
+    "loadMore": "Xem thêm"
   },
   "category": {
     "storage": "Lưu trữ & Tổ chức",
@@ -169,6 +190,7 @@
     "stabilityStandard": "Được thiết kế để đáp ứng Tiêu chuẩn Ổn định Liên bang Hoa Kỳ",
     "quantityError": "Chỉ còn lại {{quantity}} sản phẩm",
     "reviews": "Đánh giá",
+    "noReviews": "Chưa có đánh giá nào",
     "seeMore": "Xem thêm"
   },
   "cart": {
@@ -228,13 +250,15 @@
     "on": "vào",
     "by": "vào",
     "stepper": {
-      "waitPending": "Chờ xử lý",
+      "waitPending": "Chờ xác nhận",
       "confirmed": "Đã xác nhận",
       "packing": "Đang đóng gói",
       "shipping": "Đang giao hàng",
       "delivered": "Đã giao hàng",
       "cancelled": "Đã hủy"
-    }
+    },
+    "deliveredOn": "Giao ngày",
+    "expectedBy": "Dự kiến giao"
   },
   "wishlist": {
     "title": "Danh sách yêu thích",

@@ -3,11 +3,14 @@ import { useDispatch, useSelector, type TypedUseSelectorHook } from 'react-redux
 import adminSellerSlice from './admin/adminSellerSlice'
 import dealSlice from './admin/dealSlice'
 import authSlice from './AuthSlice'
+import chatSlice from './chatSlice'
 import cartSlice from './customer/cartSlice'
 import customerSlice from './customer/customerSlice'
 import orderSlice from './customer/orderSlice'
 import productSlice from './customer/ProductSlice'
+import reviewSlice from './customer/reviewSlice'
 import wishlistSlice from './customer/wishlistSlice'
+import sellerDashboardSlice from './seller/sellerDashboardSlice'
 import sellerOrderSlice from './seller/sellerOrderSlice'
 import sellerProductSlice from './seller/sellerProductSlice'
 import sellerSlice from './seller/sellerSlice'
@@ -23,11 +26,14 @@ const rootReducer = combineReducers({
   cart: cartSlice,
   order: orderSlice,
   wishlist: wishlistSlice,
+  review: reviewSlice,
   sellerOrder: sellerOrderSlice,
   transactions: transactionSlice,
   home: customerSlice,
   deal: dealSlice,
-  adminSeller: adminSellerSlice
+  adminSeller: adminSellerSlice,
+  sellerDashboard: sellerDashboardSlice,
+  chat: chatSlice
 })
 
 const store = configureStore({

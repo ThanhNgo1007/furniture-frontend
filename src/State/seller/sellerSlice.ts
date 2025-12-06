@@ -18,7 +18,7 @@ export const fetchSellerProfile = createAsyncThunk(
 );
 
 interface SellerState {
-  seller: any[]
+  seller: any  // ✅ FIXED: Changed from any[] to any (seller profile is an object, not array)
   selectedSeller: any
   profile: any
   report: any
@@ -27,7 +27,7 @@ interface SellerState {
 }
 
 const initialState: SellerState = {
-  seller: [],
+  seller: null,  // ✅ FIXED: Changed from [] to null
   selectedSeller: null,
   profile: null,
   report: null,

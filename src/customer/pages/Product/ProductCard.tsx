@@ -1,9 +1,10 @@
-import { Favorite, FavoriteBorder, ModeComment } from '@mui/icons-material';
+import { Favorite, FavoriteBorder, Message } from '@mui/icons-material';
 import { Button } from '@mui/material';
 import { teal } from '@mui/material/colors';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { createConversation } from '../../../State/chatSlice';
 import { addProductToWishlist } from '../../../State/customer/wishlistSlice';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
 import type { Product } from '../../../types/ProductTypes';
@@ -53,6 +54,33 @@ const ProductCard = ({ item, isBestSeller }: { item: Product; isBestSeller?: boo
     } else {
         // Chưa đăng nhập thì chuyển hướng
         navigate("/login");
+    }
+  };
+
+  // Handle message seller - Create conversation and open chat
+  const handleMessageSeller = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent navigation
+    
+    const jwt = localStorage.getItem("jwt");
+    if (!jwt) {
+      navigate("/login");
+      return;
+    }
+
+    if (item.seller?.id) {
+      try {
+        // Create or get conversation with this seller about this product
+        // The createConversation thunk will automatically fetch chat history (including product card)
+        await dispatch(createConversation({ 
+          sellerId: item.seller.id, 
+          productId: item.id,  // Link to this product
+          jwt 
+        })).unwrap();
+        
+        // Chat widget will automatically open and show the conversation with product card
+      } catch (error) {
+        console.error("Failed to start conversation:", error);
+      }
     }
   };
 
@@ -120,10 +148,11 @@ const ProductCard = ({ item, isBestSeller }: { item: Product; isBestSeller?: boo
                   )}
                 </Button>
 
-                {/* Nút Comment/Review (Chưa có chức năng) */}
+                {/* Message Seller Button */}
                 <Button 
                     variant="contained" 
                     color="secondary"
+                    onClick={handleMessageSeller}
                     sx={{ 
                         minWidth: '40px', 
                         width: '40px', 
@@ -134,7 +163,7 @@ const ProductCard = ({ item, isBestSeller }: { item: Product; isBestSeller?: boo
                         '&:hover': { bgcolor: '#f5f5f5' }
                     }}
                 >
-                  <ModeComment sx={{ color: teal[300] }} />
+                  <Message sx={{ color: teal[300] }} />
                 </Button>
               </div>
             </div>

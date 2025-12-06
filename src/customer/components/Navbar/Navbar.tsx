@@ -178,7 +178,7 @@ const Navbar = () => {
                                             </div>
                                             <Menu anchorEl={anchorEl} open={openServices} onClose={() => handleCloseServices()} sx={{ mt: 2 }}>
                                                 {category.subItems?.map((sub) => (
-                                                    <MenuItem key={sub.categoryId} onClick={() => handleCloseServices(sub.categoryId)} sx={{ minWidth: 180, fontWeight: 500 }}>
+                                                    <MenuItem key={sub.categoryId} onClick={() => handleCloseServices(sub.categoryId)} sx={{ minWidth: 180, fontWeight: 'bold' }}>
                                                         {sub.name}
                                                     </MenuItem>
                                                 ))}

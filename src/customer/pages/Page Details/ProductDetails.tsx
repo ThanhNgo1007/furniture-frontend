@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-    Add,
-    LocalShipping,
-    Remove,
-    Shield,
-    ShoppingBag,
-    Wallet,
-    WorkspacePremium
+  Add,
+  LocalShipping,
+  Remove,
+  Shield,
+  ShoppingBag,
+  Wallet,
+  WorkspacePremium
 } from '@mui/icons-material';
 import FavoriteIcon from '@mui/icons-material/Favorite'; // Import thêm icon tim đầy
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { addItemToCart, fetchUserCart } from '../../../State/customer/cartSlice';
 import { fetchProductById } from '../../../State/customer/ProductSlice';
+import { fetchProductReviews } from '../../../State/customer/reviewSlice';
 import { addProductToWishlist, getWishlistByUserId } from '../../../State/customer/wishlistSlice'; // Import action Wishlist
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
 import { formatVND } from '../../../Util/formatCurrency';
@@ -31,10 +32,10 @@ const ProductDetails = () => {
   const dispatch = useAppDispatch()
   const { productId } = useParams()
   
-  // Lấy product và wishlist, cart từ store
-  const { product } = useAppSelector(store => store)
+  // Lấy product và wishlist từ store
+  const { product } = useAppSelector(store => store.product)
   const { wishlist } = useAppSelector(store => store.wishlist)
-  const { cart } = useAppSelector(store => store.cart)
+  const { reviews } = useAppSelector(store => store.review)
 
   const [activeImage, setActiveImage] = useState(0)
   const navigate = useNavigate()
@@ -49,9 +50,10 @@ const ProductDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0); // Scroll lên đầu trang
-    if (!productId) return
-    dispatch(fetchProductById(Number(productId) as any))
-    
+    if (productId) {
+      dispatch(fetchProductById(Number(productId) as any))
+      dispatch(fetchProductReviews(Number(productId)))
+    }
     // --- THÊM ĐOẠN NÀY: Lấy Wishlist khi vào trang chi tiết ---
     if(localStorage.getItem("jwt")) {
         dispatch(getWishlistByUserId())
@@ -63,12 +65,12 @@ const ProductDetails = () => {
   }
 
   // --- LOGIC KIỂM TRA TỒN KHO ---
-  const stockQuantity = product.product?.quantity || 0;
+  const stockQuantity = product?.quantity || 0;
   const isOutOfStock = stockQuantity === 0;
   const jwt = localStorage.getItem("jwt");
 
   // --- LOGIC CHECK WISHLIST ---
-  const isWishlisted = product.product && wishlist?.products?.some((p) => p.id === product.product?.id);
+  const isWishlisted = product && wishlist?.products?.some((p) => p.id === product?.id);
 
   const handleIncreaseQuantity = () => {
     if (quantity < stockQuantity) {
@@ -93,12 +95,12 @@ const ProductDetails = () => {
         return;
     }
 
-    if (product.product?.id) {
+    if (product?.id) {
         // Backend sẽ tự động cộng dồn quantity nếu sản phẩm đã có trong giỏ
         dispatch(addItemToCart({
             jwt,
             request: {
-                productId: product.product.id,
+                productId: product.id,
                 quantity: quantity
             }
         })).then((action) => {
@@ -125,8 +127,8 @@ const ProductDetails = () => {
           navigate("/login");
           return;
       }
-      if (product.product?.id) {
-          dispatch(addProductToWishlist({ productId: product.product.id, jwt }));
+      if (product?.id) {
+          dispatch(addProductToWishlist({ productId: product.id, jwt }));
       }
   }
 
@@ -135,7 +137,7 @@ const ProductDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         <section className="flex flex-col-reverse lg:flex-row gap-5">
           <div className="w-full lg:w-[15%] flex flex-wrap lg:flex-col gap-3">
-            {product.product?.images.map((item, index) => (
+            {product?.images.map((item, index) => (
               <img
                 onClick={handleActiveImage(index)}
                 className="lg:w-full w-[50px] cursor-pointer rounded-md"
@@ -147,7 +149,7 @@ const ProductDetails = () => {
           <div className="w-full lg:w-[85%]">
             <img
               className="w-full rounded-md"
-              src={product.product?.images[activeImage]}
+              src={product?.images[activeImage]}
               alt=""
             />
           </div>
@@ -157,28 +159,32 @@ const ProductDetails = () => {
             <h1 className="font-bold text-lg">
               {t('product.soldBy')}{' '}
               <span className="text-[#E27E6A]">
-                {product.product?.seller?.businessDetails.businessName}
+                {product?.seller?.businessDetails.businessName}
               </span>
             </h1>
           </div>
 
-          <p className="text-gray-500 font-semibold">{product.product?.title}</p>
+          <p className="text-gray-500 font-semibold">{product?.title}</p>
           <div className="flex justify-between items-center py-2 border w-[180px] px-3 mt-5">
             <div className="flex gap-1 items-center">
-              <span>4</span>
+              <span>
+                {reviews && reviews.length > 0
+                  ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
+                  : '0.0'}
+              </span>
               <StarIcon sx={{ color: orange[500], fontSize: '17px' }} />
             </div>
             <Divider orientation="vertical" flexItem />
-            <span>123 {t('product.ratings')}</span>
+            <span>{reviews?.length || 0} {t('product.ratings')}</span>
           </div>
           <div>
             <div className="price font-bold text-3xl mt-5 space-x-6">
-              <span>{formatVND(product.product?.sellingPrice || 0)}</span>
+              <span>{formatVND(product?.sellingPrice || 0)}</span>
               <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded ">
-                {product.product?.discountPercent}% {t('product.off')}
+                {product?.discountPercent}% {t('product.off')}
               </span>
               <div className="original-price text-base text-gray-500 line-through">
-                {formatVND(product.product?.msrpPrice || 0)}
+                {formatVND(product?.msrpPrice || 0)}
               </div>
             </div>
             <p className="text-md font-semibold text-gray-500 mt-2">
@@ -306,10 +312,11 @@ const ProductDetails = () => {
           {/* LEFT: DESCRIPTION */}
           <div>
               <h1 className="font-bold text-lg mb-3">{t('product.description')}</h1>
-              <div className={`relative overflow-hidden transition-all duration-300 ${isDescriptionExpanded ? '' : 'max-h-[100px]'}`}>
-                  <p className="text-gray-600 text-justify">
-                      {product.product?.description}
-                  </p>
+              <div className={`relative overflow-hidden transition-all duration-300 ${isDescriptionExpanded ? '' : 'max-h-[400px]'}`}>
+                  <div 
+                      className="text-gray-600 product-description"
+                      dangerouslySetInnerHTML={{ __html: product?.description || '' }}
+                  />
                   {!isDescriptionExpanded && (
                       <div className="absolute bottom-0 left-0 w-full h-10 bg-gradient-to-t from-white to-transparent"></div>
                   )}
@@ -326,18 +333,26 @@ const ProductDetails = () => {
           <div>
               <h1 className="font-bold text-lg mb-3">{t('product.reviews')}</h1>
               
-              <div className="relative border rounded-lg p-4 max-h-[200px] overflow-hidden">
-                  <ReviewCard />
+              <div className="relative border rounded-lg p-4 max-h-[400px] overflow-hidden">
+                  {reviews && reviews.length > 0 ? (
+                      <ReviewCard review={reviews[0]} />
+                  ) : (
+                      <Typography variant="body2" color="text.secondary" className="text-center py-4">
+                          {t('product.noReviews')}
+                      </Typography>
+                  )}
                   
                   {/* Gradient Fade & See More Button */}
-                  <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-2">
-                      <Button 
-                          onClick={() => navigate(`/reviews/${productId}`)}
-                          sx={{ textTransform: 'none', fontWeight: 'bold' }}
-                      >
-                          {t('product.seeMore')}
-                      </Button>
-                  </div>
+                  {reviews && reviews.length > 0 && (
+                      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-2">
+                          <Button 
+                              onClick={() => navigate(`/reviews/${productId}`)}
+                              sx={{ textTransform: 'none', fontWeight: 'bold' }}
+                          >
+                              {t('product.seeMore')}
+                          </Button>
+                      </div>
+                  )}
               </div>
           </div>
       </section>
