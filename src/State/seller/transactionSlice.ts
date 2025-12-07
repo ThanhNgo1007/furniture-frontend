@@ -72,9 +72,12 @@ const transactionSlice = createSlice({
       state.loading = true
       state.error = null
     })
-    builder.addCase(payoutSeller.fulfilled, (state, action) => {
+    builder.addCase(payoutSeller.fulfilled, (state) => {
       state.loading = false
-      state.transactions = action.payload
+      // Payout endpoint returns ApiResponse message, not transactions
+      // Clear unpaid transactions since they are now paid out
+      // The component will call fetchTransactionsBySeler to refresh the list
+      state.transactions = []
     })
     builder.addCase(payoutSeller.rejected, (state, action) => {
       state.loading = false

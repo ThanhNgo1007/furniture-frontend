@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import AddNewCouponForm from '../admin/Pages/Coupon/AddNewCouponForm'
 import Coupon from '../admin/Pages/Coupon/Coupon'
+import DashboardOverview from '../admin/Pages/Dashboard/DashboardOverview'
 import Deal from '../admin/Pages/HomePage/Deal'
 import DealManagement from '../admin/Pages/HomePage/DealManagement'
 import GridTable from '../admin/Pages/HomePage/GridTable'
@@ -11,8 +12,10 @@ const AdminRoutes = () => {
   return (
     <div>
         <Routes>
-
-            <Route path="/" element={<SellersTable/>}/>
+            {/* Dashboard as default landing page */}
+            <Route path="/" element={<DashboardOverview/>}/>
+            <Route path="/dashboard" element={<DashboardOverview/>}/>
+            
             <Route path="/sellers" element={<SellersTable/>}/>
             <Route path="/users" element={<UsersTable/>}/>
             <Route path="/coupon" element={<Coupon/>}/>

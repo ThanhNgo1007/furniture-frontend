@@ -1,5 +1,5 @@
-import { Edit } from '@mui/icons-material'
-import { IconButton } from '@mui/material'
+import { Edit, RestoreFromTrash } from '@mui/icons-material'
+import { Alert, IconButton, Snackbar } from '@mui/material'
 import Paper from '@mui/material/Paper'
 import { styled } from '@mui/material/styles'
 import Table from '@mui/material/Table'
@@ -9,7 +9,7 @@ import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import { useEffect, useState } from 'react'
-import { fetchSellerProducts } from '../../../State/seller/sellerProductSlice'
+import { fetchInactiveProducts, reactivateProduct } from '../../../State/seller/sellerProductSlice'
 import { useAppDispatch, useAppSelector } from '../../../State/Store'
 import type { Product } from '../../../types/ProductTypes'
 import EditProductDialog from './EditProductDialog'
@@ -28,20 +28,24 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover
   },
-  // hide last border
   '&:last-child td, &:last-child th': {
     border: 0
   }
 }))
 
-export default function ProductTable() {
+export default function InactiveProductTable() {
   const dispatch = useAppDispatch()
-  const { sellerProduct } = useAppSelector(store => store)
+  const { inactiveProducts, loading } = useAppSelector(store => store.sellerProduct)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+    open: false,
+    message: '',
+    severity: 'success'
+  })
 
   useEffect(() => {
-    dispatch(fetchSellerProducts(localStorage.getItem('jwt')))
+    dispatch(fetchInactiveProducts(localStorage.getItem('jwt')))
   }, [dispatch])
 
   const handleEditClick = (product: Product) => {
@@ -52,14 +56,27 @@ export default function ProductTable() {
   const handleCloseDialog = () => {
     setEditDialogOpen(false)
     setSelectedProduct(null)
-    // Refresh products after edit
-    dispatch(fetchSellerProducts(localStorage.getItem('jwt')))
+    dispatch(fetchInactiveProducts(localStorage.getItem('jwt')))
+  }
+
+  const handleReactivate = async (product: Product) => {
+    if (window.confirm('Bạn có muốn đăng bán lại sản phẩm này không?')) {
+      try {
+        await dispatch(reactivateProduct({
+          productId: product.id!,
+          jwt: localStorage.getItem('jwt')
+        })).unwrap()
+        setSnackbar({ open: true, message: 'Đã đăng bán lại sản phẩm!', severity: 'success' })
+      } catch (error: any) {
+        setSnackbar({ open: true, message: error || 'Thao tác thất bại', severity: 'error' })
+      }
+    }
   }
 
   return (
     <>
       <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+        <Table sx={{ minWidth: 700 }} aria-label="inactive products table">
           <TableHead>
             <TableRow>
               <StyledTableCell>Ảnh</StyledTableCell>
@@ -68,18 +85,25 @@ export default function ProductTable() {
               <StyledTableCell align="right">Giá bán</StyledTableCell>
               <StyledTableCell align="right">Màu</StyledTableCell>
               <StyledTableCell align="right">Số lượng</StyledTableCell>
-              <StyledTableCell align="right">Cập nhật</StyledTableCell>
+              <StyledTableCell align="right">Thao tác</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {sellerProduct.products?.map((item: Product) => (
+            {inactiveProducts?.length === 0 && (
+              <StyledTableRow>
+                <StyledTableCell colSpan={7} align="center">
+                  Không có sản phẩm ngưng bán
+                </StyledTableCell>
+              </StyledTableRow>
+            )}
+            {inactiveProducts?.map((item: Product) => (
               <StyledTableRow key={item.id}>
                 <StyledTableCell component="th" scope="row">
                   <div className="flex gap-1 flex-wrap">
-                    {item.images.slice(0, 2).map((image, idx) => (
+                    {item.images?.slice(0, 2).map((image, idx) => (
                       <img key={idx} className="w-16 h-16 object-cover rounded-md" src={image} alt="" />
                     ))}
-                    {item.images.length > 2 && (
+                    {item.images?.length > 2 && (
                       <span className="text-xs text-gray-500">+{item.images.length - 2}</span>
                     )}
                   </div>
@@ -88,19 +112,27 @@ export default function ProductTable() {
                 <StyledTableCell align="right">{item.msrpPrice?.toLocaleString()}đ</StyledTableCell>
                 <StyledTableCell align="right">{item.sellingPrice?.toLocaleString()}đ</StyledTableCell>
                 <StyledTableCell align="right">{item.color}</StyledTableCell>
+                <StyledTableCell align="right">{item.quantity}</StyledTableCell>
                 <StyledTableCell align="right">
-                  <span className={item.quantity === 0 ? 'text-red-500 font-semibold' : ''}>
-                    {item.quantity === 0 ? 'Hết hàng' : item.quantity}
-                  </span>
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                  <IconButton 
-                    color="primary" 
-                    size="small"
-                    onClick={() => handleEditClick(item)}
-                  >
-                    <Edit />
-                  </IconButton>
+                  <div className="flex gap-1 justify-end">
+                    <IconButton 
+                      color="primary" 
+                      size="small"
+                      onClick={() => handleEditClick(item)}
+                      title="Chỉnh sửa"
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton 
+                      color="success" 
+                      size="small"
+                      onClick={() => handleReactivate(item)}
+                      disabled={loading}
+                      title="Đăng bán lại"
+                    >
+                      <RestoreFromTrash />
+                    </IconButton>
+                  </div>
                 </StyledTableCell>
               </StyledTableRow>
             ))}
@@ -112,8 +144,19 @@ export default function ProductTable() {
         open={editDialogOpen}
         product={selectedProduct}
         onClose={handleCloseDialog}
+        isInactive={true}
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   )
 }
-

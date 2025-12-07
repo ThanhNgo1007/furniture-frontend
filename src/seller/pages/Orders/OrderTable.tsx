@@ -100,7 +100,7 @@ function Row(props: RowProps) {
           </IconButton>
         </StyledTableCell>
         <StyledTableCell component="th" scope="row">
-          #{row.id}
+          Order #{row.id}
         </StyledTableCell>
         <StyledTableCell>
            {new Date(row.orderDate).toLocaleDateString('vi-VN')}
