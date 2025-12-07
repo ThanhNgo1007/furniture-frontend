@@ -1,10 +1,10 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Button, Checkbox, Collapse, FormControl, IconButton, InputLabel, Menu, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { Box, Button, Checkbox, CircularProgress, Collapse, FormControl, IconButton, InputLabel, Menu, MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { tableCellClasses } from '@mui/material/TableCell';
 import React, { useState } from 'react';
-import { fetchSellerOrders, updateOrderStatus } from '../../../State/seller/sellerOrderSlice';
+import { fetchSellerOrdersPaginated, resetOrders, updateOrderStatus } from '../../../State/seller/sellerOrderSlice';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
 import { formatVND } from '../../../Util/formatCurrency';
 
@@ -201,10 +201,6 @@ export default function OrderTable() {
   const dispatch = useAppDispatch();
   const { sellerOrder } = useAppSelector(store => store);
 
-  React.useEffect(() => {
-    dispatch(fetchSellerOrders(localStorage.getItem("jwt") || ""));
-  }, []);
-
   const [activeFilter, setActiveFilter] = useState("PENDING");
   const [selectedMonth, setSelectedMonth] = useState("ALL");
   const [selectedYear, setSelectedYear] = useState("ALL");
@@ -213,16 +209,27 @@ export default function OrderTable() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState<null | any>({});
 
+  // Fetch orders with cursor pagination when filter changes
+  React.useEffect(() => {
+    const jwt = localStorage.getItem("jwt") || "";
+    dispatch(resetOrders());
+    dispatch(fetchSellerOrdersPaginated({ 
+      jwt, 
+      cursor: null, 
+      size: 50,  // Fetch more per request for better UX
+      status: activeFilter 
+    }));
+  }, [activeFilter, dispatch]);
+
   // Get unique years from orders
   const years = Array.from(new Set(sellerOrder.orders.map(o => new Date(o.orderDate).getFullYear()))).sort((a, b) => b - a);
 
-  // Filter orders
+  // Filter orders by month/year (status is already server-side filtered)
   const filteredOrders = sellerOrder.orders.filter((order) => {
     const orderDate = new Date(order.orderDate);
-    const matchStatus = order.orderStatus === activeFilter;
     const matchMonth = selectedMonth === "ALL" || (orderDate.getMonth() + 1).toString() === selectedMonth;
     const matchYear = selectedYear === "ALL" || orderDate.getFullYear().toString() === selectedYear;
-    return matchStatus && matchMonth && matchYear;
+    return matchMonth && matchYear;
   });
 
   const handleResetFilters = () => {
@@ -498,6 +505,34 @@ export default function OrderTable() {
             onRowsPerPageChange={handleChangeRowsPerPage}
             labelRowsPerPage="Số hàng mỗi trang:"
         />
+        
+        {/* Load More Button */}
+        {sellerOrder.hasMore && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2, mb: 2, gap: 2, alignItems: 'center' }}>
+            <Typography variant="body2" color="text.secondary">
+              Đã tải {sellerOrder.orders.length} / {sellerOrder.totalElements} đơn hàng
+            </Typography>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                const jwt = localStorage.getItem("jwt") || "";
+                dispatch(fetchSellerOrdersPaginated({
+                  jwt,
+                  cursor: sellerOrder.nextCursor,
+                  size: 50,
+                  status: activeFilter
+                }));
+              }}
+              disabled={sellerOrder.loadingMore}
+            >
+              {sellerOrder.loadingMore ? (
+                <CircularProgress size={20} />
+              ) : (
+                "Tải thêm"
+              )}
+            </Button>
+          </Box>
+        )}
       </Paper>
     </div>
   );
