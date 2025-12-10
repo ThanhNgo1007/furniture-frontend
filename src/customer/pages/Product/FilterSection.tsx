@@ -171,7 +171,7 @@ const FilterSection = () => {
               // BƯỚC 3: Dùng `value={priceParam}` thay vì `defaultValue`
               value={priceParam}
             >
-              {price.map((item, index) => (
+              {price.map((item) => (
                 <FormControlLabel
                   key={item.name}
                   value={item.value}

@@ -60,7 +60,7 @@ export const signup = createAsyncThunk<any, any>(
 
 export const fetchUserProfile = createAsyncThunk<any, any>(
   '/auth/fetchUserProfile',
-  async ({ jwt }, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       // ⚠️ QUAN TRỌNG: Không truyền headers thủ công
       // Interceptor sẽ tự động thêm từ localStorage

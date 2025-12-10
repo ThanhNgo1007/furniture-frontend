@@ -13,29 +13,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AdminDrawerList from '../../../admin/components/AdminDrawerList';
 import { navigation } from '../../../data/navigation';
 import SellerDrawerList from '../../../seller/components/SellerDrawerList/SellerDrawerList';
-import { useAppSelector } from '../../../State/Store';
 import CategorySheet from './CategorySheet';
 import MobileNavbar from './MobileNavbar';
 import RightMenuDrawer from './RightMenuDrawer';
 import SearchBar from './SearchBar';
-
-const parseJwt = (token: string) => {
-  try {
-    return JSON.parse(atob(token.split('.')[1]));
-  } catch (e) {
-    return null;
-  }
-};
-
-const isTokenExpired = (token: string) => {
-  try {
-    const decoded = parseJwt(token);
-    if (!decoded || !decoded.exp) return true;
-    return decoded.exp * 1000 < Date.now();
-  } catch {
-    return true;
-  }
-};
 
 const Navbar = () => {
     const { t } = useTranslation();
@@ -43,10 +24,6 @@ const Navbar = () => {
     const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
     const navigate = useNavigate();
     const location = useLocation();
-    
-    // --- SỬA LỖI REDUX TẠI ĐÂY ---
-    // Chỉ lấy slice auth để tránh re-render toàn bộ và mất cảnh báo console
-    const auth = useAppSelector(store => store.auth);
 
     const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -56,18 +33,6 @@ const Navbar = () => {
     
     // State cho Mobile Menu
     const [openMobileMenu, setOpenMobileMenu] = useState(false);
-    
-    const isAuthenticated = useMemo(() => {
-        const jwt = localStorage.getItem('jwt');
-        
-        // Nếu không có JWT hoặc JWT hết hạn → Not authenticated
-        if (!jwt || isTokenExpired(jwt)) {
-            return false;
-        }
-        
-        // Kiểm tra Redux state
-        return auth.isLoggedIn && auth.user !== null;
-    }, [auth.isLoggedIn, auth.user]);
 
     const mainCategory = useMemo(() => {
     return navigation.map((item) => ({

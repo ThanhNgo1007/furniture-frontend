@@ -143,7 +143,9 @@
     "price": "Giá",
     "discount": "Giảm giá",
     "show_less": "Thu gọn",
-    "more": "Xem thêm"
+    "more": "Xem thêm",
+    "no_products_found": "Không tìm thấy sản phẩm",
+    "try_again": "Thử lại với bộ lọc khác"
   },
   "colors": {
     "white": "Trắng",

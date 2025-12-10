@@ -1,7 +1,6 @@
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 // Định nghĩa kiểu dữ liệu sẽ nhận vào
 interface RoomItem {

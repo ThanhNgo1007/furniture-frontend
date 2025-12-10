@@ -2,18 +2,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Close, FilterAlt } from '@mui/icons-material'; // Thêm Close icon
 import {
-    Box,
-    Button,
-    Divider,
-    Drawer, // Thêm Drawer
-    FormControl,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Pagination,
-    Select,
-    useMediaQuery,
-    useTheme
+  Box,
+  Button,
+  Divider,
+  Drawer, // Thêm Drawer
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Pagination,
+  Select,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -154,10 +154,10 @@ const Product = () => {
               <div className="flex flex-col items-center justify-center h-[60vh] opacity-60 w-full">
                 <FilterAlt sx={{ fontSize: 80, color: 'gray', mb: 2 }} />
                 <p className="text-xl font-medium text-gray-500">
-                  {t('product_listing.no_products_found') || "Không tìm thấy sản phẩm nào"}
+                  {t('product_listing.no_products_found')}
                 </p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Vui lòng thử lại với bộ lọc khác
+                  {t('product_listing.try_again')}
                 </p>
               </div>
             )}

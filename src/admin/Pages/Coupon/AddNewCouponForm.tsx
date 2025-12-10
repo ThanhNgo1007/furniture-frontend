@@ -20,7 +20,7 @@ interface CouponFormValue {
 const AddNewCouponForm = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { loading, error, couponCreated } = useAppSelector(state => state.adminCoupon);
+    const { loading } = useAppSelector(state => state.adminCoupon);
     const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
         open: false,
         message: '',

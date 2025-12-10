@@ -87,6 +87,17 @@ const Checkout = () => {
         dispatch(fetchUserCart(localStorage.getItem("jwt") || ""));
     }, [dispatch]);
 
+    // Auto-select default address when user data is loaded
+    useEffect(() => {
+        if (auth.user?.addresses && auth.user.addresses.length > 0 && !selectedAddress) {
+            // Find the default address
+            const defaultAddress = auth.user.addresses.find((addr: any) => addr.isDefault);
+            if (defaultAddress) {
+                setSelectedAddress(defaultAddress);
+            }
+        }
+    }, [auth.user?.addresses, selectedAddress]);
+
     return (
         <>
             <div className='pt-10 px-5 sm:px-10 md:px-44 lg:px-60 min-h-screen'>

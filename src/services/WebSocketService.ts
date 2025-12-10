@@ -61,7 +61,7 @@ class WebSocketService {
         heartbeatOutgoing: 4000,
       });
 
-      this.client.onConnect = (frame) => {
+      this.client.onConnect = () => {
         // console.log("[WebSocket] Connected successfully");
         this.reconnectAttempts = 0;
         this.isReconnecting = false;
@@ -97,7 +97,7 @@ class WebSocketService {
   /**
    * Throttle error logging to prevent console spam
    */
-  private throttledError(message: string): void {
+  private throttledError(_message: string): void {
     const now = Date.now();
     if (now - this.lastErrorLogged > 30000) {
       // console.warn(`[WebSocket] ${message}`);
@@ -187,9 +187,9 @@ class WebSocketService {
       return;
     }
 
-    const subscription = this.client.subscribe("/user/queue/messages", (message) => {
+    const subscription = this.client.subscribe("/user/queue/messages", (msg) => {
       try {
-        const messageData: Message = JSON.parse(message.body);
+        const messageData: Message = JSON.parse(msg.body);
         // console.log("[WebSocket] Received message:", messageData);
         this.notifyMessageCallbacks(messageData);
       } catch (error) {

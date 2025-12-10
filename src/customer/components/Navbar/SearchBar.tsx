@@ -48,17 +48,14 @@ const SearchBar = () => {
     }
   }, [isExpanded]);
 
-  const handleProductClick = (productId: number, item: Product) => {
+  const handleProductClick = (item: Product) => {
     navigate(`/product-details/${item.category?.parentCategory?.categoryId}/${item.category?.categoryId}/${encodeURIComponent(item.title)}/${item.id}`);
     setSearchQuery('');
     setShowResults(false);
     setIsExpanded(false);
   };
 
-  const handleClear = () => {
-    setSearchQuery('');
-    setShowResults(false);
-  };
+
 
   const handleClickAway = () => {
     if (!searchQuery) {
@@ -144,7 +141,7 @@ const SearchBar = () => {
                         {searchResults.map((product: Product) => (
                           <div
                             key={product.id}
-                            onClick={() => handleProductClick(product.id || 0, product)}
+                            onClick={() => handleProductClick(product)}
                             className="flex items-center gap-3 px-4 py-3 hover:bg-teal-50 cursor-pointer transition-colors border-b border-gray-100 last:border-0"
                           >
                             <img

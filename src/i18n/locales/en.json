@@ -288,7 +288,9 @@
     "price": "Price",
     "discount": "Discount",
     "show_less": "Show less",
-    "more": "More"
+    "more": "More",
+    "no_products_found": "No products found",
+    "try_again": "Choose other filters"
   },
   "colors": {
     "white": "White",

@@ -27,14 +27,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const orderStatusColor: { [key: string]: { color: string; label: string } } = {
-  PENDING: { color: "#FFA500", label: "Chờ xác nhận" },
-  CONFIRMED: { color: "#F5BCBA", label: "Đã xác nhận" },
-  PLACED: { color: "#c26e1f", label: "Đang chuẩn bị" },
-  SHIPPED: { color: "#1E90FF", label: "Đang vận chuyển" },
-  DELIVERED: { color: "#32CD32", label: "Đã giao" },
-  CANCELLED: { color: "#FF0000", label: "Đã hủy" },
-};
+
 
 // Thêm props
 interface TransactionTableProps {

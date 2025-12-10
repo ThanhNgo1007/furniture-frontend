@@ -1,6 +1,5 @@
-import {Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
 import { useFormik } from 'formik'
-import React from 'react'
 
 const CreateDealForm = () => {
     const formik = useFormik({

@@ -36,15 +36,17 @@ export interface Order {
   deliveryDate: string,
 }
 
-export enum OrderStatus {
-  PENDING = "PENDING",
-  PLACED = "PLACED",
-  CONFIRMED = "CONFIRMED",
-  SHIPPED = "SHIPPED",
-  DELIVERED = "DELIVERED",
-  CANCELLED = "CANCELLED",
-  FAILED = "FAILED"
-}
+export const OrderStatus = {
+  PENDING: "PENDING",
+  PLACED: "PLACED",
+  CONFIRMED: "CONFIRMED",
+  SHIPPED: "SHIPPED",
+  DELIVERED: "DELIVERED",
+  CANCELLED: "CANCELLED",
+  FAILED: "FAILED"
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
 
 export interface OrderItem {
   id: number,
