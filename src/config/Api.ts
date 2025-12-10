@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5454';
+// Remove trailing slash to prevent double slash in URL concatenation
+const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5454';
+export const API_BASE_URL = baseUrl.replace(/\/$/, '');
 
 
 export const api = axios.create({
