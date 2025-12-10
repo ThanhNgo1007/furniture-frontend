@@ -52,12 +52,10 @@ class WebSocketService {
       }
 
       this.client = new Client({
-        webSocketFactory: () => new SockJS(`${API_BASE_URL}/ws`),
-        connectHeaders: {
-          Authorization: `Bearer ${jwt}`,
-        },
-        debug: () => { }, // Disable debug logging to reduce console spam
-        reconnectDelay: 0, // We handle reconnection manually
+        webSocketFactory: () => new SockJS(`${API_BASE_URL}/ws?token=${jwt}`),
+        // Remove connectHeaders - doesn't work with SockJS
+        debug: () => { },
+        reconnectDelay: 0,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
       });
