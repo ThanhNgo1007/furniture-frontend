@@ -86,7 +86,7 @@ const ProductCard = ({ item, isBestSeller }: { item: Product; isBestSeller?: boo
 
   const handleNavigate = () => {
      if(item.id) {
-         navigate(`/product-details/${item.category?.parentCategory?.categoryId}/${item.category?.categoryId}/${item.title}/${item.id}`)
+         navigate(`/product-details/${item.category?.parentCategory?.categoryId}/${item.category?.categoryId}/${encodeURIComponent(item.title)}/${item.id}`)
      }
   }
 

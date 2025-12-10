@@ -8,20 +8,41 @@ import { sumCartItemMsrpPrice, sumCartItemSellingPrice } from '../../../Util/sum
 const PricingCard = () => {
   const { cart } = useAppSelector(store => store.cart)
 
-  const { subtotal, total, totalDiscount } = useMemo(() => {
-      if (!cart) return { subtotal: 0, total: 0, totalDiscount: 0 };
+  const { subtotal, totalDiscount, couponDiscount, finalTotal } = useMemo(() => {
+      if (!cart) return { subtotal: 0, totalDiscount: 0, couponDiscount: 0, finalTotal: 0 };
 
-      const items = cart.cartItemsInBag || [];
-      // Giả sử bạn import đúng hàm tính tổng
-      const sub = sumCartItemMsrpPrice(items);
-      const tot = sumCartItemSellingPrice(items);
+      const allItems = cart.cartItemsInBag || [];
+      
+      // Filter only available items for price calculation
+      const availableItems = allItems.filter(item => {
+          const product = item.product;
+          // Unavailable if: isActive is false OR quantity is 0 or less
+          const isUnavailable = product.isActive === false || (product.quantity !== undefined && product.quantity <= 0);
+          return !isUnavailable;
+      });
+      
+      // Giá gốc (MSRP) - chỉ tính sản phẩm available
+      const sub = sumCartItemMsrpPrice(availableItems);
+      // Tổng sau discount sản phẩm (chưa có coupon)
+      const totalBeforeCoupon = sumCartItemSellingPrice(availableItems);
+      // Discount từ sản phẩm
+      const productDiscount = sub - totalBeforeCoupon;
+      
+      // Coupon discount: tính từ percentage × totalBeforeCoupon / 100
+      // cart.discount stores PERCENTAGE (e.g., 10 for 10%)
+      const discountPercent = cart.discount || 0;
+      const couponD = Math.round(totalBeforeCoupon * discountPercent / 100);
+      
+      // Final total = totalBeforeCoupon - couponDiscount (recalculated from available items)
+      const final = totalBeforeCoupon - couponD;
       
       return {
           subtotal: sub,
-          total: tot,
-          totalDiscount: sub - tot
+          totalDiscount: productDiscount,
+          couponDiscount: couponD,
+          finalTotal: final
       };
-  }, [cart]); // Chỉ tính lại khi object cart thay đổi
+  }, [cart]);
 
   if (!cart) return null;
 
@@ -33,16 +54,19 @@ const PricingCard = () => {
         </div>
 
         <div className='flex justify-between items-center'>
-            <span>Discount</span>
+            <span>Product Discount</span>
             <span className="text-green-600 font-medium">
                 - {formatVND(totalDiscount)}
             </span>
         </div>
 
-        {/* Hiển thị Coupon nếu có */}
-        {cart.couponCode && (
-             <div className='flex justify-between items-center text-sm text-gray-500'>
-                <span>(Coupon applied: {cart.couponCode})</span>
+        {/* Hiển thị Coupon discount nếu có */}
+        {cart.couponCode && couponDiscount > 0 && (
+             <div className='flex justify-between items-center'>
+                <span className="text-sm">Coupon ({cart.couponCode})</span>
+                <span className="text-green-600 font-medium">
+                    - {formatVND(couponDiscount)}
+                </span>
             </div>
         )}
 
@@ -60,7 +84,7 @@ const PricingCard = () => {
 
         <div className='flex justify-between items-center text-teal-600 py-2 font-bold text-xl'>
             <span>Total</span>
-            <span>{formatVND(total)}</span>
+            <span>{formatVND(finalTotal)}</span>
         </div>
     </div>
   )

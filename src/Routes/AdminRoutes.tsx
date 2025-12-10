@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import AdminAccount from '../admin/Pages/Account/AdminAccount'
 import AddNewCouponForm from '../admin/Pages/Coupon/AddNewCouponForm'
 import Coupon from '../admin/Pages/Coupon/Coupon'
 import DashboardOverview from '../admin/Pages/Dashboard/DashboardOverview'
@@ -23,6 +24,7 @@ const AdminRoutes = () => {
             <Route path="/home-grid" element={<GridTable/>}/>
             <Route path="/deals" element={<Deal/>}/>
             <Route path="/deal-management" element={<DealManagement/>}/>
+            <Route path="/account" element={<AdminAccount/>}/>
             
         </Routes>
     </div>

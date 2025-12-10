@@ -14,8 +14,8 @@ const BestSeller = () => {
   const [bestSellerProducts, setBestSellerProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Fetch all products
-    dispatch(fetchAllProducts({ pageSize: 1000 }));
+    // Fetch products sorted by discount, only need top items
+    dispatch(fetchAllProducts({ pageSize: 20, sort: 'discountPercent,desc' }));
   }, [dispatch]);
 
   useEffect(() => {

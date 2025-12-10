@@ -44,7 +44,7 @@ const menu = [
 const menu2 = [
     {
         name: "Tài khoản",
-        path: "/seller/account",
+        path: "/admin/account",
         icon: <AccountBox className='text-teal-600'/>,
         activeIcon: <AccountBox className='text-white' />
     },

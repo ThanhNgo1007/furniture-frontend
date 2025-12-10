@@ -101,7 +101,6 @@ const OrderDetails = () => {
                             <img className="w-[80px] h-[80px] object-cover rounded" src={item.product.images[0]} alt={item.product.title} />
                             <div className='flex-1 space-y-1'>
                                 <h2 className='font-bold text-sm'>{item.product.title}</h2>
-                                <p className='text-xs text-gray-500 line-clamp-2'>{item.product.description}</p>
                                 <div className="flex justify-between items-center">
                                     <p className='text-xs text-gray-600'>{t('product.quantity')}: {item.quantity}</p>
                                     <p className='font-medium text-sm'>{formatVND(item.sellingPrice)}</p>

@@ -7,7 +7,12 @@ import { useAppDispatch } from '../../../State/Store';
 import { type CartItem } from '../../../types/cartTypes';
 import { formatVND } from '../../../Util/formatCurrency';
 
-const CartItemCard = ({item}: {item: CartItem}) => {
+interface CartItemCardProps {
+  item: CartItem;
+  isUnavailable?: boolean;
+}
+
+const CartItemCard = ({ item, isUnavailable = false }: CartItemCardProps) => {
 
   const dispatch = useAppDispatch();
 
@@ -17,6 +22,9 @@ const CartItemCard = ({item}: {item: CartItem}) => {
   const stockQuantity = item.product.quantity;
 
   const handleUpdateQuantity = (value: number) => () => {
+      // Không cho update nếu sản phẩm unavailable
+      if (isUnavailable) return;
+      
       // Trường hợp TĂNG số lượng
       if (value > 0) {
           if (item.quantity + value > (stockQuantity || 0)) {
@@ -44,7 +52,16 @@ const CartItemCard = ({item}: {item: CartItem}) => {
   }
 
   return (
-    <div className='border border-gray-200 rounded-md relative'>
+    <div className={`border rounded-md relative ${isUnavailable ? 'opacity-50 bg-gray-100' : 'border-gray-200'}`}>
+
+        {/* SOLD OUT Badge */}
+        {isUnavailable && (
+            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <span className="bg-red-600 text-white font-bold text-lg px-4 py-2 rounded-md rotate-[-15deg] shadow-lg">
+                    HẾT HÀNG
+                </span>
+            </div>
+        )}
 
         <div className='p-5 flex gap-3'>
             <div>
@@ -52,7 +69,6 @@ const CartItemCard = ({item}: {item: CartItem}) => {
             </div>
             <div className="space-y-2">
                 <h1 className='font-semibold text-lg'>{item.product.title}</h1>
-                <p className='text-gray-600 font-medium text-sm line-clamp-1'>{item.product.description}</p>
                 <p className='text-gray-400 text-xs'><strong>Sold by: </strong>{item.product.seller?.businessDetails.businessName}</p>
                 <p className='text-sm'>7 days replacement available</p>
                 <p className='text-sm text-gray-500'><strong>quantity: </strong>{item.quantity}</p>
@@ -66,7 +82,7 @@ const CartItemCard = ({item}: {item: CartItem}) => {
                 <div className="flex items-center gap-2 w-[140px] justify-between">
                      <Button 
                           variant="text"
-                          disabled={item.quantity <= 1}
+                          disabled={item.quantity <= 1 || isUnavailable}
                           sx={{ color: 'text.primary', borderRadius: '30px', minWidth: '10px' }}
                           onClick={handleUpdateQuantity(-1)}
                       >
@@ -87,7 +103,7 @@ const CartItemCard = ({item}: {item: CartItem}) => {
                       
                       <Button 
                         variant="text"
-                        // BỎ DISABLED CHECK STOCK Ở ĐÂY để cho phép click và hiện lỗi
+                        disabled={isUnavailable}
                         sx={{ color: 'text.primary', borderRadius: '30px', minWidth: '40px' }}
                         onClick={handleUpdateQuantity(1)}
                       >
@@ -109,7 +125,7 @@ const CartItemCard = ({item}: {item: CartItem}) => {
             </div>
         </div>
 
-        <div className='absolute top-1 right-1'>
+        <div className='absolute top-1 right-1 z-20'>
             <IconButton 
                 color='error' 
                 onClick={handleRemoveCartItem}

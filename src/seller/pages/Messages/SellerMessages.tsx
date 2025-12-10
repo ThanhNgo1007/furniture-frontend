@@ -1,38 +1,38 @@
 import {
-  Chat as ChatIcon,
-  Close as CloseIcon,
-  DoneAll as DoneAllIcon,
-  Done as DoneIcon,
-  Search as SearchIcon,
-  Send as SendIcon,
-  Visibility as VisibilityIcon
+    Chat as ChatIcon,
+    Close as CloseIcon,
+    DoneAll as DoneAllIcon,
+    Done as DoneIcon,
+    Search as SearchIcon,
+    Send as SendIcon,
+    Visibility as VisibilityIcon
 } from "@mui/icons-material";
 import {
-  Avatar,
-  Badge,
-  Box,
-  CircularProgress,
-  Divider,
-  IconButton,
-  InputAdornment,
-  List,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemText,
-  Paper,
-  TextField,
-  Typography
+    Avatar,
+    Badge,
+    Box,
+    CircularProgress,
+    Divider,
+    IconButton,
+    InputAdornment,
+    List,
+    ListItemAvatar,
+    ListItemButton,
+    ListItemText,
+    Paper,
+    TextField,
+    Typography
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import {
-  addMessage,
-  fetchChatHistory,
-  fetchConversations,
-  markMessagesAsRead,
-  markMessagesAsReadLocally,
-  setConnected,
-  setCurrentConversation,
+    addMessage,
+    fetchChatHistory,
+    fetchConversations,
+    markMessagesAsRead,
+    markMessagesAsReadLocally,
+    setConnected,
+    setCurrentConversation,
 } from "../../../State/chatSlice";
 import { webSocketService } from "../../../services/WebSocketService";
 import type { Message } from "../../../types/chatTypes";
@@ -106,8 +106,9 @@ const SellerMessages = () => {
     webSocketService.addMessageListener(handleMessage);
     webSocketService.addReadReceiptListener(handleReadReceipt);
     
+    // Use forceReconnect to ensure reconnection works after JWT refresh
     webSocketService
-      .connect(auth.jwt)
+      .forceReconnect(auth.jwt)
       .then(() => {
         console.log("[SellerMessages] WebSocket connected successfully");
         dispatch(setConnected(true));

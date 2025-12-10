@@ -4,6 +4,7 @@
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import CloseIcon from '@mui/icons-material/Close'
 import {
+    Alert,
     Button,
     CircularProgress,
     FormControl,
@@ -13,6 +14,7 @@ import {
     InputLabel,
     MenuItem,
     Select,
+    Snackbar,
     TextField
 } from '@mui/material'
 import { useFormik } from 'formik'
@@ -32,7 +34,7 @@ import { mainCategory } from '../../../data/category/mainCategory'
 import { colors } from '../../../data/filter/color'
 import { createProduct } from '../../../State/seller/sellerProductSlice'
 import { useAppDispatch } from '../../../State/Store'
-import { uploadToCloudinary } from '../../../Util/uploadToCloudinary'
+import { deleteFromCloudinary, uploadToCloudinary } from '../../../Util/uploadToCloudinary'
 
 const categoryTwo: { [key: string]: any[] } = {
   furnitures: furnituresLevelTwo,
@@ -52,6 +54,11 @@ const categoryThree: { [key: string]: any[] } = {
 
 const AddProduct = () => {
   const [uploadImage, setUploadingImage] = useState(false)
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+    open: false,
+    message: '',
+    severity: 'success'
+  })
   
   // Configure Quill to only allow text formatting, no images/videos
   const { quill, quillRef } = useQuill({
@@ -104,9 +111,27 @@ const AddProduct = () => {
       return errors
     },
 
-    onSubmit: values => {
+    onSubmit: async (values, { resetForm }) => {
       console.log(values)
-      dispatch(createProduct({ request: values, jwt: localStorage.getItem('jwt') }))
+      // Convert string values to proper types for backend
+      const request = {
+        ...values,
+        msrpPrice: parseFloat(values.msrpPrice),
+        sellingPrice: parseFloat(values.sellingPrice),
+        quantity: parseInt(values.quantity, 10)
+      }
+      
+      try {
+        await dispatch(createProduct({ request, jwt: localStorage.getItem('jwt') })).unwrap()
+        setSnackbar({ open: true, message: 'Thêm sản phẩm thành công!', severity: 'success' })
+        resetForm()
+        // Clear Quill editor
+        if (quill) {
+          quill.setText('')
+        }
+      } catch (error: any) {
+        setSnackbar({ open: true, message: error || 'Thêm sản phẩm thất bại', severity: 'error' })
+      }
     }
   })
 
@@ -118,7 +143,11 @@ const AddProduct = () => {
     setUploadingImage(false)
   }
 
-  const handleRemoveImage = (index: number) => {
+  const handleRemoveImage = async (index: number) => {
+    const imageUrl = formik.values.images[index]
+    // Delete from Cloudinary first
+    await deleteFromCloudinary(imageUrl)
+    // Then remove from local array
     const updatedImages = [...formik.values.images]
     updatedImages.splice(index, 1)
     formik.setFieldValue('images', updatedImages)
@@ -395,6 +424,17 @@ const AddProduct = () => {
           </Grid>
         </Grid>
       </form>
+      
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }

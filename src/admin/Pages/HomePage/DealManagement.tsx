@@ -60,7 +60,7 @@ export default function DealManagement() {
 
   const fetchProductsData = async () => {
     try {
-      const resultAction = await dispatch(fetchAllProducts({ pageSize: 1000 }));
+      const resultAction = await dispatch(fetchAllProducts({ pageSize: 100 }));
       if (fetchAllProducts.fulfilled.match(resultAction)) {
         const productsData = resultAction.payload.content || [];
         setProducts(productsData);

@@ -28,9 +28,12 @@ const Cart = () => {
         }
     }, [dispatch, navigate]);
 
-    const handleChange = (e: any) => {
-        setCouponCode(e.target.value)
-        setErrorMessage("") // Xóa lỗi khi người dùng nhập lại
+    // Xóa error message khi user bắt đầu nhập mới
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCouponCode(e.target.value);
+        if (errorMessage) {
+            setErrorMessage(""); // Clear error when user starts typing
+        }
     }
 
     // Hàm xử lý Apply Coupon
@@ -40,22 +43,24 @@ const Cart = () => {
         const jwt = localStorage.getItem("jwt") || "";
         const orderValue = cart?.totalSellingPrice || 0;
 
+
         try {
-             // Dispatch action applyCoupon
-            const resultAction = await dispatch(applyCoupon({
+            await dispatch(applyCoupon({
                 apply: "true",
                 code: couponCode,
                 orderValue: orderValue,
                 jwt
-            })).unwrap(); // unwrap để bắt lỗi ngay tại đây
+            })).unwrap();
 
-            // Nếu thành công (không nhảy vào catch), clear input
+
+            // Nếu thành công, clear input - KHÔNG cần fetchUserCart vì cartSlice đã update từ applyCoupon.fulfilled
             setErrorMessage("");
+            setCouponCode("");
+            // BỎ fetchUserCart - nó ghi đè data đúng bằng data cũ
             
-        } catch (error) {
-            // Nếu thất bại, hiển thị lỗi
-            setErrorMessage("Wrong Coupon Code");
-            setCouponCode(""); // (Tùy chọn) Xóa mã sai
+        } catch (error: any) {
+            // Nếu thất bại, hiển thị lỗi từ backend - KHÔNG clear couponCode
+            setErrorMessage(error || "Mã giảm giá không hợp lệ");
         }
     }
 
@@ -64,15 +69,19 @@ const Cart = () => {
         const jwt = localStorage.getItem("jwt") || "";
         const orderValue = cart?.totalSellingPrice || 0;
         
-        // Gọi applyCoupon với apply="false" để gỡ
-        await dispatch(applyCoupon({
-            apply: "false",
-            code: cart?.couponCode || "",
-            orderValue: orderValue,
-            jwt
-        }));
-        setCouponCode("");
-        setErrorMessage("");
+        try {
+            await dispatch(applyCoupon({
+                apply: "false",
+                code: cart?.couponCode || "",
+                orderValue: orderValue,
+                jwt
+            })).unwrap();
+            
+            setCouponCode("");
+            setErrorMessage("");
+        } catch (error: any) {
+            setErrorMessage(error || "Failed to remove coupon");
+        }
     }
 
     // ... (Logic kiểm tra giỏ hàng rỗng giữ nguyên)
@@ -96,13 +105,40 @@ const Cart = () => {
         )
     }
 
+    // Helper function to check if a cart item is unavailable
+    const isItemUnavailable = (item: typeof cart.cartItemsInBag[0]) => {
+        return item.product.isActive === false || (item.product.quantity !== undefined && item.product.quantity <= 0);
+    };
+
+    // Split items into available and unavailable
+    const availableItems = cart.cartItemsInBag.filter(item => !isItemUnavailable(item));
+    const unavailableItems = cart.cartItemsInBag.filter(item => isItemUnavailable(item));
+
     return (
         <div className='pt-10 px-5 sm:px-10 md:px-60 min-h-screen'>
             <div className='grid grid-cols-1 lg:grid-cols-3 gap-5'>
                 <div className='cartItemSection lg:col-span-2 space-y-3'>
-                    {cart.cartItemsInBag.map((item) => (
-                        <CartItemCard key={item.id} item={item}/>
+                    {/* Available Items */}
+                    {availableItems.map((item) => (
+                        <CartItemCard key={item.id} item={item} isUnavailable={false}/>
                     ))}
+                    
+                    {/* Unavailable Items Section */}
+                    {unavailableItems.length > 0 && (
+                        <div className='mt-6 space-y-3'>
+                            <div className='bg-gray-200 px-4 py-2 rounded-md'>
+                                <h2 className='text-gray-700 font-semibold'>
+                                    Sản phẩm không khả dụng ({unavailableItems.length})
+                                </h2>
+                                <p className='text-sm text-gray-500'>
+                                    Những sản phẩm này đã hết hàng hoặc ngừng bán
+                                </p>
+                            </div>
+                            {unavailableItems.map((item) => (
+                                <CartItemCard key={item.id} item={item} isUnavailable={true}/>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 
                 <div className='col-span-1 text-sm space-y-3'>

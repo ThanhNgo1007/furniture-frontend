@@ -1,5 +1,5 @@
 import { Edit } from '@mui/icons-material'
-import { IconButton } from '@mui/material'
+import { IconButton, TablePagination } from '@mui/material'
 import Paper from '@mui/material/Paper'
 import { styled } from '@mui/material/styles'
 import Table from '@mui/material/Table'
@@ -39,6 +39,10 @@ export default function ProductTable() {
   const { sellerProduct } = useAppSelector(store => store)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  
+  // Pagination state
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
 
   useEffect(() => {
     dispatch(fetchSellerProducts(localStorage.getItem('jwt')))
@@ -56,6 +60,19 @@ export default function ProductTable() {
     dispatch(fetchSellerProducts(localStorage.getItem('jwt')))
   }
 
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage)
+  }
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10))
+    setPage(0)
+  }
+
+  // Get current page products
+  const products = sellerProduct.products || []
+  const paginatedProducts = products.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+
   return (
     <>
       <TableContainer component={Paper}>
@@ -72,7 +89,7 @@ export default function ProductTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {sellerProduct.products?.map((item: Product) => (
+            {paginatedProducts.map((item: Product) => (
               <StyledTableRow key={item.id}>
                 <StyledTableCell component="th" scope="row">
                   <div className="flex gap-1 flex-wrap">
@@ -106,9 +123,21 @@ export default function ProductTable() {
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={products.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          labelRowsPerPage="Số sản phẩm mỗi trang:"
+          labelDisplayedRows={({ from, to, count }) => `${from}-${to} trong ${count}`}
+        />
       </TableContainer>
 
       <EditProductDialog
+        key={selectedProduct?.id ?? 'empty'}
         open={editDialogOpen}
         product={selectedProduct}
         onClose={handleCloseDialog}
@@ -116,4 +145,3 @@ export default function ProductTable() {
     </>
   )
 }
-

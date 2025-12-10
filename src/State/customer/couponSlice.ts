@@ -27,11 +27,12 @@ export const applyCoupon = createAsyncThunk<
           Authorization: `Bearer ${jwt}`
         }
       })
-      console.log('Coupon applied', response.data)
       return response.data
     } catch (error: any) {
-      console.log('Coupon applied error', error)
-      return rejectWithValue(error.response?.data.error || "Failed to apply coupon")
+      console.log('Coupon apply error', error)
+      // Backend returns error message directly or in response.data.message
+      const errorMessage = error.response?.data?.message || error.response?.data || error.message || "Failed to apply coupon"
+      return rejectWithValue(errorMessage)
     }
   })
 

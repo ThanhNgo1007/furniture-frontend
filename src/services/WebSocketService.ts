@@ -19,7 +19,13 @@ class WebSocketService {
    */
   updateToken(jwt: string): void {
     // console.log("[WebSocket] Token updated");
+    const tokenChanged = this.currentJwt !== jwt;
     this.currentJwt = jwt;
+
+    // If token changed and we're not connected, reset attempts to allow reconnection
+    if (tokenChanged && !this.client?.connected) {
+      this.reconnectAttempts = 0;
+    }
   }
 
   /**
@@ -32,6 +38,10 @@ class WebSocketService {
       return Promise.resolve();
     }
 
+    // Reset reconnect attempts when explicitly connecting with a (new) JWT
+    if (this.currentJwt !== jwt) {
+      this.reconnectAttempts = 0;
+    }
     this.currentJwt = jwt;
 
     return new Promise((resolve, reject) => {
@@ -127,6 +137,31 @@ class WebSocketService {
   }
 
   /**
+   * Force reconnect with current or new JWT - resets attempt counter
+   */
+  forceReconnect(jwt?: string): Promise<void> {
+    const tokenToUse = jwt || this.currentJwt;
+    if (!tokenToUse) {
+      return Promise.resolve();
+    }
+
+    // Reset attempts to allow fresh reconnection
+    this.reconnectAttempts = 0;
+    this.isReconnecting = false;
+
+    // Disconnect without setting max attempts
+    if (this.client) {
+      this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+      this.subscriptions.clear();
+      this.client.deactivate();
+      this.client = null;
+    }
+
+    this.currentJwt = tokenToUse;
+    return this.connect(tokenToUse);
+  }
+
+  /**
    * Disconnect from WebSocket server
    */
   disconnect(): void {
@@ -137,7 +172,7 @@ class WebSocketService {
 
       this.client.deactivate();
       this.client = null;
-      this.reconnectAttempts = this.maxReconnectAttempts;
+      this.reconnectAttempts = this.maxReconnectAttempts; // Prevent auto-reconnect after explicit disconnect
       this.notifyConnectionCallbacks(false);
       // console.log("[WebSocket] Disconnected");
     }

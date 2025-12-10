@@ -49,7 +49,7 @@ const SearchBar = () => {
   }, [isExpanded]);
 
   const handleProductClick = (productId: number, item: Product) => {
-    navigate(`/product-details/${item.category?.parentCategory?.categoryId}/${item.category?.categoryId}/${item.title}/${item.id}`);
+    navigate(`/product-details/${item.category?.parentCategory?.categoryId}/${item.category?.categoryId}/${encodeURIComponent(item.title)}/${item.id}`);
     setSearchQuery('');
     setShowResults(false);
     setIsExpanded(false);

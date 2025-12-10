@@ -14,7 +14,7 @@ export interface Product {
   category?: Category;
   seller?: Seller;
   createdAt?: Date;
-  //in_stock?: boolean;
+  isActive?: boolean; // true = available, false = seller disabled
 }
 
 export interface Category {

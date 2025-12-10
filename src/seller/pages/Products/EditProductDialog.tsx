@@ -22,7 +22,9 @@ import {
     TextField
 } from '@mui/material'
 import { useFormik } from 'formik'
-import { useEffect, useState } from 'react'
+import 'quill/dist/quill.snow.css'
+import { useEffect, useRef, useState } from 'react'
+import { useQuill } from 'react-quilljs'
 import { furnituresLevelThree } from '../../../data/category/levelthree/furnituresLevelThree'
 import { lightingLevelThree } from '../../../data/category/levelthree/lightingLevelThree'
 import { outdoorLevelThree } from '../../../data/category/levelthree/outdoorLevelThree'
@@ -37,7 +39,7 @@ import { colors } from '../../../data/filter/color'
 import { markOutOfStock, reactivateProduct, softDeleteProduct, updateProduct } from '../../../State/seller/sellerProductSlice'
 import { useAppDispatch, useAppSelector } from '../../../State/Store'
 import type { Product } from '../../../types/ProductTypes'
-import { uploadToCloudinary } from '../../../Util/uploadToCloudinary'
+import { deleteFromCloudinary, uploadToCloudinary } from '../../../Util/uploadToCloudinary'
 
 const categoryTwo: { [key: string]: any[] } = {
   furnitures: furnituresLevelTwo,
@@ -70,6 +72,21 @@ const EditProductDialog = ({ open, product, onClose, isInactive = false }: EditP
     message: '',
     severity: 'success'
   })
+  
+  // Quill editor setup
+  const { quill, quillRef } = useQuill({
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'align': [] }],
+        ['clean']
+      ]
+    }
+  });
+  const quillInitialized = useRef(false);
+  const lastProductId = useRef<number | null>(null);
 
   const formik = useFormik({
     initialValues: {
@@ -116,10 +133,8 @@ const EditProductDialog = ({ open, product, onClose, isInactive = false }: EditP
             sellingPrice: Number(values.sellingPrice),
             quantity: Number(values.quantity),
             color: values.color,
-            images: values.images,
-            category: values.category,
-            category2: values.category2,
-            category3: values.category3
+            images: values.images
+            // Note: Category update not supported - backend expects Category object
           },
           jwt: localStorage.getItem('jwt')
         })).unwrap()
@@ -175,8 +190,58 @@ const EditProductDialog = ({ open, product, onClose, isInactive = false }: EditP
         category2: cat2,
         category3: cat3
       })
+
+      // Reset quill initialized flag when product changes
+      if (product.id !== lastProductId.current) {
+        quillInitialized.current = false;
+        lastProductId.current = product.id ?? null;
+      }
     }
   }, [product])
+
+  // Set Quill content when dialog opens and quill is ready
+  useEffect(() => {
+    if (open && quill && product?.description && !quillInitialized.current) {
+      // Use requestAnimationFrame to ensure DOM is ready, then blur editor before setting content
+      const timer = setTimeout(() => {
+        requestAnimationFrame(() => {
+          try {
+            // Blur the editor to prevent addRange error
+            quill.blur();
+            // Set content without selection
+            const delta = quill.clipboard.convert({ html: product.description });
+            quill.setContents(delta, 'silent');
+            quillInitialized.current = true;
+          } catch (e) {
+            console.warn('Quill initialization warning:', e);
+          }
+        });
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+    // Reset flag when dialog closes
+    if (!open) {
+      quillInitialized.current = false;
+      lastProductId.current = null;
+      // Clear quill content when dialog closes
+      if (quill) {
+        try {
+          quill.setText('');
+        } catch (e) {
+          // Ignore errors during cleanup
+        }
+      }
+    }
+  }, [open, quill, product])
+
+  // Sync Quill editor with formik
+  useEffect(() => {
+    if (quill) {
+      quill.on('text-change', () => {
+        formik.setFieldValue('description', quill.root.innerHTML);
+      });
+    }
+  }, [quill]);
 
   const childCategory = (category: any, parentCategoryId: any) => {
     return category?.filter((child: any) => child.parentCategoryId === parentCategoryId) || []
@@ -190,7 +255,11 @@ const EditProductDialog = ({ open, product, onClose, isInactive = false }: EditP
     setUploadingImage(false)
   }
 
-  const handleRemoveImage = (index: number) => {
+  const handleRemoveImage = async (index: number) => {
+    const imageUrl = formik.values.images[index]
+    // Delete from Cloudinary first
+    await deleteFromCloudinary(imageUrl)
+    // Then remove from local array
     const updatedImages = [...formik.values.images]
     updatedImages.splice(index, 1)
     formik.setFieldValue('images', updatedImages)
@@ -333,17 +402,10 @@ const EditProductDialog = ({ open, product, onClose, isInactive = false }: EditP
                 />
               </Grid>
 
-              {/* Description */}
+              {/* Description with Quill */}
               <Grid size={{ xs: 12 }}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={4}
-                  name="description"
-                  label="Mô tả sản phẩm"
-                  value={formik.values.description}
-                  onChange={formik.handleChange}
-                />
+                <InputLabel sx={{ mb: 1 }}>Mô tả sản phẩm</InputLabel>
+                <div ref={quillRef} style={{ height: '200px', marginBottom: '50px' }} />
               </Grid>
 
               {/* Prices and Quantity */}

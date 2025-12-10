@@ -25,7 +25,6 @@ export const fetchUserCart = createAsyncThunk<Cart, string>(
       const response = await api.get(API_URL, {
         headers: { Authorization: `Bearer ${jwt}` }
       })
-      console.log('Cart fetched', response.data)
       return response.data
     } catch (error: any) {
       console.log('Cart fetched error', error.response)

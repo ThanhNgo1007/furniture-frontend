@@ -1,5 +1,34 @@
-import { Button, CircularProgress, TextField } from "@mui/material";
-import { useState } from "react";
+import {
+    AccountCircle as AccountCircleIcon,
+    Edit as EditIcon,
+    Email as EmailIcon,
+    Person as PersonIcon,
+    Phone as PhoneIcon,
+    Save as SaveIcon,
+    Security as SecurityIcon
+} from '@mui/icons-material';
+import {
+    Alert,
+    Avatar,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    Chip,
+    CircularProgress,
+    Divider,
+    Grid,
+    IconButton,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Paper,
+    Snackbar,
+    TextField,
+    Typography
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../config/Api";
 import { fetchUserProfile } from "../../../State/AuthSlice";
@@ -15,6 +44,17 @@ const UserDetails = () => {
     const [mobile, setMobile] = useState(user?.mobile || "");
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({ fullName: "", mobile: "" });
+    const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+        open: false,
+        message: '',
+        severity: 'success'
+    });
+
+    // Sync state when user data changes
+    useEffect(() => {
+        setFullName(user?.fullName || "");
+        setMobile(user?.mobile || "");
+    }, [user]);
 
     const validateForm = () => {
         const newErrors = { fullName: "", mobile: "" };
@@ -48,16 +88,16 @@ const UserDetails = () => {
             const response = await api.put("/api/users/profile", { fullName: fullName.trim(), mobile: mobile.trim() });
             
             if (response.status === 200) {
-                // Refresh user data
                 const jwt = localStorage.getItem("jwt");
                 if (jwt) {
                     dispatch(fetchUserProfile({ jwt }));
                 }
                 setIsEditing(false);
                 setErrors({ fullName: "", mobile: "" });
+                setSnackbar({ open: true, message: 'Cập nhật thành công!', severity: 'success' });
             }
         } catch (error: any) {
-            alert(error.response?.data?.message || "Cập nhật thất bại");
+            setSnackbar({ open: true, message: error.response?.data?.message || 'Cập nhật thất bại', severity: 'error' });
         } finally {
             setLoading(false);
         }
@@ -71,78 +111,173 @@ const UserDetails = () => {
     };
 
     return (
-        <div className="flex justify-center py-10">
-            <div className="w-full lg:w-[70%]">
-                <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-                    <h1 className="text-2xl font-bold text-gray-600">{t('account.personalDetails')}</h1>
-                    {!isEditing && (
-                        <Button variant="outlined" size="small" onClick={() => setIsEditing(true)}>
-                            Chỉnh sửa
-                        </Button>
-                    )}
-                </div>
-                <div className="">
-                    {/* Full Name */}
-                    <div className="py-5">
-                        <span className="font-semibold">{t('account.name')} : </span>
-                        {isEditing ? (
-                            <TextField
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                                error={!!errors.fullName}
-                                helperText={errors.fullName}
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                            />
-                        ) : (
-                            <span className="text-gray-600">{user?.fullName}</span>
-                        )}
-                    </div>
+        <Box sx={{ p: { xs: 2, md: 3 } }}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+                {t('account.personalDetails')}
+            </Typography>
 
-                    {/* Mobile */}
-                    <div className="py-5">
-                        <span className="font-semibold">{t('account.mobile')} : </span>
-                        {isEditing ? (
-                            <TextField
-                                value={mobile}
-                                onChange={(e) => setMobile(e.target.value)}
-                                error={!!errors.mobile}
-                                helperText={errors.mobile}
-                                size="small"
-                                fullWidth
-                                sx={{ mt: 1 }}
-                            />
-                        ) : (
-                            <span className="text-gray-600">{user?.mobile}</span>
-                        )}
-                    </div>
-
-                    {/* Email (Read-only) */}
-                    <div className="py-5">
-                        <span className="font-semibold">{t('account.email')} : </span>
-                        <span className="text-gray-600">{user?.email}</span>
-                    </div>
-
-                    {/* Action Buttons */}
-                    {isEditing && (
-                        <div className="flex gap-3 mt-4">
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={handleSave}
-                                disabled={loading}
+            <Grid container spacing={3}>
+                {/* Profile Card */}
+                <Grid size={{ xs: 12, md: 4 }}>
+                    <Card elevation={2}>
+                        <CardContent sx={{ textAlign: 'center', py: 4 }}>
+                            <Avatar
+                                sx={{
+                                    width: 120,
+                                    height: 120,
+                                    mx: 'auto',
+                                    mb: 2,
+                                    bgcolor: '#0d9488',
+                                    fontSize: 48
+                                }}
                             >
-                                {loading ? <CircularProgress size={20} /> : "Lưu"}
-                            </Button>
-                            <Button variant="outlined" onClick={handleCancel} disabled={loading}>
-                                Hủy
-                            </Button>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+                                {user?.fullName?.charAt(0).toUpperCase() || 'U'}
+                            </Avatar>
+                            <Typography variant="h6" fontWeight="bold">
+                                {user?.fullName || 'Người dùng'}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                                {user?.email || 'email@example.com'}
+                            </Typography>
+                            <Chip
+                                icon={<AccountCircleIcon />}
+                                label="Khách hàng"
+                                color="primary"
+                                sx={{ mt: 2, bgcolor: '#0d9488' }}
+                            />
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                {/* Account Details */}
+                <Grid size={{ xs: 12, md: 8 }}>
+                    <Paper elevation={2} sx={{ p: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Typography variant="h6" fontWeight="bold">
+                                Chi tiết tài khoản
+                            </Typography>
+                            {!isEditing && (
+                                <IconButton color="primary" onClick={() => setIsEditing(true)}>
+                                    <EditIcon />
+                                </IconButton>
+                            )}
+                        </Box>
+                        <Divider sx={{ mb: 2 }} />
+
+                        <List>
+                            {/* Full Name */}
+                            <ListItem sx={{ py: 2 }}>
+                                <ListItemIcon>
+                                    <PersonIcon color="primary" sx={{ color: '#0d9488' }} />
+                                </ListItemIcon>
+                                {isEditing ? (
+                                    <TextField
+                                        fullWidth
+                                        label={t('account.name')}
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        error={!!errors.fullName}
+                                        helperText={errors.fullName}
+                                        size="small"
+                                    />
+                                ) : (
+                                    <ListItemText
+                                        primary={t('account.name')}
+                                        secondary={user?.fullName || 'Chưa cập nhật'}
+                                    />
+                                )}
+                            </ListItem>
+
+                            {/* Email - Read Only */}
+                            <ListItem sx={{ py: 2 }}>
+                                <ListItemIcon>
+                                    <EmailIcon color="primary" sx={{ color: '#0d9488' }} />
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={t('account.email')}
+                                    secondary={
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            {user?.email || 'Chưa cập nhật'}
+                                            <Chip label="Không thể thay đổi" size="small" variant="outlined" sx={{ fontSize: 10 }} />
+                                        </Box>
+                                    }
+                                />
+                            </ListItem>
+
+                            {/* Phone */}
+                            <ListItem sx={{ py: 2 }}>
+                                <ListItemIcon>
+                                    <PhoneIcon color="primary" sx={{ color: '#0d9488' }} />
+                                </ListItemIcon>
+                                {isEditing ? (
+                                    <TextField
+                                        fullWidth
+                                        label={t('account.mobile')}
+                                        value={mobile}
+                                        onChange={(e) => setMobile(e.target.value)}
+                                        error={!!errors.mobile}
+                                        helperText={errors.mobile}
+                                        size="small"
+                                    />
+                                ) : (
+                                    <ListItemText
+                                        primary={t('account.mobile')}
+                                        secondary={user?.mobile || 'Chưa cập nhật'}
+                                    />
+                                )}
+                            </ListItem>
+                        </List>
+
+                        {/* Action Buttons */}
+                        {isEditing && (
+                            <Box sx={{ display: 'flex', gap: 2, mt: 2, justifyContent: 'flex-end' }}>
+                                <Button variant="outlined" onClick={handleCancel} disabled={loading}>
+                                    Hủy
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
+                                    onClick={handleSave}
+                                    disabled={loading}
+                                    sx={{ bgcolor: '#0d9488', '&:hover': { bgcolor: '#0f766e' } }}
+                                >
+                                    {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                                </Button>
+                            </Box>
+                        )}
+                    </Paper>
+
+                    {/* Security Info */}
+                    <Paper elevation={2} sx={{ p: 3, mt: 3 }}>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom>
+                            Bảo mật
+                        </Typography>
+                        <Divider sx={{ mb: 2 }} />
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <SecurityIcon color="success" />
+                            <Box>
+                                <Typography variant="body1">Xác thực qua Email</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Tài khoản được bảo vệ bằng OTP gửi qua email
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
+        </Box>
     );
 };
 
