@@ -1,5 +1,6 @@
 import { Client, type StompSubscription } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { API_BASE_URL } from "../config/Api";
 import type { Message, ReadReceipt } from "../types/chatTypes";
 
 class WebSocketService {
@@ -51,7 +52,7 @@ class WebSocketService {
       }
 
       this.client = new Client({
-        webSocketFactory: () => new SockJS(`http://localhost:5454/ws`),
+        webSocketFactory: () => new SockJS(`${API_BASE_URL}/ws`),
         connectHeaders: {
           Authorization: `Bearer ${jwt}`,
         },
