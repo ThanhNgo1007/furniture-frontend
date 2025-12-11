@@ -23,7 +23,7 @@ import {
   TextField,
   Typography
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import {
@@ -73,121 +73,90 @@ const isDifferentDay = (date1: string, date2: string): boolean => {
 const FloatingChatWidget = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { pathname } = useLocation(); // ✅ Move useLocation BEFORE any conditional returns
   const { auth } = useAppSelector((state) => state);
   const { seller } = useAppSelector((state) => state.seller);
   const { conversations, currentConversation, messages, unreadCount, connected, loading, isOpen } =
     useAppSelector((state) => state.chat);
-
   const [messageInput, setMessageInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  // ✅ FIX: Stable callback with useCallback
+  const handleMessage = useCallback((message: Message) => {
+    console.log("[FloatingChatWidget] Received message:", message);
+    dispatch(addMessage(message));
+  }, [dispatch]);
+  const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt: string; readBy: string }) => {
+    console.log("[FloatingChatWidget] Received read receipt:", receipt);
+    dispatch(markMessagesAsReadLocally({ conversationId: receipt.conversationId, readAt: receipt.readAt, readBy: receipt.readBy }));
+  }, [dispatch]);
   const handleProductClick = () => {
     if (currentConversation?.productId && currentConversation.categoryId && currentConversation.parentCategoryId) {
       navigate(`/product-details/${currentConversation.parentCategoryId}/${currentConversation.categoryId}/${encodeURIComponent(currentConversation.productTitle || '')}/${currentConversation.productId}`);
     }
   };
-
-  // Connect to WebSocket when component mounts or JWT changes
+  // ✅ FIX: WebSocket connection with stable callbacks and isConnected check
   useEffect(() => {
     if (!auth.jwt) {
-      // No JWT - disconnect and reset
       webSocketService.disconnect();
       dispatch(setConnected(false));
       return;
     }
-    
-    console.log("[FloatingChatWidget] Connecting WebSocket with JWT...");
-    // Update token in service for reconnection
     webSocketService.updateToken(auth.jwt);
-    
-    // Listen for incoming messages
-    const handleMessage = (message: Message) => {
-      console.log("[FloatingChatWidget] Received message:", message);
-      dispatch(addMessage(message));
-    };
-
-    // Listen for read receipts
-    const handleReadReceipt = (receipt: { conversationId: number; readAt: string; readBy: string }) => {
-      console.log("[FloatingChatWidget] Received read receipt:", receipt);
-      dispatch(markMessagesAsReadLocally({ conversationId: receipt.conversationId, readAt: receipt.readAt, readBy: receipt.readBy }));
-    };
-
     webSocketService.addMessageListener(handleMessage);
     webSocketService.addReadReceiptListener(handleReadReceipt);
-    
-    // Use forceReconnect to ensure reconnection works after JWT refresh
-    webSocketService
-      .forceReconnect(auth.jwt)
-      .then(() => {
-        console.log("[FloatingChatWidget] WebSocket connected successfully");
-        dispatch(setConnected(true));
-      })
-      .catch((err) => {
-        console.error("[FloatingChatWidget] Failed to connect to WebSocket:", err);
-        dispatch(setConnected(false));
-      });
-
+    if (webSocketService.isConnected()) {
+      console.log("[FloatingChatWidget] Already connected");
+      dispatch(setConnected(true));
+    } else {
+      console.log("[FloatingChatWidget] Connecting WebSocket...");
+      webSocketService.forceReconnect(auth.jwt)
+        .then(() => {
+          console.log("[FloatingChatWidget] WebSocket connected successfully");
+          dispatch(setConnected(true));
+        })
+        .catch((err) => {
+          console.error("[FloatingChatWidget] Failed to connect:", err);
+          dispatch(setConnected(false));
+        });
+    }
     return () => {
       webSocketService.removeMessageListener(handleMessage);
       webSocketService.removeReadReceiptListener(handleReadReceipt);
-      // Don't disconnect on cleanup - let the connection persist
     };
-  }, [auth.jwt, dispatch]);
-
-  // Load conversations when chat opens
+  }, [auth.jwt, dispatch, handleMessage, handleReadReceipt]);
   useEffect(() => {
     if (isOpen && auth.jwt) {
       if (conversations.length === 0) {
         dispatch(fetchConversations(auth.jwt));
       }
-      // If there is a current conversation but no messages (e.g. reopened), fetch history
       if (currentConversation && messages.length === 0) {
         dispatch(fetchChatHistory({ conversationId: currentConversation.id, jwt: auth.jwt }));
       }
     }
   }, [isOpen, auth.jwt, conversations.length, currentConversation, messages.length, dispatch]);
-
-  // Subscribe to current conversation updates
   useEffect(() => {
-    console.log("[FloatingChatWidget] Subscription effect - currentConversation:", currentConversation?.id, "connected:", connected);
     if (currentConversation?.id && connected) {
-      console.log("[FloatingChatWidget] Subscribing to conversation:", currentConversation.id);
       webSocketService.subscribeToConversation(currentConversation.id);
     }
-
     return () => {
       if (currentConversation?.id) {
-        console.log("[FloatingChatWidget] Unsubscribing from conversation:", currentConversation.id);
         webSocketService.unsubscribeFromConversation(currentConversation.id);
       }
     };
   }, [currentConversation?.id, connected]);
-
-  // Auto-mark new incoming messages as read when viewing the conversation
   useEffect(() => {
     if (currentConversation && auth.jwt && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      // If last message is from the other party and not read, mark as read
       if (lastMessage.senderType !== "USER" && !lastMessage.isRead) {
         dispatch(markMessagesAsRead({ conversationId: currentConversation.id, jwt: auth.jwt }));
       }
     }
   }, [messages, currentConversation, auth.jwt, dispatch]);
-
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleToggleChat = () => {
-    dispatch(setIsOpen(!isOpen));
-  };
-
+  }, [messages]);
+  const handleToggleChat = () => dispatch(setIsOpen(!isOpen));
   const handleSelectConversation = (conversationId: number) => {
     const conversation = conversations.find((c) => c.id === conversationId);
     if (conversation && auth.jwt) {
@@ -196,61 +165,39 @@ const FloatingChatWidget = () => {
       dispatch(markMessagesAsRead({ conversationId, jwt: auth.jwt }));
     }
   };
-
   const handleSendMessage = () => {
     if (messageInput.trim() && currentConversation && connected && auth.user) {
-      const messageContent = messageInput.trim();
-      
-      // Send via WebSocket - server will broadcast back to us and others
       webSocketService.sendMessage({
         conversationId: currentConversation.id,
-        content: messageContent,
+        content: messageInput.trim(),
         messageType: "TEXT",
       });
-      
       setMessageInput("");
     }
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
-
   const getOtherParticipantName = () => {
     if (!currentConversation) return "";
-    const isUser = auth.user?.role === "ROLE_CUSTOMER";
-    return isUser ? currentConversation.sellerName : currentConversation.userName;
+    return auth.user?.role === "ROLE_CUSTOMER" ? currentConversation.sellerName : currentConversation.userName;
   };
-
-  // Filter conversations based on search and hide empty ones (unless it's the current active one)
   const filteredConversations = conversations.filter((conv) => {
     const isUser = auth.user?.role === "ROLE_CUSTOMER";
     const participantName = isUser ? conv.sellerName : conv.userName;
     const matchesSearch = participantName?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false;
-    
-    // Show if it has a last message OR if it's the currently open conversation (even if empty)
-    // We check lastMessagePreview or unread counts as proxy for having history
-    // But for the "just clicked" case, it might be empty. 
-    // We want to show it IF it is selected.
     const hasHistory = conv.lastMessagePreview || conv.unreadCountUser > 0 || conv.unreadCountSeller > 0;
     const isCurrent = currentConversation?.id === conv.id;
-    
     return matchesSearch && (hasHistory || isCurrent);
   });
-
-  // Don't render for sellers and admins - they use dedicated pages
-  // Check both auth.user.role AND seller state (seller login may not set auth.user)
-  if (auth.user?.role === "ROLE_SELLER" || auth.user?.role === "ROLE_ADMIN" || seller) {
+  // ✅ Don't render for sellers/admins or on seller dashboard
+  if (auth.user?.role === "ROLE_SELLER" || auth.user?.role === "ROLE_ADMIN" || seller || pathname.startsWith('/seller')) {
     return null;
   }
-  // Không render nếu user là Seller và đang ở seller dashboard
-const { pathname } = useLocation();
-if (pathname.startsWith('/seller')) {
-  return null;
-}
+
 
   return (
     <>
