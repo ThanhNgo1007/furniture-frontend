@@ -8,6 +8,14 @@ Dự án này là phần giao diện người dùng (Client-side), được thi�
 
 ---
 
+## 🌐 Live Demo
+
+Trải nghiệm trực tiếp sản phẩm tại đây:
+👉 **[Furniture Shop Demo](https://furniture-frontend.pages.dev)**  
+*(Lưu ý: Backend được deploy trên Render/Heroku nên có thể mất khoảng 30s để khởi động trong lần truy cập đầu tiên)*
+
+---
+
 ## 🚀 Tính năng nổi bật
 
 ### 🛒 Dành cho Khách hàng (Customer)
