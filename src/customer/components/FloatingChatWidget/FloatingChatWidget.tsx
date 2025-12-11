@@ -1,40 +1,40 @@
 import {
-    Chat as ChatIcon,
-    Close as CloseIcon,
-    DoneAll as DoneAllIcon,
-    Done as DoneIcon,
-    Search as SearchIcon,
-    Send as SendIcon,
-    Visibility as VisibilityIcon
+  Chat as ChatIcon,
+  Close as CloseIcon,
+  DoneAll as DoneAllIcon,
+  Done as DoneIcon,
+  Search as SearchIcon,
+  Send as SendIcon,
+  Visibility as VisibilityIcon
 } from "@mui/icons-material";
 import {
-    Avatar,
-    Badge,
-    Box,
-    CircularProgress,
-    Divider,
-    IconButton,
-    InputAdornment,
-    List,
-    ListItemAvatar,
-    ListItemButton,
-    ListItemText,
-    Paper,
-    TextField,
-    Typography
+  Avatar,
+  Badge,
+  Box,
+  CircularProgress,
+  Divider,
+  IconButton,
+  InputAdornment,
+  List,
+  ListItemAvatar,
+  ListItemButton,
+  ListItemText,
+  Paper,
+  TextField,
+  Typography
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import {
-    addMessage,
-    fetchChatHistory,
-    fetchConversations,
-    markMessagesAsRead,
-    markMessagesAsReadLocally,
-    setConnected,
-    setCurrentConversation,
-    setIsOpen,
+  addMessage,
+  fetchChatHistory,
+  fetchConversations,
+  markMessagesAsRead,
+  markMessagesAsReadLocally,
+  setConnected,
+  setCurrentConversation,
+  setIsOpen,
 } from "../../../State/chatSlice";
 import { webSocketService } from "../../../services/WebSocketService";
 import type { Message } from "../../../types/chatTypes";
@@ -246,6 +246,11 @@ const FloatingChatWidget = () => {
   if (auth.user?.role === "ROLE_SELLER" || auth.user?.role === "ROLE_ADMIN" || seller) {
     return null;
   }
+  // Không render nếu user là Seller và đang ở seller dashboard
+const { pathname } = useLocation();
+if (pathname.startsWith('/seller')) {
+  return null;
+}
 
   return (
     <>

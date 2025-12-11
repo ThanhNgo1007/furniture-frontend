@@ -79,56 +79,50 @@ const SellerMessages = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleMessage = useCallback((message: Message) => {
-  console.log("[SellerMessages] Received message:", message);
-  dispatch(addMessage(message));
-}, [dispatch]);
-const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt: string; readBy: string }) => {
-  console.log("[SellerMessages] Received read receipt:", receipt);
-  dispatch(markMessagesAsReadLocally({ 
-    conversationId: receipt.conversationId, 
-    readAt: receipt.readAt, 
-    readBy: receipt.readBy 
-  }));
-}, [dispatch]);
-
-  // Connect to WebSocket when component mounts or JWT changes
+    console.log("[SellerMessages] Received message:", message);
+    dispatch(addMessage(message));
+  }, [dispatch]);
+  const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt: string; readBy: string }) => {
+    console.log("[SellerMessages] Received read receipt:", receipt);
+    dispatch(markMessagesAsReadLocally({ 
+      conversationId: receipt.conversationId, 
+      readAt: receipt.readAt, 
+      readBy: receipt.readBy 
+    }));
+  }, [dispatch]);
+  // ✅ FIX: WebSocket connection with proper cleanup
   useEffect(() => {
-    if (!auth.jwt) {
-      // No JWT - disconnect and reset
+    const jwt = auth.jwt || localStorage.getItem("jwt");
+    if (!jwt) {
       webSocketService.disconnect();
       dispatch(setConnected(false));
       return;
     }
-    
-    console.log("[SellerMessages] Connecting WebSocket with JWT...");
-    // Update token in service for reconnection
-    webSocketService.updateToken(auth.jwt);
-    
+    // Add listeners using stable references
     webSocketService.addMessageListener(handleMessage);
     webSocketService.addReadReceiptListener(handleReadReceipt);
-
+    // Check if already connected before forcing reconnect
     if (webSocketService.isConnected()) {
-    console.log("[SellerMessages] Already connected, skipping reconnect");
-    dispatch(setConnected(true));
-  } else {
-    webSocketService.forceReconnect(auth.jwt)
-      .then(() => {
-        console.log("[SellerMessages] WebSocket connected successfully");
-        dispatch(setConnected(true));
-      })
-      .catch((err) => {
-        console.error("[SellerMessages] Failed to connect:", err);
-        dispatch(setConnected(false));
-      });
-  }
-
+      console.log("[SellerMessages] Already connected");
+      dispatch(setConnected(true));
+    } else {
+      console.log("[SellerMessages] Connecting WebSocket...");
+      webSocketService.forceReconnect(jwt)
+        .then(() => {
+          console.log("[SellerMessages] WebSocket connected successfully");
+          dispatch(setConnected(true));
+        })
+        .catch((err) => {
+          console.error("[SellerMessages] Failed to connect:", err);
+          dispatch(setConnected(false));
+        });
+    }
     return () => {
+      // Cleanup using same stable references
       webSocketService.removeMessageListener(handleMessage);
       webSocketService.removeReadReceiptListener(handleReadReceipt);
-      // Don't disconnect on cleanup - let the connection persist
     };
-  }, [auth.jwt, dispatch]);
-
+  }, [auth.jwt, dispatch, handleMessage, handleReadReceipt]);
   // Load conversations when component mounts
   useEffect(() => {
     const jwt = localStorage.getItem("jwt");
@@ -136,7 +130,6 @@ const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt
       dispatch(fetchConversations(jwt));
     }
   }, [conversations.length, dispatch]);
-
   // Subscribe to current conversation updates
   useEffect(() => {
     console.log("[SellerMessages] Subscription effect - currentConversation:", currentConversation?.id, "connected:", connected);
@@ -144,7 +137,6 @@ const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt
       console.log("[SellerMessages] Subscribing to conversation:", currentConversation.id);
       webSocketService.subscribeToConversation(currentConversation.id);
     }
-
     return () => {
       if (currentConversation?.id) {
         console.log("[SellerMessages] Unsubscribing from conversation:", currentConversation.id);
@@ -152,28 +144,20 @@ const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt
       }
     };
   }, [currentConversation?.id, connected]);
-
-  // Auto-mark new incoming messages as read when viewing the conversation
+  // Auto-mark new incoming messages as read
   useEffect(() => {
     const jwt = localStorage.getItem("jwt");
     if (currentConversation && jwt && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
-      // If last message is from the other party (USER) and not read, mark as read
       if (lastMessage.senderType !== "SELLER" && !lastMessage.isRead) {
         dispatch(markMessagesAsRead({ conversationId: currentConversation.id, jwt }));
       }
     }
   }, [messages, currentConversation, dispatch]);
-
   // Scroll to bottom when new messages arrive
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  }, [messages]);
   const handleSelectConversation = (conversationId: number) => {
     const jwt = localStorage.getItem("jwt");
     const conversation = conversations.find((c) => c.id === conversationId);
@@ -183,30 +167,22 @@ const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt
       dispatch(markMessagesAsRead({ conversationId, jwt }));
     }
   };
-
   const handleSendMessage = () => {
     if (messageInput.trim() && currentConversation && connected && seller) {
-      const messageContent = messageInput.trim();
-      
-      // Send via WebSocket - server will broadcast back to us and others
       webSocketService.sendMessage({
         conversationId: currentConversation.id,
-        content: messageContent,
+        content: messageInput.trim(),
         messageType: "TEXT",
       });
-      
       setMessageInput("");
     }
   };
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
-
-  // Filter conversations based on search
   const filteredConversations = conversations.filter((conv) => {
     const participantName = conv.userName;
     const matchesSearch = participantName?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false;
