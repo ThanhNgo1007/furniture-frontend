@@ -23,7 +23,7 @@ import {
   TextField,
   Typography
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../State/Store";
 import {
   addMessage,
@@ -78,6 +78,19 @@ const SellerMessages = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const handleMessage = useCallback((message: Message) => {
+  console.log("[SellerMessages] Received message:", message);
+  dispatch(addMessage(message));
+}, [dispatch]);
+const handleReadReceipt = useCallback((receipt: { conversationId: number; readAt: string; readBy: string }) => {
+  console.log("[SellerMessages] Received read receipt:", receipt);
+  dispatch(markMessagesAsReadLocally({ 
+    conversationId: receipt.conversationId, 
+    readAt: receipt.readAt, 
+    readBy: receipt.readBy 
+  }));
+}, [dispatch]);
+
   // Connect to WebSocket when component mounts or JWT changes
   useEffect(() => {
     if (!auth.jwt) {
@@ -91,21 +104,9 @@ const SellerMessages = () => {
     // Update token in service for reconnection
     webSocketService.updateToken(auth.jwt);
     
-    // Listen for incoming messages
-    const handleMessage = (message: Message) => {
-      console.log("[SellerMessages] Received message:", message);
-      dispatch(addMessage(message));
-    };
-
-    // Listen for read receipts
-    const handleReadReceipt = (receipt: { conversationId: number; readAt: string; readBy: string }) => {
-      console.log("[SellerMessages] Received read receipt:", receipt);
-      dispatch(markMessagesAsReadLocally({ conversationId: receipt.conversationId, readAt: receipt.readAt, readBy: receipt.readBy }));
-    };
-
     webSocketService.addMessageListener(handleMessage);
     webSocketService.addReadReceiptListener(handleReadReceipt);
-    
+
     if (webSocketService.isConnected()) {
     console.log("[SellerMessages] Already connected, skipping reconnect");
     dispatch(setConnected(true));
