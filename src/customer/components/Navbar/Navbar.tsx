@@ -81,7 +81,7 @@ const Navbar = () => {
     
     if (isSeller || isAdmin) {
         return (
-             <div className="shadow-sm bg-white sticky top-0 z-50 h-[70px] flex items-center px-5 justify-between border-b border-gray-200 relative">
+             <div className="shadow-sm bg-white top-0 z-50 h-[70px] flex items-center px-5 justify-between border-b border-gray-200 relative">
                 <div className="flex items-center gap-3">
                     {/* --- SỬA LOGIC ẨN HAMBURGER --- */}
                     {/* Chỉ hiển thị nút Menu khi màn hình nhỏ (!isLarge) */}

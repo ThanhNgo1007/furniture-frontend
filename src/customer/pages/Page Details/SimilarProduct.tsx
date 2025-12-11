@@ -1,34 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../State/Store';
-import { fetchAllProducts } from '../../../State/customer/ProductSlice';
-import type { Product } from '../../../types/ProductTypes';
+import { clearSimilarProducts, fetchSimilarProducts } from '../../../State/customer/ProductSlice';
 import ProductCard from '../Product/ProductCard';
 
 
 const SimilarProduct = () => {
   const dispatch = useAppDispatch();
-  const { product, products } = useAppSelector(store => store.product);
-  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+  const { product, similarProducts } = useAppSelector(store => store.product);
 
   useEffect(() => {
-    if (product?.category) {
-      // Fetch products with the same category (prioritize categoryId)
-      dispatch(fetchAllProducts({ 
-        category: product.category.categoryId || product.category.name,
-        pageSize: 6 
-      }));
+    if (product?.id) {
+      // Fetch similar products from API (same category level 3)
+      dispatch(fetchSimilarProducts({ productId: product.id, limit: 6 }));
     }
-  }, [product?.category?.name, dispatch]);
-
-  useEffect(() => {
-    if (products && product) {
-      // Filter out the current product and limit to 6 items
-      const filtered = products
-        .filter(p => p.id !== product.id)
-        .slice(0, 6);
-      setSimilarProducts(filtered);
-    }
-  }, [products, product]);
+    
+    // Cleanup when component unmounts or product changes
+    return () => {
+      dispatch(clearSimilarProducts());
+    };
+  }, [product?.id, dispatch]);
 
   if (similarProducts.length === 0) return null;
 

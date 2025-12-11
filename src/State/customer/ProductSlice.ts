@@ -65,6 +65,40 @@ export const fetchAllProducts = createAsyncThunk<ProductsResponse, any>(
   }
 )
 
+// Fetch Best Seller Products (sorted by sales volume)
+export const fetchBestSellerProducts = createAsyncThunk<Product[], number | undefined>(
+  'products/fetchBestSellerProducts',
+  async (limit = 10, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/best-sellers`, {
+        params: { limit }
+      })
+      console.log('best seller products:', response.data)
+      return response.data
+    } catch (error: any) {
+      console.log('error:', error)
+      return rejectWithValue(error.response?.data?.message || error.message)
+    }
+  }
+)
+
+// Fetch Similar Products (same category level 3)
+export const fetchSimilarProducts = createAsyncThunk<Product[], { productId: number; limit?: number }>(
+  'products/fetchSimilarProducts',
+  async ({ productId, limit = 8 }, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/${productId}/similar`, {
+        params: { limit }
+      })
+      console.log('similar products:', response.data)
+      return response.data
+    } catch (error: any) {
+      console.log('error:', error)
+      return rejectWithValue(error.response?.data?.message || error.message)
+    }
+  }
+)
+
 interface ProductState {
   product: Product | null
   products: Product[]
@@ -72,7 +106,8 @@ interface ProductState {
   loading: boolean
   error: string | null
   searchProduct: Product[]
-  bestSellerIds: number[] // Track best seller product IDs
+  bestSellerProducts: Product[]  // Best seller products from API
+  similarProducts: Product[]      // Similar products from API
 }
 
 const initialState: ProductState = {
@@ -82,24 +117,16 @@ const initialState: ProductState = {
   loading: false,
   error: null,
   searchProduct: [],
-  bestSellerIds: []
+  bestSellerProducts: [],
+  similarProducts: []
 }
 
 const productSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {
-    setBestSellers: (state, action: PayloadAction<number[]>) => {
-      state.bestSellerIds = action.payload;
-      // Persist to localStorage
-      localStorage.setItem('bestSellerIds', JSON.stringify(action.payload));
-    },
-    loadBestSellers: (state) => {
-      // Load from localStorage on app init
-      const stored = localStorage.getItem('bestSellerIds');
-      if (stored) {
-        state.bestSellerIds = JSON.parse(stored);
-      }
+    clearSimilarProducts: (state) => {
+      state.similarProducts = []
     }
   },
   extraReducers: builder => {
@@ -147,8 +174,36 @@ const productSlice = createSlice({
       state.loading = false
       state.error = action.payload as string
     })
+
+    // Best Seller Products
+    builder.addCase(fetchBestSellerProducts.pending, state => {
+      state.loading = true
+      state.error = null
+    })
+    builder.addCase(fetchBestSellerProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+      state.loading = false
+      state.bestSellerProducts = action.payload
+    })
+    builder.addCase(fetchBestSellerProducts.rejected, (state, action) => {
+      state.loading = false
+      state.error = action.payload as string
+    })
+
+    // Similar Products
+    builder.addCase(fetchSimilarProducts.pending, state => {
+      state.loading = true
+      state.error = null
+    })
+    builder.addCase(fetchSimilarProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+      state.loading = false
+      state.similarProducts = action.payload
+    })
+    builder.addCase(fetchSimilarProducts.rejected, (state, action) => {
+      state.loading = false
+      state.error = action.payload as string
+    })
   }
 })
 
-export const { setBestSellers, loadBestSellers } = productSlice.actions
+export const { clearSimilarProducts } = productSlice.actions
 export default productSlice.reducer

@@ -3,7 +3,7 @@ import { Divider } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { logout } from '../../../State/AuthSlice'
-import { useAppDispatch } from '../../../State/Store'
+import { useAppDispatch, useAppSelector } from '../../../State/Store'
 import Address from './Address'
 import OrderDetails from './OrderDetails'
 import Orders from './Orders'
@@ -14,6 +14,7 @@ const Account = () => {
   const location = useLocation()
   const dispatch = useAppDispatch()
   const { t } = useTranslation()
+  const { auth } = useAppSelector((store) => store)
 
   const menu = [
     { name: t('account.orders'), path: '/account/orders' },
@@ -32,7 +33,7 @@ const Account = () => {
   return (
     <div className="px-5 lg:px-52 min-h-screen mt-10">
       <div>
-        <h1 className="text-xl font-bold pb-5">Ngo Huu Thanh</h1>
+        <h1 className="text-xl font-bold pb-5">{auth.user?.fullName}</h1>
       </div>
       <Divider />
       <div className="grid grid-cols-1 lg:grid-cols-3 lg:min-h-[78vh]">

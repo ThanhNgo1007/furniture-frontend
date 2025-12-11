@@ -25,7 +25,6 @@ import Wishlist from './customer/Wishlist/Wishlist'
 import './index.css'
 import SellerDashboard from './seller/pages/SellerDashboard/SellerDashboard'
 import { fetchUserProfile } from './State/AuthSlice'
-import { loadBestSellers } from './State/customer/ProductSlice'
 import { fetchSellerProfile } from './State/seller/sellerSlice'
 import { useAppDispatch, useAppSelector } from './State/Store'
 import customTheme from './theme/customTheme'
@@ -127,11 +126,6 @@ function App() {
   const seller = useAppSelector(store => store.seller);
   
   const [isInitializing, setIsInitializing] = useState(true)
-
-  // ===== LOAD BEST SELLERS FROM LOCALSTORAGE ON MOUNT =====
-  useEffect(() => {
-    dispatch(loadBestSellers());
-  }, [dispatch]);
 
   // ===== 1. LẮNG NGHE AUTO LOGOUT TỪ INTERCEPTOR =====
   useEffect(() => {

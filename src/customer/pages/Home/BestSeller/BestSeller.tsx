@@ -1,35 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useAppDispatch, useAppSelector } from '../../../../State/Store';
-import { fetchAllProducts } from '../../../../State/customer/ProductSlice';
-import type { Product } from '../../../../types/ProductTypes';
+import { fetchBestSellerProducts } from '../../../../State/customer/ProductSlice';
 import ProductCard from '../../Product/ProductCard';
 
 const BestSeller = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { products } = useAppSelector(store => store.product);
-  const [bestSellerProducts, setBestSellerProducts] = useState<Product[]>([]);
+  const { bestSellerProducts, loading } = useAppSelector(store => store.product);
 
   useEffect(() => {
-    // Fetch products sorted by discount, only need top items
-    dispatch(fetchAllProducts({ pageSize: 20, sort: 'discountPercent,desc' }));
+    // Fetch best seller products from API (sorted by sales volume)
+    dispatch(fetchBestSellerProducts(12));
   }, [dispatch]);
 
-  useEffect(() => {
-    if (products && products.length > 0) {
-      // Sort by discount percentage and take top 12
-      const sorted = [...products]
-        .sort((a, b) => b.discountPercent - a.discountPercent)
-        .slice(0, 12);
-      
-      setBestSellerProducts(sorted);
-    }
-  }, [products]);
-
-  if (bestSellerProducts.length === 0) {
+  if (loading || bestSellerProducts.length === 0) {
     return null;
   }
 
