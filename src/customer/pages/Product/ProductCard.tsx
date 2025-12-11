@@ -19,8 +19,8 @@ const ProductCard = ({ item, isBestSeller }: { item: Product; isBestSeller?: boo
   const dispatch = useAppDispatch();
   
   // Check if this product is a best seller from Redux - OPTIMIZED SELECTOR
-  const bestSellerIds = useAppSelector(store => store.product.bestSellerIds);
-  const isProductBestSeller = isBestSeller || (item.id !== undefined && bestSellerIds.includes(item.id));
+  const bestSellerProducts = useAppSelector(store => store.product.bestSellerProducts);
+  const isProductBestSeller = isBestSeller || (item.id !== undefined && bestSellerProducts.some(p => p.id === item.id));
   // 1. LẤY DANH SÁCH WISHLIST TỪ STORE (Thay vì dùng useState)
   const { wishlist } = useAppSelector(store => store.wishlist);
 
