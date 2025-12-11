@@ -26,7 +26,7 @@ export const createDeal = createAsyncThunk(
   "deals/createDeal",
   async (deal: any, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/admin/deal`, deal, {
+      const response = await api.post(`/admin/deals`, deal, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("jwt")}`
