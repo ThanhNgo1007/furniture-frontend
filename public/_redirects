@@ -1,2 +1,2 @@
-# This file is intentionally empty to overwrite any cached invalid configurations.
-# Routing is handled by _routes.json
+# SPA Fallback - Serve index.html for all routes except static assets
+/*    /index.html   200
