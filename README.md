@@ -1,73 +1,165 @@
-# React + TypeScript + Vite
+# Furniture Shop Frontend 🛋️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Giới thiệu
 
-Currently, two official plugins are available:
+**Furniture Shop Frontend** là ứng dụng web thương mại điện tử hiện đại, chuyên cung cấp các sản phẩm nội thất cao cấp. Dự án được xây dựng với mục tiêu đem lại trải nghiệm mua sắm mượt mà, trực quan và đẳng cấp cho người dùng, đồng thời cung cấp các công cụ quản lý mạnh mẽ cho nhà bán hàng.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Dự án này là phần giao diện người dùng (Client-side), được thiết kế theo kiến trúc Clean Architecture, tối ưu hóa hiệu năng và tuân thủ các quy chuẩn lập trình chuyên nghiệp. Đây là sản phẩm phù hợp để trình bày trong các buổi phỏng vấn hoặc làm đồ án chuyên sâu.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Tính năng nổi bật
 
-## Expanding the ESLint configuration
+### 🛒 Dành cho Khách hàng (Customer)
+- **Trải nghiệm mua sắm**: Tìm kiếm, lọc và xem chi tiết sản phẩm với giao diện trực quan.
+- **Giỏ hàng & Thanh toán**: Quy trình đặt hàng đơn giản, hỗ trợ quản lý giỏ hàng thông minh.
+- **Chat trực tuyến (Real-time)**: Tích hợp Widget chat (Socket.io) giúp khách hàng liên hệ trực tiếp với nhân viên hỗ trợ.
+- **Tài khoản cá nhân**: Quản lý hồ sơ, lịch sử đơn hàng và danh sách yêu thích.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 💼 Dành cho Quản trị viên & Nhà bán hàng (Admin/Seller)
+- **Dashboard quản trị**: Biểu đồ thống kê doanh thu, đơn hàng theo thời gian thực.
+- **Quản lý sản phẩm**: Thêm, sửa, xóa và cập nhật trạng thái kho hàng.
+- **Quản lý Deal & Coupon**: Tạo các chương trình khuyến mãi, mã giảm giá.
+- **Hệ thống tin nhắn**: Phản hồi tin nhắn từ khách hàng ngay trong trang quản trị.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 📸 Hình ảnh minh họa (Screenshots)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+<details>
+<summary><b>1. Trang chủ (Home Page)</b></summary>
+
+![Trang chủ](./screenshots/home-page.png)
+*(Thêm ảnh trang chủ vào đây)*
+</details>
+
+<details>
+<summary><b>2. Chi tiết sản phẩm (Product Detail)</b></summary>
+
+![Chi tiết sản phẩm](./screenshots/product-detail.png)
+*(Thêm ảnh chi tiết sản phẩm vào đây)*
+</details>
+
+<details>
+<summary><b>3. Giỏ hàng & Thanh toán (Cart & Checkout)</b></summary>
+
+![Giỏ hàng](./screenshots/cart.png)
+</details>
+
+<details>
+<summary><b>4. Admin Dashboard</b></summary>
+
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+</details>
+
+<details>
+<summary><b>5. Chat Real-time</b></summary>
+
+![Chat Feature](./screenshots/chat-widget.png)
+</details>
+
+---
+
+## 🛠️ Công nghệ sử dụng
+
+Dự án sử dụng các công nghệ tiên tiến nhất trong hệ sinh thái React:
+
+- **Core**: React 18, TypeScript, Vite (Build tool siêu tốc).
+- **State Management**: Redux Toolkit & RTK Query (Quản lý trạng thái và data fetching).
+- **Styling**: CSS Modules/Vanilla CSS (Tùy biến giao diện cao cấp), kết hợp Glassmorphism UI.
+- **Real-time**: Socket.io-client (Chat thời gian thực).
+- **Routing**: React Router v6.
+- **Deployment**: Cloudflare Pages (CI/CD tự động).
+- **Code Quality**: ESLint, Prettier.
+
+---
+
+## ⚙️ Cài đặt và Chạy dự án
+
+Để chạy dự án trên máy cục bộ, hãy làm theo các bước sau:
+
+### 1. Yêu cầu hệ thống
+- Node.js (phiên bản 18 trở lên)
+- npm hoặc yarn
+
+### 2. Clone dự án
+
+```bash
+git clone https://github.com/thanhngo1007/furniture-frontend.git
+cd furniture-frontend
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 3. Cài đặt thư viện
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+# hoặc
+yarn install
 ```
+
+### 4. Cấu hình quy biến môi trường (.env)
+
+Tạo file `.env` tại thư mục gốc của dự án (tham khảo `.env.example`) và điền các thông tin cần thiết:
+
+```env
+VITE_API_BASE_URL=http://localhost:5454
+VITE_SOCKET_URL=http://localhost:5454
+# Các key khác nếu có (Google Maps API, Cloudinary...)
+```
+
+### 5. Chạy môi trường phát triển (Development)
+
+```bash
+npm run dev
+```
+Truy cập `http://localhost:5173` để xem ứng dụng.
+
+### 6. Build production
+
+```bash
+npm run build
+```
+
+---
+
+## 📂 Cấu trúc thư mục
+
+Cấu trúc dự án được tổ chức rõ ràng, dễ bảo trì và mở rộng:
+
+```
+src/
+├── admin/               # Module dành cho trang quản trị (Admin/Seller)
+│   ├── Components/      # Các component dùng chung trong admin
+│   └── Pages/           # Các trang chính (Dashboard, Product, Deals...)
+├── customer/            # Module dành cho khách hàng
+│   ├── components/      # Component UI (Navbar, ProductCard, ChatWidget...)
+│   └── pages/           # Các trang (Home, Product Detail, Cart...)
+├── store/               # Redux Store và các Slices (Auth, Product, Cart...)
+├── config/              # Cấu hình API, Theme, Constants
+├── utils/               # Các hàm tiện ích (Format tiền tệ, Date time...)
+├── assets/              # Hình ảnh, Font chữ, Global Styles
+├── App.tsx              # Component gốc và định tuyến (Routing)
+└── main.tsx             # Entry point
+```
+
+---
+
+## 🤝 Đóng góp (Contributing)
+
+Nếu bạn muốn đóng góp cho dự án:
+1. Fork repository này.
+2. Tạo branch mới (`git checkout -b feature/tinh-nang-moi`).
+3. Commit thay đổi của bạn (`git commit -m 'Thêm tính năng mới'`).
+4. Push lên branch (`git push origin feature/tinh-nang-moi`).
+5. Tạo Pull Request.
+
+---
+
+## 📞 Liên hệ
+
+- **Tác giả**: Thanh Ngo
+- **Email**: [Email của bạn]
+- **LinkedIn/Portfolio**: [Link Profile của bạn]
+
+---
+*Dự án được thực hiện nhằm mục đích học tập và phát triển kỹ năng lập trình Fullstack.*
