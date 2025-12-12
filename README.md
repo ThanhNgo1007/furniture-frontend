@@ -8,7 +8,7 @@
 ## 🌐 Live Demo
 
 Trải nghiệm trực tiếp sản phẩm tại đây:
-👉 **[Furniture Multi-vendor E-commerce Demo](rniture-frontend.nhthanh1007.workers.dev)**  
+👉 **[Furniture Multi-vendor E-commerce Demo](Furniture-frontend.nhthanh1007.workers.dev)**  
 *(Lưu ý: Backend được deploy trên Railway nên có thể mất khoảng 1 phút để khởi động trong lần truy cập đầu tiên)*
 
 ---
