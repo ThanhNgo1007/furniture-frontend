@@ -34,33 +34,34 @@ Trải nghiệm trực tiếp sản phẩm tại đây:
 <details>
 <summary><b>1. Trang chủ (Home Page)</b></summary>
 
-![Trang chủ](./screenshots/home-page.png)
+![Trang chủ](./screenshots/CleanShot%202025-12-13%20at%2000.10.24@2x.png)
 *(Thêm ảnh trang chủ vào đây)*
 </details>
 
 <details>
 <summary><b>2. Chi tiết sản phẩm (Product Detail)</b></summary>
 
-![Chi tiết sản phẩm](./screenshots/product-detail.png)
+![Chi tiết sản phẩm](./screenshots/CleanShot%202025-12-13%20at%2000.11.07@2x.png)
 *(Thêm ảnh chi tiết sản phẩm vào đây)*
 </details>
 
 <details>
 <summary><b>3. Giỏ hàng & Thanh toán (Cart & Checkout)</b></summary>
 
-![Giỏ hàng](./screenshots/cart.png)
+![Giỏ hàng](./screenshots/CleanShot%202025-12-13%20at%2000.12.07@2x.png)
+![Thanh toán](./screenshots/CleanShot%202025-12-13%20at%2000.12.23@2x.png)
 </details>
 
 <details>
 <summary><b>4. Admin Dashboard</b></summary>
 
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+![Admin Dashboard](./screenshots/CleanShot%202025-12-13%20at%2000.12.45@2x.png)
 </details>
 
 <details>
 <summary><b>5. Chat Real-time</b></summary>
 
-![Chat Feature](./screenshots/chat-widget.png)
+![Chat Feature](./screenshots/CleanShot%202025-12-13%20at%2000.13.40@2x.png)
 </details>
 
 ---

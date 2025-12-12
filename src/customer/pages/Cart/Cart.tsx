@@ -4,6 +4,7 @@
 import { Close } from '@mui/icons-material'
 import { Button, IconButton, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { fetchUserCart } from '../../../State/customer/cartSlice'
 import { applyCoupon } from '../../../State/customer/couponSlice'; // Import action applyCoupon
@@ -12,6 +13,7 @@ import CartItemCard from './CartItemCard'
 import PricingCard from './PricingCard'
 
 const Cart = () => {
+    const { t } = useTranslation();
     const [couponCode, setCouponCode] = useState<string>("");
     const [errorMessage, setErrorMessage] = useState<string>(""); // State lưu lỗi
     
@@ -86,20 +88,20 @@ const Cart = () => {
 
     // ... (Logic kiểm tra giỏ hàng rỗng giữ nguyên)
     if (loading && !cart) {
-        return <div className="h-[80vh] flex justify-center items-center">Loading cart...</div>
+        return <div className="h-[80vh] flex justify-center items-center">{t('cartExtra.loadingCart')}</div>
     }
     if (!cart || !cart.cartItemsInBag || cart.cartItemsInBag.length === 0) {
         return (
             <div className="flex flex-col justify-center items-center h-[80vh]">
                 <h1 className="text-2xl font-bold text-gray-500 mb-5">
-                    Your Cart is empty. Add Product to buy
+                    {t('cart.empty')}
                 </h1>
                 <Button 
                     variant="contained" 
                     onClick={() => navigate('/')}
                     sx={{ bgcolor: '#E27E6A', padding: '10px 30px' }}
                 >
-                    Shop Now
+                    {t('cart.shopNow')}
                 </Button>
             </div>
         )
@@ -128,11 +130,11 @@ const Cart = () => {
                         <div className='mt-6 space-y-3'>
                             <div className='bg-gray-200 px-4 py-2 rounded-md'>
                                 <h2 className='text-gray-700 font-semibold'>
-                                    Sản phẩm không khả dụng ({unavailableItems.length})
-                                </h2>
-                                <p className='text-sm text-gray-500'>
-                                    Những sản phẩm này đã hết hàng hoặc ngừng bán
-                                </p>
+                                {t('cartExtra.unavailableCount', { count: unavailableItems.length })}
+                            </h2>
+                            <p className='text-sm text-gray-500'>
+                                {t('cartExtra.unavailableDesc')}
+                            </p>
                             </div>
                             {unavailableItems.map((item) => (
                                 <CartItemCard key={item.id} item={item} isUnavailable={true}/>
@@ -146,7 +148,7 @@ const Cart = () => {
                     <div className='border rounded-md px-5 py-3 space-y-5 border-gray-200'>
                         <div className='flex gap-3 text-sm items-center'>
                              <div className='flex gap-3 text-sm items-center'>
-                                <p className='font-bold min-w-[fit-content] text-lg'>Coupon</p>
+                                <p className='font-bold min-w-[fit-content] text-lg'>{t('cart.coupon')}</p>
                             </div>
                         </div>
 
@@ -170,7 +172,7 @@ const Cart = () => {
                                         onClick={handleApplyCoupon}
                                         disabled={!couponCode}
                                     >
-                                        Apply
+                                        {t('cart.applyCoupon')}
                                     </Button>
                                 </div>
                                 {/* Hiển thị dòng lỗi */}
@@ -182,7 +184,7 @@ const Cart = () => {
                             <div className='flex'>
                                 <div className='p-1 pl-5 pr-3 border border-green-200 bg-green-50 rounded-md flex gap-2 items-center justify-between w-full'>
                                     <span className='text-green-700 font-medium'>
-                                        {cart.couponCode} Applied
+                                        {cart.couponCode} {t('cart.applied')}
                                     </span>
                                     <IconButton size="small" onClick={handleRemoveCoupon}>
                                         <Close className='text-red-600'/>
@@ -202,7 +204,7 @@ const Cart = () => {
                                 fullWidth
                                 variant='contained' 
                                 sx={{py: "15px", fontSize: "16px"}}>
-                                Buy now
+                                {t('cart.buyNow')}
                             </Button>
                         </div>
                     </div>

@@ -125,12 +125,12 @@ const CartItemCard = ({ item, isUnavailable = false }: CartItemCardProps) => {
             </div>
         </div>
 
-        <div className='absolute top-1 right-1 z-20'>
+        <div className='absolute top-1 right-1'>
             <IconButton 
                 color='error' 
                 onClick={handleRemoveCartItem}
             >
-                <Close/>
+                <Close />
             </IconButton>
         </div>
 

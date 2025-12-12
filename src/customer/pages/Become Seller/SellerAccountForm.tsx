@@ -1,6 +1,7 @@
 import { Button, Step, StepLabel, Stepper } from '@mui/material';
 import { useFormik } from 'formik';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 import BecomeSellerFormStep1 from './BecomeSellerFormStep1';
 import BecomeSellerFormStep2 from './BecomeSellerFormStep2';
@@ -11,63 +12,64 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../State/Store';
 import { registerSeller } from '../../../State/seller/sellerAuthSlice';
 
-const steps = [
-    'Tax Details & Mobile', 
-    'Pickup Address', 
-    'Bank Information', 
-    'Supplier Info'
-];
-
-const validationSchemas = [
-    // Step 0: Tax & Mobile
-    Yup.object({
-        MST: Yup.string().required('Tax ID (MST) is required'),
-        mobile: Yup.string()
-            .required('Mobile number is required')
-            .matches(/^[0-9]{10}$/, 'Mobile number must be exactly 10 digits'),
-    }),
-    // Step 1: Pickup Address
-    Yup.object({
-        pickupAddress: Yup.object({
-            name: Yup.string().required('Name is required'),
-            mobile: Yup.string()
-                .required('Mobile number is required')
-                .matches(/^[0-9]{10}$/, 'Mobile number must be exactly 10 digits'),
-            pinCode: Yup.string()
-                .required('Pin code is required')
-                .matches(/^[0-9]{5}$/, 'Pin code must be exactly 5 digits'),
-            address: Yup.string().required('Address is required'),
-            city: Yup.string().required('City/Province is required'),
-            ward: Yup.string().required('Ward is required'),
-            locality: Yup.string().required('District is required'),
-        }),
-    }),
-    // Step 2: Bank Info
-    Yup.object({
-        bankDetails: Yup.object({
-            accountNumber: Yup.string().required('Account number is required'),
-            accountHolderName: Yup.string().required('Account holder name is required'),
-            swiftCode: Yup.string().required('IFSC/SWIFT code is required'),
-        }),
-    }),
-    // Step 3: Supplier Info
-    Yup.object({
-        sellerName: Yup.string().required('Seller name is required'),
-        email: Yup.string().email('Invalid email').required('Email is required'),
-        password: Yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
-        businessDetails: Yup.object({
-            businessName: Yup.string().required('Business name is required'),
-            businessEmail: Yup.string().email('Invalid email').required('Business email is required'),
-            businessMobile: Yup.string().required('Business mobile is required'),
-            businessAddress: Yup.string().required('Business address is required'),
-        }),
-    }),
-];
-
 const SellerAccountForm = () => {
+    const { t } = useTranslation();
     const [activeStep, setActiveStep] = useState(0);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    
+    const steps = [
+        t('becomeSeller.steps.taxMobile'), 
+        t('becomeSeller.steps.pickupAddress'), 
+        t('becomeSeller.steps.bankInfo'), 
+        t('becomeSeller.steps.supplierInfo')
+    ];
+    
+    const validationSchemas = [
+        // Step 0: Tax & Mobile
+        Yup.object({
+            MST: Yup.string().required(t('becomeSeller.validation.mstRequired')),
+            mobile: Yup.string()
+                .required(t('becomeSeller.validation.mobileRequired'))
+                .matches(/^[0-9]{10}$/, t('becomeSeller.validation.mobileFormat')),
+        }),
+        // Step 1: Pickup Address
+        Yup.object({
+            pickupAddress: Yup.object({
+                name: Yup.string().required(t('becomeSeller.validation.nameRequired')),
+                mobile: Yup.string()
+                    .required(t('becomeSeller.validation.mobileRequired'))
+                    .matches(/^[0-9]{10}$/, t('becomeSeller.validation.mobileFormat')),
+                pinCode: Yup.string()
+                    .required(t('becomeSeller.validation.pinCodeRequired'))
+                    .matches(/^[0-9]{5}$/, t('becomeSeller.validation.pinCodeFormat')),
+                address: Yup.string().required(t('becomeSeller.validation.addressRequired')),
+                city: Yup.string().required(t('becomeSeller.validation.cityRequired')),
+                ward: Yup.string().required(t('becomeSeller.validation.wardRequired')),
+                locality: Yup.string().required(t('becomeSeller.validation.districtRequired')),
+            }),
+        }),
+        // Step 2: Bank Info
+        Yup.object({
+            bankDetails: Yup.object({
+                accountNumber: Yup.string().required(t('becomeSeller.validation.accountNumberRequired')),
+                accountHolderName: Yup.string().required(t('becomeSeller.validation.accountHolderRequired')),
+                swiftCode: Yup.string().required(t('becomeSeller.validation.swiftRequired')),
+            }),
+        }),
+        // Step 3: Supplier Info
+        Yup.object({
+            sellerName: Yup.string().required(t('becomeSeller.validation.sellerNameRequired')),
+            email: Yup.string().email(t('becomeSeller.validation.emailInvalid')).required(t('becomeSeller.validation.emailRequired')),
+            password: Yup.string().required(t('becomeSeller.validation.passwordRequired')).min(6, t('becomeSeller.validation.passwordMin')),
+            businessDetails: Yup.object({
+                businessName: Yup.string().required(t('becomeSeller.validation.businessNameRequired')),
+                businessEmail: Yup.string().email(t('becomeSeller.validation.emailInvalid')).required(t('becomeSeller.validation.businessEmailRequired')),
+                businessMobile: Yup.string().required(t('becomeSeller.validation.businessMobileRequired')),
+                businessAddress: Yup.string().required(t('becomeSeller.validation.businessAddressRequired')),
+            }),
+        }),
+    ];
     
     // Khởi tạo Formik
     const formik = useFormik({
@@ -190,10 +192,10 @@ const SellerAccountForm = () => {
             
             <div className='flex items-center justify-between'>
                 <Button sx={{color: "white"}} onClick={handleStep(-1)} variant='contained' disabled={activeStep === 0}>
-                    Back
+                    {t('becomeSeller.buttons.back')}
                 </Button>
                 <Button sx={{color: "white"}} onClick={handleStep(1)} variant='contained'>
-                    {activeStep === steps.length - 1 ? "Create Account" : "Next"}
+                    {activeStep === steps.length - 1 ? t('becomeSeller.buttons.createAccount') : t('becomeSeller.buttons.next')}
                 </Button>
             </div>
         </section>

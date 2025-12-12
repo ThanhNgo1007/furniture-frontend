@@ -4,6 +4,7 @@
 import { Add } from '@mui/icons-material';
 import { Box, Button, FormControlLabel, Modal, Radio, RadioGroup } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../../State/Store'; // Import useAppSelector
 import { fetchUserCart } from '../../../State/customer/cartSlice';
@@ -37,6 +38,7 @@ const paymentGatewayList = [
 ]
 
 const Checkout = () => {
+    const { t } = useTranslation();
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -79,7 +81,7 @@ const Checkout = () => {
             });
             // ---------------------
         } else {
-            alert("Please select an address first!");
+            alert(t('checkoutExtra.selectAddressAlert'));
         }
     }
 
@@ -104,13 +106,13 @@ const Checkout = () => {
                 <div className="space-y-5 lg:space-y-0 lg:grid grid-cols-3 lg:gap-9">
                     <div className="col-span-2 space-y-5">
                         <div className="flex justify-between items-center">
-                            <h1 className='font-semibold text-lg'>Select Address</h1>
+                            <h1 className='font-semibold text-lg'>{t('checkoutExtra.selectAddress')}</h1>
                             <Button variant='outlined' color='success' onClick={handleOpen}>
-                                Add new address
+                                {t('checkoutExtra.addNewAddress')}
                             </Button>
                         </div>
                         <div className='text-md font-medium space-y-5'>
-                            <p>Saved Addresses</p>
+                            <p>{t('checkoutExtra.savedAddresses')}</p>
                             <div className='space-y-3'>
                                 {/* Hiển thị danh sách địa chỉ thực tế của User */}
                                 {auth.user?.addresses?.map((item: any, index: number) => (
@@ -135,20 +137,20 @@ const Checkout = () => {
                                 
                                 {/* Fallback nếu chưa có địa chỉ nào */}
                                 {(!auth.user?.addresses || auth.user?.addresses.length === 0) && (
-                                    <p className="text-gray-500 text-center">No addresses found. Please add one.</p>
+                                    <p className="text-gray-500 text-center">{t('checkoutExtra.noAddresses')}</p>
                                 )}
                             </div>
                         </div>
                         <div className='py-4 px-6 rounded-md border border-gray-200'>
                             <Button onClick={handleOpen} color='success'>
-                                <Add /> Add new address
+                                <Add /> {t('checkoutExtra.addNewAddress')}
                             </Button>
                         </div>
                     </div>
                     <div>
                         <div>
                             <div className='space-y-3 p-5 border border-gray-200 rounded-md'>
-                                <h1 className='font-medium pb-2 text-center'>Choose Payment Gateway</h1>
+                                <h1 className='font-medium pb-2 text-center'>{t('checkoutExtra.choosePayment')}</h1>
                                 <RadioGroup
                                     row
                                     aria-labelledby="demo-row-radio-buttons-group-label"
@@ -182,7 +184,7 @@ const Checkout = () => {
                                     sx={{ py: "15px" }}
                                     disabled={!selectedAddress} // Disable nút nếu chưa chọn địa chỉ
                                 >
-                                    Check out
+                                    {t('checkoutExtra.checkoutBtn')}
                                 </Button>
                             </div>
                         </div>

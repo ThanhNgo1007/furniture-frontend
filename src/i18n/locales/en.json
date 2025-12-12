@@ -14,18 +14,6 @@
     "cart": "Shopping Cart",
     "start": "Start selling today"
   },
-  "footer": {
-    "about": "About Aptdeco",
-    "works": "How Aptdeco Works",
-    "reviews": "Reviews",
-    "blog": "Blog",
-    "sell": "Sell on AptDeco",
-    "rights": "APTDECO, INC. ALL RIGHTS RESERVED",
-    "privacy": "PRIVACY",
-    "terms": "TERMS AND CONDITIONS",
-    "contact": "Contact Us"
-    
-  },
   "decor": {
     "name": "Decor", 
     "accentpillow": "Accent Pillows",
@@ -324,5 +312,109 @@
     "privacy": "PRIVACY",
     "terms": "TERMS AND CONDITIONS"
   },
-  "discount_more": "{{value}}% or more"
+  "discount_more": "{{value}}% or more",
+  "becomeSeller": {
+    "title": "Become a Seller",
+    "joinBusiness": "Join AptDeco Business",
+    "boostSales": "Boost your sales today with our professional tools.",
+    "noAccount": "Don't have a seller account?",
+    "haveAccount": "Already have a seller account?",
+    "registerAsSeller": "Register as Seller",
+    "loginAsSeller": "Login as Seller",
+    "steps": {
+      "taxMobile": "Tax Details & Mobile",
+      "pickupAddress": "Pickup Address",
+      "bankInfo": "Bank Information",
+      "supplierInfo": "Supplier Info"
+    },
+    "buttons": {
+      "back": "Back",
+      "next": "Next",
+      "createAccount": "Create Account"
+    },
+    "step1": {
+      "title": "Contact Details",
+      "mobile": "Mobile",
+      "mst": "Tax ID (MST)"
+    },
+    "step2": {
+      "title": "Pickup Details",
+      "name": "Name",
+      "mobileNumber": "Mobile Number",
+      "pinCode": "Pin Code",
+      "province": "Province/City",
+      "district": "District",
+      "ward": "Ward",
+      "streetAddress": "Street Address (House No, Building, Street)"
+    },
+    "step3": {
+      "title": "Bank Details",
+      "accountNumber": "Account Number",
+      "swiftCode": "SWIFT Code",
+      "accountHolderName": "Account Holder Name"
+    },
+    "step4": {
+      "businessName": "Business Name",
+      "businessMobile": "Business Mobile",
+      "businessEmail": "Business Email",
+      "fullAddress": "Full Business Address (Auto-generated)",
+      "sellerName": "Seller Name",
+      "accountEmail": "Account Email (Login)",
+      "password": "Password"
+    },
+    "validation": {
+      "mstRequired": "Tax ID (MST) is required",
+      "mobileRequired": "Mobile number is required",
+      "mobileFormat": "Mobile number must be exactly 10 digits",
+      "nameRequired": "Name is required",
+      "pinCodeRequired": "Pin code is required",
+      "pinCodeFormat": "Pin code must be exactly 5 digits",
+      "addressRequired": "Address is required",
+      "cityRequired": "City/Province is required",
+      "wardRequired": "Ward is required",
+      "districtRequired": "District is required",
+      "accountNumberRequired": "Account number is required",
+      "accountHolderRequired": "Account holder name is required",
+      "swiftRequired": "IFSC/SWIFT code is required",
+      "sellerNameRequired": "Seller name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email",
+      "passwordRequired": "Password is required",
+      "passwordMin": "Password must be at least 6 characters",
+      "businessNameRequired": "Business name is required",
+      "businessEmailRequired": "Business email is required",
+      "businessMobileRequired": "Business mobile is required",
+      "businessAddressRequired": "Business address is required"
+    }
+  },
+  "sellerLogin": {
+    "title": "Seller Login",
+    "subtitle": "Access your seller dashboard",
+    "email": "Email Address",
+    "emailInvalid": "Please enter a valid email address.",
+    "sendOtp": "Send OTP",
+    "resendOtp": "Resend OTP",
+    "resendIn": "Resend OTP in {{seconds}}s",
+    "otpSent": "Enter the 6-digit OTP sent to your email",
+    "otpCode": "OTP Code",
+    "verifyLogin": "Verify & Login",
+    "otpExpired": "OTP has expired. Please resend or change email.",
+    "changeEmail": "Change Email",
+    "loginFailed": "Login Failed"
+  },
+  "cartExtra": {
+    "unavailableTitle": "Unavailable Products",
+    "unavailableCount": "Unavailable Products ({{count}})",
+    "unavailableDesc": "These products are out of stock or discontinued",
+    "loadingCart": "Loading cart..."
+  },
+  "checkoutExtra": {
+    "selectAddress": "Select Address",
+    "addNewAddress": "Add new address",
+    "savedAddresses": "Saved Addresses",
+    "noAddresses": "No addresses found. Please add one.",
+    "choosePayment": "Choose Payment Gateway",
+    "checkoutBtn": "Check out",
+    "selectAddressAlert": "Please select an address first!"
+  }
 }

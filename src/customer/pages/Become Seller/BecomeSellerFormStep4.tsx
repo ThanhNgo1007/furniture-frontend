@@ -1,12 +1,14 @@
 import { Autocomplete, Grid, TextField } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface BecomeSellerFormStep4Props {
   formik: any;
 }
 
 const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
+  const { t } = useTranslation();
   const [provinces, setProvinces] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [wards, setWards] = useState<any[]>([]);
@@ -102,7 +104,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
       <TextField
         fullWidth
         name="businessDetails.businessName"
-        label="Business Name"
+        label={t('becomeSeller.step4.businessName')}
         value={formik.values.businessDetails.businessName}
         onChange={formik.handleChange}
         error={
@@ -119,7 +121,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
       <TextField
         fullWidth
         name="businessDetails.businessMobile"
-        label="Business Mobile"
+        label={t('becomeSeller.step4.businessMobile')}
         value={formik.values.businessDetails.businessMobile}
         onChange={formik.handleChange}
         error={
@@ -136,7 +138,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
       <TextField
         fullWidth
         name="businessDetails.businessEmail"
-        label="Business Email"
+        label={t('becomeSeller.step4.businessEmail')}
         value={formik.values.businessDetails.businessEmail}
         onChange={formik.handleChange}
         error={
@@ -160,7 +162,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
                 renderInput={(params) => (
                     <TextField
                         {...params}
-                        label="Province/City"
+                        label={t('becomeSeller.step2.province')}
                         error={formik.touched.businessDetails?.businessAddress && !selectedProvince}
                     />
                 )}
@@ -176,7 +178,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
                 renderInput={(params) => (
                     <TextField
                         {...params}
-                        label="District"
+                        label={t('becomeSeller.step2.district')}
                         error={formik.touched.businessDetails?.businessAddress && !selectedDistrict}
                     />
                 )}
@@ -192,7 +194,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
                 renderInput={(params) => (
                     <TextField
                         {...params}
-                        label="Ward"
+                        label={t('becomeSeller.step2.ward')}
                         error={formik.touched.businessDetails?.businessAddress && !selectedWard}
                     />
                 )}
@@ -201,7 +203,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
           <Grid size={{xs:12}}>
             <TextField
                 fullWidth
-                label="Street Address"
+                label={t('becomeSeller.step2.streetAddress')}
                 value={streetAddress}
                 onChange={handleStreetChange}
                 error={formik.touched.businessDetails?.businessAddress && !streetAddress}
@@ -214,7 +216,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
       <TextField
         fullWidth
         name="businessDetails.businessAddress"
-        label="Full Business Address (Auto-generated)"
+        label={t('becomeSeller.step4.fullAddress')}
         value={formik.values.businessDetails.businessAddress}
         InputProps={{
             readOnly: true,
@@ -233,7 +235,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
       <TextField
         fullWidth
         name="sellerName"
-        label="Seller Name"
+        label={t('becomeSeller.step4.sellerName')}
         value={formik.values.sellerName}
         onChange={formik.handleChange}
         error={formik.touched.sellerName && Boolean(formik.errors.sellerName)}
@@ -244,7 +246,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
       <TextField
         fullWidth
         name="email"
-        label="Account Email (Login)"
+        label={t('becomeSeller.step4.accountEmail')}
         value={formik.values.email}
         onChange={formik.handleChange}
         error={formik.touched.email && Boolean(formik.errors.email)}
@@ -255,7 +257,7 @@ const BecomeSellerFormStep4 = ({ formik }: BecomeSellerFormStep4Props) => {
       <TextField
         fullWidth
         name="password"
-        label="Password"
+        label={t('becomeSeller.step4.password')}
         type="password"
         value={formik.values.password}
         onChange={formik.handleChange}

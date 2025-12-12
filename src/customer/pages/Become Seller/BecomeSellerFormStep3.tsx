@@ -1,16 +1,19 @@
 import { TextField } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface BecomeSellerFormStep3Props {
   formik: any;
 }
 
 const BecomeSellerFormStep3 = ({ formik }: BecomeSellerFormStep3Props) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="space-y-5 flex flex-col gap-5 mb-4">
       <TextField
         fullWidth
         name="bankDetails.accountNumber"
-        label="Account Number"
+        label={t('becomeSeller.step3.accountNumber')}
         value={formik.values.bankDetails.accountNumber}
         onChange={formik.handleChange}
         
@@ -27,7 +30,7 @@ const BecomeSellerFormStep3 = ({ formik }: BecomeSellerFormStep3Props) => {
       <TextField
         fullWidth
         name="bankDetails.swiftCode"
-        label="SWIFT Code"
+        label={t('becomeSeller.step3.swiftCode')}
         value={formik.values.bankDetails.swiftCode}
         onChange={formik.handleChange}
         
@@ -44,7 +47,7 @@ const BecomeSellerFormStep3 = ({ formik }: BecomeSellerFormStep3Props) => {
       <TextField
         fullWidth
         name="bankDetails.accountHolderName"
-        label="Account Holder Name"
+        label={t('becomeSeller.step3.accountHolderName')}
         value={formik.values.bankDetails.accountHolderName}
         onChange={formik.handleChange}
         

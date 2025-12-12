@@ -1,17 +1,20 @@
-import { Box, TextField } from '@mui/material'
+import { Box, TextField } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const BecomSellerFormStep1 = ({formik}:any) => {
+  const { t } = useTranslation();
+  
   return (
     <Box>
         <p className='text-xl font-bold text-center pb-9'>
-            Contact Details
+            {t('becomeSeller.step1.title')}
         </p>
       <div className='space-y-9 '>
 
         <TextField
                     fullWidth
                     name="mobile"
-                    label="Mobile"
+                    label={t('becomeSeller.step1.mobile')}
                     value={formik.values.mobile}
                     onChange={formik.handleChange}
                     error={formik.touched.mobile && Boolean(formik.errors.mobile)}
@@ -22,7 +25,7 @@ const BecomSellerFormStep1 = ({formik}:any) => {
         <TextField
                     fullWidth
                     name="MST"
-                    label="MST"
+                    label={t('becomeSeller.step1.mst')}
                     value={formik.values.MST}
                     onChange={formik.handleChange}
                     error={formik.touched.MST && Boolean(formik.errors.MST)}

@@ -1,8 +1,10 @@
 import { Autocomplete, Box, Grid, TextField } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const BecomeSellerFormStep2 = ({ formik }: any) => {
+    const { t } = useTranslation();
     const [provinces, setProvinces] = useState<any[]>([]);
     const [districts, setDistricts] = useState<any[]>([]);
     const [wards, setWards] = useState<any[]>([]);
@@ -62,14 +64,14 @@ const BecomeSellerFormStep2 = ({ formik }: any) => {
 
     return (
         <Box>
-            <p className='text-xl font-bold text-center pb-5'>Pickup Details</p>
+            <p className='text-xl font-bold text-center pb-5'>{t('becomeSeller.step2.title')}</p>
             <form onSubmit={formik.handleSubmit}>
                 <Grid container spacing={3}>
                     <Grid size={{xs:12}}>
                         <TextField
                             fullWidth
                             name="pickupAddress.name"
-                            label="Name"
+                            label={t('becomeSeller.step2.name')}
                             value={formik.values.pickupAddress.name}
                             onChange={formik.handleChange}
                             error={formik.touched.pickupAddress?.name && Boolean(formik.errors.pickupAddress?.name)}
@@ -80,7 +82,7 @@ const BecomeSellerFormStep2 = ({ formik }: any) => {
                         <TextField
                             fullWidth
                             name="pickupAddress.mobile"
-                            label="Mobile Number"
+                            label={t('becomeSeller.step2.mobileNumber')}
                             value={formik.values.pickupAddress.mobile}
                             onChange={formik.handleChange}
                             error={formik.touched.pickupAddress?.mobile && Boolean(formik.errors.pickupAddress?.mobile)}
@@ -92,7 +94,7 @@ const BecomeSellerFormStep2 = ({ formik }: any) => {
                         <TextField
                             fullWidth
                             name="pickupAddress.pinCode"
-                            label="Pin Code"
+                            label={t('becomeSeller.step2.pinCode')}
                             value={formik.values.pickupAddress.pinCode}
                             onChange={formik.handleChange}
                             error={formik.touched.pickupAddress?.pinCode && Boolean(formik.errors.pickupAddress?.pinCode)}
@@ -110,7 +112,7 @@ const BecomeSellerFormStep2 = ({ formik }: any) => {
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label="Province/City"
+                                    label={t('becomeSeller.step2.province')}
                                     error={formik.touched.pickupAddress?.city && Boolean(formik.errors.pickupAddress?.city)}
                                     helperText={formik.touched.pickupAddress?.city && formik.errors.pickupAddress?.city}
                                 />
@@ -127,7 +129,7 @@ const BecomeSellerFormStep2 = ({ formik }: any) => {
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label="District"
+                                    label={t('becomeSeller.step2.district')}
                                     error={formik.touched.pickupAddress?.locality && Boolean(formik.errors.pickupAddress?.locality)}
                                     helperText={formik.touched.pickupAddress?.locality && formik.errors.pickupAddress?.locality}
                                 />
@@ -144,7 +146,7 @@ const BecomeSellerFormStep2 = ({ formik }: any) => {
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
-                                    label="Ward"
+                                    label={t('becomeSeller.step2.ward')}
                                     error={formik.touched.pickupAddress?.ward && Boolean(formik.errors.pickupAddress?.ward)}
                                     helperText={formik.touched.pickupAddress?.ward && formik.errors.pickupAddress?.ward}
                                 />
@@ -156,7 +158,7 @@ const BecomeSellerFormStep2 = ({ formik }: any) => {
                         <TextField
                             fullWidth
                             name="pickupAddress.address"
-                            label="Street Address (House No, Building, Street)"
+                            label={t('becomeSeller.step2.streetAddress')}
                             value={formik.values.pickupAddress.address}
                             onChange={formik.handleChange}
                             error={formik.touched.pickupAddress?.address && Boolean(formik.errors.pickupAddress?.address)}

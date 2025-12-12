@@ -3,12 +3,14 @@
 import { Button, CircularProgress, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react'; // Import useEffect
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { sendLoginSignupOtp } from '../../../State/AuthSlice';
 import { useAppDispatch } from '../../../State/Store';
 import { sellerLogin } from '../../../State/seller/sellerAuthSlice';
 
 const SellerLoginForm = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
 
@@ -41,7 +43,7 @@ const SellerLoginForm = () => {
         navigate('/seller')
       } catch (error: any) {
         // Hiển thị message từ backend (bao gồm cả thông báo chưa verify)
-        const errorMsg = typeof error === 'string' ? error : (error?.message || 'Login Failed');
+        const errorMsg = typeof error === 'string' ? error : (error?.message || t('sellerLogin.loginFailed'));
         setFieldError('otp', errorMsg) 
       } finally {
         setSubmitting(false)
@@ -52,7 +54,7 @@ const SellerLoginForm = () => {
   const handleSendOtp = async () => {
     const emailRegex = /^\S+@\S+\.\S+$/
     if (!formik.values.email || !emailRegex.test(formik.values.email)) {
-      formik.setFieldError('email', 'Please enter a valid email address.')
+      formik.setFieldError('email', t('sellerLogin.emailInvalid'))
       return
     }
 
@@ -81,16 +83,16 @@ const SellerLoginForm = () => {
     <div>
       <div className="mb-8">
         <h1 className="text-center font-bold text-3xl text-teal-600 pb-3">
-          Seller Login
+          {t('sellerLogin.title')}
         </h1>
-        <p className="text-center text-gray-500 text-base">Access your seller dashboard</p>
+        <p className="text-center text-gray-500 text-base">{t('sellerLogin.subtitle')}</p>
       </div>
 
       <form className="space-y-8" onSubmit={formik.handleSubmit}>
         <TextField
           fullWidth
           name="email"
-          label="Email Address"
+          label={t('sellerLogin.email')}
           variant="outlined"
           value={formik.values.email}
           onChange={formik.handleChange}
@@ -126,9 +128,9 @@ const SellerLoginForm = () => {
                     {isSendingOtp ? (
                         <CircularProgress size={24} color="inherit" />
                     ) : timer > 0 ? (
-                        `Resend OTP in ${timer}s`
+                        t('sellerLogin.resendIn', { seconds: timer })
                     ) : (
-                        'Send OTP'
+                        t('sellerLogin.sendOtp')
                     )}
                 </Button>
             </div>
@@ -140,7 +142,7 @@ const SellerLoginForm = () => {
                 <>
                     <div className="bg-teal-50 p-4 rounded-lg border border-teal-100 text-center">
                     <p className="font-medium text-base text-teal-800">
-                        Enter the 6-digit OTP sent to your email
+                        {t('sellerLogin.otpSent')}
                     </p>
                     </div>
 
@@ -148,7 +150,7 @@ const SellerLoginForm = () => {
                     fullWidth
                     id="otp"
                     name="otp"
-                    label="OTP Code"
+                    label={t('sellerLogin.otpCode')}
                     value={formik.values.otp}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
@@ -191,7 +193,7 @@ const SellerLoginForm = () => {
                         {formik.isSubmitting ? (
                             <CircularProgress size={24} color="inherit" />
                         ) : (
-                            'Verify & Login'
+                            t('sellerLogin.verifyLogin')
                         )}
                         </Button>
                     </div>
@@ -199,7 +201,7 @@ const SellerLoginForm = () => {
             ) : (
                 <div className="flex flex-col gap-4 pt-4">
                     <div className="text-center text-red-500 text-base font-medium mb-2">
-                        OTP has expired. Please resend or change email.
+                        {t('sellerLogin.otpExpired')}
                     </div>
                     <Button
                         onClick={handleSendOtp}
@@ -215,7 +217,7 @@ const SellerLoginForm = () => {
                             fontWeight: 600
                         }}
                     >
-                        Resend OTP
+                        {t('sellerLogin.resendOtp')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -235,7 +237,7 @@ const SellerLoginForm = () => {
                             '&:hover': { borderColor: '#0f766e', bgcolor: 'rgba(13, 148, 136, 0.04)' }
                         }}
                     >
-                        Change Email
+                        {t('sellerLogin.changeEmail')}
                     </Button>
                 </div>
             )}

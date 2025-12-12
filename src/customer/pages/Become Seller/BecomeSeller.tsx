@@ -1,10 +1,12 @@
 import { Button } from '@mui/material';
 import { useEffect, useState } from 'react'; // Import useEffect
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom'; // Import useLocation
 import SellerAccountForm from './SellerAccountForm';
 import SellerLoginForm from './SellerLoginForm';
 
 const BecomeSeller = () => {
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(false)
   const location = useLocation(); // Hook để lấy dữ liệu truyền qua navigate
 
@@ -30,7 +32,7 @@ const BecomeSeller = () => {
 
             <div className="mt-8 pt-5 border-t border-gray-100 text-center space-y-2">
               <h1 className="text-sm font-medium text-gray-500">
-                {isLogin ? "Don't have a seller account?" : "Already have a seller account?"}
+                {isLogin ? t('becomeSeller.noAccount') : t('becomeSeller.haveAccount')}
               </h1>
               <Button
                 onClick={handleShowPage}
@@ -49,7 +51,7 @@ const BecomeSeller = () => {
                   }
                 }}
               >
-                {isLogin ? 'Register as Seller' : 'Login as Seller'}
+                {isLogin ? t('becomeSeller.registerAsSeller') : t('becomeSeller.loginAsSeller')}
               </Button>
             </div>
           </div>
@@ -66,8 +68,8 @@ const BecomeSeller = () => {
             
             <div className="absolute bottom-0 left-0 p-10 text-white z-10 space-y-4">
               <div className="space-y-2">
-                <p className="text-4xl font-bold leading-tight">Join AptDeco Business</p>
-                <p className="text-xl text-teal-100 font-light">Boost your sales today with our professional tools.</p>
+                <p className="text-4xl font-bold leading-tight">{t('becomeSeller.joinBusiness')}</p>
+                <p className="text-xl text-teal-100 font-light">{t('becomeSeller.boostSales')}</p>
               </div>
               <div className="flex gap-2 pt-4">
                  <div className="h-1 w-10 bg-white rounded-full"></div>
