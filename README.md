@@ -1,18 +1,15 @@
-# Furniture Shop Frontend 🛋️
+# Furniture Multi-vendor E-commerce Frontend 🛋️
 
 ## Giới thiệu
 
-**Furniture Shop Frontend** là ứng dụng web thương mại điện tử hiện đại, chuyên cung cấp các sản phẩm nội thất cao cấp. Dự án được xây dựng với mục tiêu đem lại trải nghiệm mua sắm mượt mà, trực quan và đẳng cấp cho người dùng, đồng thời cung cấp các công cụ quản lý mạnh mẽ cho nhà bán hàng.
-
-Dự án này là phần giao diện người dùng (Client-side), được thiết kế theo kiến trúc Clean Architecture, tối ưu hóa hiệu năng và tuân thủ các quy chuẩn lập trình chuyên nghiệp. Đây là sản phẩm phù hợp để trình bày trong các buổi phỏng vấn hoặc làm đồ án chuyên sâu.
-
+**Furniture Multi-vendor E-commerce Frontend** là ứng dụng web nền tảng thương mại điện tử mua bán nội thất với thiết kế hiện đại sử dụng ReactJS, TypeScript, TailwindCSS và MUI hiện đại. Đây là phần giao diện Client-side của hệ thống.
 ---
 
 ## 🌐 Live Demo
 
 Trải nghiệm trực tiếp sản phẩm tại đây:
-👉 **[Furniture Shop Demo](https://furniture-frontend.pages.dev)**  
-*(Lưu ý: Backend được deploy trên Render/Heroku nên có thể mất khoảng 30s để khởi động trong lần truy cập đầu tiên)*
+👉 **[Furniture Multi-vendor E-commerce Demo](rniture-frontend.nhthanh1007.workers.dev)**  
+*(Lưu ý: Backend được deploy trên Railway nên có thể mất khoảng 1 phút để khởi động trong lần truy cập đầu tiên)*
 
 ---
 
@@ -21,7 +18,7 @@ Trải nghiệm trực tiếp sản phẩm tại đây:
 ### 🛒 Dành cho Khách hàng (Customer)
 - **Trải nghiệm mua sắm**: Tìm kiếm, lọc và xem chi tiết sản phẩm với giao diện trực quan.
 - **Giỏ hàng & Thanh toán**: Quy trình đặt hàng đơn giản, hỗ trợ quản lý giỏ hàng thông minh.
-- **Chat trực tuyến (Real-time)**: Tích hợp Widget chat (Socket.io) giúp khách hàng liên hệ trực tiếp với nhân viên hỗ trợ.
+- **Chat trực tuyến (Real-time)**: Tích hợp Widget chat (WebSocket) giúp khách hàng liên hệ trực tiếp với nhân viên hỗ trợ.
 - **Tài khoản cá nhân**: Quản lý hồ sơ, lịch sử đơn hàng và danh sách yêu thích.
 
 ### 💼 Dành cho Quản trị viên & Nhà bán hàng (Admin/Seller)
@@ -73,11 +70,11 @@ Trải nghiệm trực tiếp sản phẩm tại đây:
 Dự án sử dụng các công nghệ tiên tiến nhất trong hệ sinh thái React:
 
 - **Core**: React 18, TypeScript, Vite (Build tool siêu tốc).
-- **State Management**: Redux Toolkit & RTK Query (Quản lý trạng thái và data fetching).
-- **Styling**: CSS Modules/Vanilla CSS (Tùy biến giao diện cao cấp), kết hợp Glassmorphism UI.
-- **Real-time**: Socket.io-client (Chat thời gian thực).
+- **State Management**: Redux Toolkit & Axios (Quản lý trạng thái và data fetching).
+- **Styling**: TailwindCSS (Tùy biến giao diện cao cấp), kết hợp Material UI.
+- **Real-time**: WebSocket (Chat thời gian thực).
 - **Routing**: React Router v6.
-- **Deployment**: Cloudflare Pages (CI/CD tự động).
+- **Deployment**: Cloudflare Workers (CI/CD tự động).
 - **Code Quality**: ESLint, Prettier.
 
 ---
