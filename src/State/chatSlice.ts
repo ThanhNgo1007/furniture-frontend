@@ -86,7 +86,7 @@ export const createConversation = createAsyncThunk<
 
 // Mark messages as read
 export const markMessagesAsRead = createAsyncThunk<
-  void,
+  { conversationId: number },
   { conversationId: number; jwt: string }
 >(
   "chat/markMessagesAsRead",
@@ -95,6 +95,7 @@ export const markMessagesAsRead = createAsyncThunk<
       await api.put(`${API_URL}/conversations/${conversationId}/read`, null, {
         headers: { Authorization: `Bearer ${jwt}` },
       });
+      return { conversationId };
     } catch (error: any) {
       return rejectWithValue(error.response?.data || "Failed to mark messages as read");
     }
@@ -176,14 +177,22 @@ const chatSlice = createSlice({
     },
 
     // Mark all messages in current conversation as read (for read receipt handling)
-    // When SELLER reads the conversation, USER's messages are now read -> senderType "USER" should be marked
-    // When USER reads the conversation, SELLER's messages are now read -> senderType "SELLER" should be marked
+    // When we receive read receipt from the OTHER party, we mark OUR OWN sent messages as "read"
+    // - If readBy = "SELLER" (seller read the chat), then USER's messages sent TO seller are now read
+    //   BUT from USER's perspective, their own messages (USER type) should show "Đã xem" 
+    // - If readBy = "USER" (user read the chat), then SELLER's messages sent TO user are now read
+    //   BUT from SELLER's perspective, their own messages (SELLER type) should show "Đã xem"
+    // 
+    // CORRECT LOGIC: readBy tells us WHO read. Their reading marks the OPPOSITE side's messages as read.
+    // readBy = "SELLER" means seller read -> marks messages with senderType = "USER" as read (user sent to seller)
+    // readBy = "USER" means user read -> marks messages with senderType = "SELLER" as read (seller sent to user)
     markMessagesAsReadLocally: (state, action: PayloadAction<{ conversationId: number; readAt: string; readBy?: string }>) => {
       const { conversationId, readAt, readBy } = action.payload;
       if (state.currentConversation?.id === conversationId) {
-        // readBy tells us who read the messages
-        // If SELLER read, then USER's sent messages are read (senderType = "USER")
-        // If USER read, then SELLER's sent messages are read (senderType = "SELLER")
+        // readBy tells us WHO read the messages (the reader)
+        // We mark messages FROM the OPPOSITE party as read
+        // If SELLER read -> USER's messages are read by seller -> mark senderType = "USER"
+        // If USER read -> SELLER's messages are read by user -> mark senderType = "SELLER"
         const senderTypeToMark = readBy === "SELLER" ? "USER" : "SELLER";
 
         state.messages = state.messages.map((msg) => {
@@ -196,6 +205,18 @@ const chatSlice = createSlice({
           }
           return msg;
         });
+      }
+
+      // Also update unread count in conversations list
+      const convIndex = state.conversations.findIndex((c) => c.id === conversationId);
+      if (convIndex !== -1) {
+        // If SELLER read, reset unreadCountSeller
+        // If USER read, reset unreadCountUser
+        if (readBy === "SELLER") {
+          state.conversations[convIndex].unreadCountSeller = 0;
+        } else if (readBy === "USER") {
+          state.conversations[convIndex].unreadCountUser = 0;
+        }
       }
     },
   },
@@ -262,6 +283,43 @@ const chatSlice = createSlice({
     builder.addCase(createConversation.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
+    });
+
+    // Mark messages as read - update local state after successful API call
+    builder.addCase(markMessagesAsRead.fulfilled, (state, action) => {
+      const { conversationId } = action.payload;
+
+      // Mark all messages from the OTHER party as read in current conversation
+      if (state.currentConversation?.id === conversationId) {
+        // Determine current user type based on context (we need to mark messages FROM the other party)
+        // Since this is called when user opens a conversation, we mark messages NOT sent by current user
+        state.messages = state.messages.map((msg) => {
+          // We don't know the current user role here, so we mark all unread messages
+          // The backend already handles the correct logic
+          if (!msg.isRead) {
+            return {
+              ...msg,
+              isRead: true,
+              readAt: new Date().toISOString(),
+            };
+          }
+          return msg;
+        });
+      }
+
+      // Reset unread count for the conversation in list
+      const convIndex = state.conversations.findIndex((c) => c.id === conversationId);
+      if (convIndex !== -1) {
+        // We can't determine if it's seller or user here easily, so reset both
+        // The correct value will be fetched on next refresh
+        state.conversations[convIndex].unreadCountUser = 0;
+        state.conversations[convIndex].unreadCountSeller = 0;
+      }
+
+      // Recalculate total unread count
+      state.unreadCount = state.conversations.reduce((total, conv) => {
+        return total + (conv.unreadCountUser || 0) + (conv.unreadCountSeller || 0);
+      }, 0);
     });
 
     // Fetch unread count
